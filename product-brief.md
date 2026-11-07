@@ -14,6 +14,7 @@ _Rewritten 2026-11-07 after the scope reset. The earlier research-heavy version 
 
 - **Name:** Nigiri.
 - **Platform:** a phone web app on the home screen, hosted on GitHub Pages. No desktop layout.
+- **Web address:** `https://cluade58.github.io/nigiri/`. Keep it fixed once anyone installs, because changing it breaks their home-screen icon.
 - **Decks:** made with a separate **New deck** button on home. You name each deck and pick its highlighter colour ([spec §6](product-spec.md)).
 - **Scheduling:** FSRS via `ts-fsrs@6.0.0` (pinned), default parameters, target 90% (fixed).
 - **Built first:** plain English text cards. Mandarin and math are on the [v2 page](v2-input-flows.md).
@@ -45,11 +46,12 @@ _Rewritten 2026-11-07 after the scope reset. The earlier research-heavy version 
   - plain CSS variables
   - `@fontsource-variable/bricolage-grotesque` and `@fontsource-variable/atkinson-hyperlegible-next` 5.3.0
   - Vitest 5.1.0, Playwright 1.65.0
-  - GitHub Pages, from the `study-app-design` repository (public since 2026-11-07, so Pages is free)
+  - GitHub Pages, from the `Cluade58/nigiri` repository (renamed from `study-app-design` on 2026-11-07; public, so Pages is free)
 
 ## Undecided
 
 - **What v2 is.** The two-week test decides ([spec §7](product-spec.md)).
+- **How updates reach phones:** undecided. It's either silent updates or a "New version, tap to update" bar.
 
 ## What the research taught (one line each)
 
