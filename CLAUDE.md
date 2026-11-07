@@ -8,6 +8,7 @@
 - [PROJECT-BRIEF.md](PROJECT-BRIEF.md): short summary plus the working rules for agents
 - [product-brief.md](product-brief.md): decided, undecided, stack, visual tokens
 - [product-spec.md](product-spec.md): the card, scheduling and Test mode, saving, data, acceptance checks, screens around the card, build order, and the version 1.1 list
+- [fsrs-notes.md](fsrs-notes.md): how the scheduler works (memory model, learning steps, calculated intervals, policies), the differences from Anki, the recommended settings, and the verification scenarios
 - [v2-input-flows.md](v2-input-flows.md): the Mandarin and math input flows, written down but not built
 - [UI-DESIGN-BRIEF.md](UI-DESIGN-BRIEF.md): design expectations
 - [publishing.md](publishing.md): where everything lives, the web address, when and how to publish, installing, updates, and the risks
@@ -18,7 +19,7 @@
 - **Choices:** present at most two options, with the trade-off in one line each, and let the user choose. Never mark your own suggestions "(proposed)" or ask for approval of them.
 - **Gaps:** if the user hasn't decided something, write "undecided" and stop. Don't fill the gap with a default.
 - **Order:** the card flow comes first. It was written on 2026-11-07 (spec §1). Every other section stays shorter than the card section.
-- **FSRS:** use `ts-fsrs@6.0.0` (pinned). Never design an alternative scheduler.
+- **FSRS:** use `ts-fsrs@6.0.0` (pinned), with its v6 calls (`DefaultScheduler`, `newCard`, `review`), never the old v5 names. Details are in [product-spec.md §2 and §7](product-spec.md) and [fsrs-notes.md](fsrs-notes.md). Never hardcode review delays per rating: only the configured learning steps are set delays, and the model may lengthen them. Never design an alternative scheduler.
 - **Out of scope:** desktop layouts, legal or privacy compliance, accessibility audits, migration strategies.
 - **Talking to the user:** they're learning to build software. Use plain language and explain decisions briefly.
 

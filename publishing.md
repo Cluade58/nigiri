@@ -18,9 +18,9 @@ Nigiri is a website that installs to the home screen. GitHub stores the code and
 
 ## What's in the repo
 
-- **The plan:** `CLAUDE.md`, `PROJECT-BRIEF.md`, `product-brief.md`, `product-spec.md`, `UI-DESIGN-BRIEF.md`, `v2-input-flows.md`, and this file.
+- **The plan:** `CLAUDE.md`, `PROJECT-BRIEF.md`, `product-brief.md`, `product-spec.md`, `UI-DESIGN-BRIEF.md`, `fsrs-notes.md`, `v2-input-flows.md`, and this file.
 - **Design:** `mockups/`, the phone screens. Start at `mockups/index.html`.
-- **Helpers:** `.claude/agents/` (six roles) and `.claude/skills/`.
+- **Helpers:** `.claude/agents/` (nine roles) and `.claude/skills/`.
 - **Tools:** `tools/screenshot.mjs`, `package.json`, `package-lock.json`, `.gitignore`.
 - **Left off GitHub on purpose:** `node_modules/`, `screenshots/`, `.claude/settings.local.json`, `.impeccable/`, and any `.env` file.
 - **Arrives with build step 1:** `src/` (the app's code), the app's packages (versions in the brief), and `.github/workflows/deploy.yml` (the publishing file).

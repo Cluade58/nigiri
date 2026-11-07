@@ -17,7 +17,7 @@ _Rewritten 2026-11-07 after the scope reset. The earlier research-heavy version 
 - **Web address:** `https://cluade58.github.io/nigiri/`. Keep it fixed once anyone installs, because changing it breaks their home-screen icon and leaves their cards behind ([publishing.md](publishing.md)).
 - **Updates:** silent. A phone picks up the new version the next time the app opens, and nobody reinstalls. After an update, a short "What's new" note shows once on home ([spec §6](product-spec.md)).
 - **Decks:** made with a separate **New deck** button on home. You name each deck and pick its highlighter colour ([spec §6](product-spec.md)).
-- **Scheduling:** FSRS via `ts-fsrs@6.0.0` (pinned), default parameters, target 90% (fixed).
+- **Scheduling:** FSRS via `ts-fsrs@6.0.0` (pinned), default parameters (the FSRS-7 model), target 90% (fixed). How the library behaves is in [spec §2](product-spec.md). With no test date, new cards come due as ts-fsrs 6 decides, with no daily limit added by the app ([spec §2](product-spec.md)).
 - **Built first:** plain English text cards. Mandarin and math are on the [v2 page](v2-input-flows.md).
 - **One way to make cards: write your own.** No import, and no AI ([spec §1](product-spec.md)).
 - **Domains:** each domain is its own product, with its own input path and its own review screen. They share only the scheduler and the deck.

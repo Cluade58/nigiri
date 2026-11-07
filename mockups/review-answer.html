@@ -14,10 +14,10 @@
     <a class="btn-icon" href="home.html" aria-label="End session. Your ratings are saved.">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
     </a>
-    <span class="count">7 of 18</span>
+    <span class="count" id="left">12 left</span>
     <span></span>
   </header>
-  <div class="progress" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="18" aria-valuenow="6" aria-valuetext="Card 7 of 18">
+  <div class="progress" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="18" aria-valuenow="6" aria-valuetext="6 reviewed, 12 left">
     <span style="width: 33.3%"></span>
   </div>
 
@@ -52,7 +52,12 @@
     if (key.disabled) return;
     key.classList.add('is-rated');
     keys.forEach((k) => { k.disabled = true; });
-    if (announce) document.getElementById('live').textContent = `Rated ${key.dataset.rate}. Card 8 of 18.`;
+    // Again sends the card back into this session, so the count stays at 12. Any other rating leaves 11.
+    const left = key.dataset.rate === 'Again' ? 12 : 11;
+    document.getElementById('left').textContent = `${left} left`;
+    if (announce) document.getElementById('live').textContent = key.dataset.rate === 'Again'
+      ? `Again. It comes back later in this session. ${left} left.`
+      : `Rated ${key.dataset.rate}. ${left} left.`;
   }
   keys.forEach((k) => k.addEventListener('click', () => rate(k, true)));
 
