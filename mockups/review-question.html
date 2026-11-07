@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Review, question</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="highlighter.css">
+</head>
+<body>
+<div class="session" style="--hl: var(--hl-bio)">
+  <header class="session-bar">
+    <a class="btn-icon" href="home.html" aria-label="End session. Your ratings are saved.">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </a>
+    <span class="count">7 of 18</span>
+    <span></span>
+  </header>
+  <div class="progress" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="18" aria-valuenow="6" aria-valuetext="Card 7 of 18">
+    <span style="width: 33.3%"></span>
+  </div>
+
+  <main class="card">
+    <p class="context"><span class="swatch is-small" aria-hidden="true"></span>AP Bio unit 4</p>
+    <h1 class="t-card" id="question">What does the electron transport chain do?</h1>
+  </main>
+
+  <div class="action-zone">
+    <div class="slot">
+      <a class="btn btn-primary" id="show" href="review-answer.html">Show answer</a>
+    </div>
+  </div>
+</div>
+<script>
+  // Long questions step down to the smaller card size.
+  const q = document.getElementById('question');
+  if (q.textContent.trim().length > 140) q.classList.add('is-long');
+</script>
+</body>
+</html>

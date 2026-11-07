@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="highlighter.css">
+</head>
+<body>
+<main class="screen has-bar" style="--hl: var(--hl-history)">
+  <header class="form-bar">
+    <a class="btn-text back-link" href="home.html">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Home</a>
+    <span></span><span></span>
+  </header>
+
+  <div class="deck-head">
+    <span class="swatch" aria-hidden="true"></span>
+    <div>
+      <h1 class="t-hero">US History unit 2</h1>
+      <p class="t-secondary counts">35 cards, 6 due</p>
+    </div>
+  </div>
+
+  <div class="lead">
+    <a class="btn btn-primary" href="review-question.html">Review 6 cards</a>
+  </div>
+
+  <div class="test-line">
+    <span class="t-secondary">No test date yet</span>
+    <a class="btn-text" href="deck-test.html">Add a test</a>
+  </div>
+
+  <section class="sec" aria-labelledby="cards-title" style="margin-top: var(--s4)">
+    <div class="sec-head">
+      <h2 class="t-title" id="cards-title">Cards</h2>
+      <span class="t-meta">Tap one to edit it</span>
+    </div>
+    <ul class="card-list" id="list">
+      <li><button type="button"><span class="f">Missouri Compromise</span><span class="b">Missouri joined as a slave state and Maine as a free one, 1820</span></button></li>
+      <li><button type="button"><span class="f">Monroe Doctrine</span><span class="b">Europe stays out of the Americas, 1823</span></button></li>
+      <li><button type="button"><span class="f">Erie Canal</span><span class="b">Linked the Great Lakes to New York City, 1825</span></button></li>
+      <li><button type="button"><span class="f">Indian Removal Act</span><span class="b">1830 law forcing tribes west of the Mississippi</span></button></li>
+      <li><button type="button"><span class="f">Nullification Crisis</span><span class="b">South Carolina tried to cancel a federal tariff, 1832</span></button></li>
+      <li><button type="button"><span class="f">Trail of Tears</span><span class="b">Forced removal of the Cherokee, 1838</span></button></li>
+      <li><button type="button"><span class="f">Seneca Falls</span><span class="b">First women's rights convention, 1848</span></button></li>
+    </ul>
+  </section>
+</main>
+
+<nav class="bar" aria-label="Make cards">
+  <div class="bar-inner">
+    <a class="btn btn-secondary btn-wide" href="add-card.html">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add card</a>
+  </div>
+</nav>
+
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
+  <span class="grip" aria-hidden="true"></span>
+  <div class="sheet-head">
+    <h2 class="t-title" id="sheet-title">Edit card</h2>
+    <button class="btn-text" type="button" id="cancel">Cancel</button>
+  </div>
+  <div class="compose">
+    <div class="field">
+      <label for="e-front">Front</label>
+      <textarea class="input front" id="e-front" rows="1"></textarea>
+    </div>
+    <div class="field">
+      <label for="e-back">Back</label>
+      <textarea class="input back" id="e-back" rows="3"></textarea>
+    </div>
+  </div>
+  <button class="btn btn-primary" type="button" id="save">Save changes</button>
+  <button class="btn-text" type="button" id="delete" style="justify-self: center">Delete card</button>
+</div>
+<script>
+  // Demo only. Deleting asks first, and can't be undone.
+  const $ = (s) => document.querySelector(s);
+  let current = null;
+  // Text boxes grow to fit, so the whole answer shows while you fix it.
+  const grow = (el) => { el.style.height = 'auto'; el.style.height = (el.scrollHeight + el.offsetHeight - el.clientHeight) + 'px'; };
+  document.querySelectorAll('#sheet textarea').forEach((t) => t.addEventListener('input', () => grow(t)));
+  function openSheet(btn) {
+    current = btn;
+    $('#e-front').value = btn.querySelector('.f').textContent;
+    $('#e-back').value = btn.querySelector('.b').textContent;
+    $('#scrim').hidden = false; $('#sheet').hidden = false;
+    document.querySelectorAll('#sheet textarea').forEach(grow);
+    $('#e-back').focus();
+  }
+  function closeSheet() { $('#scrim').hidden = true; $('#sheet').hidden = true; if (current) current.focus(); }
+  document.querySelectorAll('#list button').forEach((b) => b.addEventListener('click', () => openSheet(b)));
+  $('#cancel').addEventListener('click', closeSheet);
+  $('#scrim').addEventListener('click', closeSheet);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#sheet').hidden) closeSheet(); });
+  $('#save').addEventListener('click', () => {
+    current.querySelector('.f').textContent = $('#e-front').value;
+    current.querySelector('.b').textContent = $('#e-back').value;
+    closeSheet();
+  });
+  $('#delete').addEventListener('click', () => {
+    if (confirm("Delete this card? This can't be undone.")) { current.closest('li').remove(); current = null; closeSheet(); }
+  });
+
+  // ?edit opens the sheet for screenshots.
+  if (new URLSearchParams(location.search).has('edit')) openSheet(document.querySelector('#list li:nth-child(2) button'));
+</script>
+</body>
+</html>

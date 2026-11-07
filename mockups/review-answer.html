@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Review, answer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="highlighter.css">
+</head>
+<body>
+<div class="session" style="--hl: var(--hl-bio)">
+  <header class="session-bar">
+    <a class="btn-icon" href="home.html" aria-label="End session. Your ratings are saved.">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </a>
+    <span class="count">7 of 18</span>
+    <span></span>
+  </header>
+  <div class="progress" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="18" aria-valuenow="6" aria-valuetext="Card 7 of 18">
+    <span style="width: 33.3%"></span>
+  </div>
+
+  <main class="card">
+    <p class="context"><span class="swatch is-small" aria-hidden="true"></span>AP Bio unit 4</p>
+    <h1 class="t-card" id="question">What does the electron transport chain do?</h1>
+    <hr class="ink-rule">
+    <div class="answer" id="answer" tabindex="-1">
+      <p>It passes electrons along the inner membrane of the mitochondria and pumps H+ out. That build-up powers ATP synthase, which makes most of the cell's ATP.</p>
+    </div>
+  </main>
+
+  <div class="action-zone">
+    <div class="slot">
+      <div class="keys" role="group" aria-label="How well did you know it?">
+        <button class="key" type="button" data-rate="Again"><span class="k-label"><svg class="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7"/></svg>Again</span></button>
+        <button class="key" type="button" data-rate="Hard"><span class="k-label"><svg class="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7"/></svg>Hard</span></button>
+        <button class="key" type="button" data-rate="Good"><span class="k-label"><svg class="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7"/></svg>Good</span></button>
+        <button class="key" type="button" data-rate="Easy"><span class="k-label"><svg class="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7"/></svg>Easy</span></button>
+      </div>
+    </div>
+  </div>
+  <p class="sr-only" id="live" role="status" aria-live="polite"></p>
+</div>
+<script>
+  const q = document.getElementById('question');
+  if (q.textContent.trim().length > 140) q.classList.add('is-long');
+
+  // The buttons turn off after one tap: that's the double-tap fix. The demo stops there; the app moves to card 8.
+  const keys = [...document.querySelectorAll('.key')];
+  function rate(key, announce) {
+    if (key.disabled) return;
+    key.classList.add('is-rated');
+    keys.forEach((k) => { k.disabled = true; });
+    if (announce) document.getElementById('live').textContent = `Rated ${key.dataset.rate}. Card 8 of 18.`;
+  }
+  keys.forEach((k) => k.addEventListener('click', () => rate(k, true)));
+
+  // ?rated=good shows the state right after a tap.
+  const preset = new URLSearchParams(location.search).get('rated');
+  const match = preset && keys.find((k) => k.dataset.rate.toLowerCase() === preset.toLowerCase());
+  if (match) rate(match, false);
+  else document.getElementById('answer').focus({ preventScroll: true });
+</script>
+</body>
+</html>

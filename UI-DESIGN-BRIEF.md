@@ -1,38 +1,23 @@
 # UI design expectations
 
-**Chosen direction: B, Highlighter.** Tokens, type and rules are in [product-brief.md §6](product-brief.md); the reference is `mockups/today-b-highlighter.html`. New screens extend that system rather than proposing new directions.
+**Phone only:** a web app on the home screen, designed at 390px and checked at 360px. No desktop layout.
 
-Use frontend-design for design direction and Impeccable's critique workflow to evaluate rendered results. Follow two passes: write the design plan from the product, audience, main action, real example content and constraints, then review it against the brief before any authorized prototype or implementation. Make typography, composition, colour and interaction choices explicit and explain how they support the main user action.
+**Direction: B, Highlighter.** Tokens and type are in [product-brief.md](product-brief.md); the reference screens start at `mockups/index.html`, and the plan behind them is `mockups/design-plan.md`. New screens extend that system.
 
-Audience: high school students, phone-first. Plan at 390 CSS px, then check a smaller phone (360), larger text (200%), desktop, keyboard input and screen readers.
+**A pure flashcards app.** Screens exist only for decks, cards, reviewing and a deck's test. There's no calendar or assignments, so the existing mockups' "Due soon" list and Calendar tab no longer apply.
 
-## Connected flows to design
+**The card screens come first.** They're designed from the card-creation flow in [product-spec.md §1](product-spec.md). Other screens follow outward from the card.
+- One way to make cards: write your own. No import.
+- **Screens:** home (empty and normal), add card, deck page (with editing a card), review, done, and a deck's test with the fit check. What's on each is in [spec §6](product-spec.md). Anything on the version 1.1 list (§8) stays off the screens.
+- Each domain has its own input screen and its own review screen. Version one has only plain text cards.
+- Input is designed for the moment someone has something in hand (a line in a textbook, a sentence they heard, a word they just looked up), not for a sit-down card-making session.
 
-Today → deck library → flashcard session → test detail and readiness → assignment capture → backup and restore.
+Use frontend-design for the design plan (then review it against the brief), and Impeccable's critique to review renders.
 
-For each flow, define what the student sees and does at each step, and design these states:
-- empty
-- populated
-- long content
-- saving
-- failure
-- **offline**
-- completion
+**Basics on every screen:**
+- one clear primary action
+- readable text
+- thumb-sized tap targets (48px)
+- a visible focus ring
 
-**Explain readiness where it's shown.** Next to the number or strip, say in plain words what it measures ("predicted recall on test day if you stopped now"). Show coverage ("18 of 60 not started") and the "Early estimate" label when evidence is thin (spec §2).
-
-Useful pattern references: Things for task hierarchy, Structured for the daily agenda, Mochi for readable study content, Quizlet for question focus, RemNote for entering a practice queue. Treat them as patterns to evaluate, not to copy. Research current examples before relying on a particular interaction. [Things](https://culturedcode.com/things/features/), [Structured](https://structured.app/), [Mochi](https://mochi.cards/), [Quizlet](https://quizlet.com/features/learn), [RemNote](https://help.remnote.com/en/articles/7925835-the-flashcard-home)
-
-## Rules
-
-Design the main action and the information around it together. Make an empty state inviting and useful, with a clear way to begin. Give populated screens readable organization and distinguish primary actions from secondary controls.
-
-Use labeled controls, semantic structure, visible keyboard focus, comfortable touch targets (at least 48px), readable contrast, text alongside status colours, and reduced-motion support. Modal forms need clear actions, Escape dismissal, and appropriate focus handling.
-
-For flashcards, put one question in focus, reveal the answer on request, and keep rating controls predictable. Use the app's actual scheduling rules and measured progress. For planning, distinguish a deadline from a scheduled work block and show the next action clearly.
-
-## Review
-
-Compare matching before and after screenshots for existing screens. For a new screen, compare the first render with its revised version. Review empty and representative populated states using isolated development data. Check hierarchy, spacing, type, contrast, generic-looking defaults, keyboard focus, reduced motion and horizontal overflow.
-
-Technical checks and visual critique both contribute to the final acceptance decision, but keep them separate: a screenshot is visual evidence only. Persistence and scheduling are verified through interactions and targeted tests.
+For flashcards: one question in focus, the answer revealed on request, rating buttons that stay in the same place.

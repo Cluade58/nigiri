@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Add a test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="highlighter.css">
+</head>
+<body>
+<div class="screen page-flow" style="--hl: var(--hl-history)">
+  <header class="form-bar">
+    <a class="btn-text" href="deck.html">Cancel</a>
+    <h1>Add a test</h1>
+    <span></span>
+  </header>
+
+  <form class="form grow" id="form" novalidate>
+    <p class="for-deck"><span class="swatch is-small" aria-hidden="true"></span>US History unit 2</p>
+
+    <div class="field">
+      <label for="date">Test date</label>
+      <input class="input" id="date" type="text" value="Wed, Nov 11" autocomplete="off" aria-describedby="date-help">
+      <p class="helper" id="date-help">Tomorrow</p>
+    </div>
+
+    <div class="field">
+      <label for="minutes">Minutes a day</label>
+      <div class="stepper">
+        <button class="step" type="button" id="fewer" aria-label="Fewer minutes" aria-controls="minutes">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10"/></svg>
+        </button>
+        <input class="input" id="minutes" type="text" inputmode="numeric" value="15" aria-describedby="min-help">
+        <button class="step" type="button" id="more" aria-label="More minutes" aria-controls="minutes">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10M10 5v10"/></svg>
+        </button>
+        <span class="unit">min</span>
+      </div>
+      <p class="helper" id="min-help">Your study time each day, for all your decks.</p>
+    </div>
+
+    <section class="fit" aria-labelledby="fit-title" aria-live="polite">
+      <h2 class="t-hero" id="fit-title"><span class="mark" id="fit-mark">It fits</span></h2>
+      <p class="lede" id="lede">35 cards at 20 seconds each, with 1 day left, needs about 12 min a day. You have 15.</p>
+    </section>
+  </form>
+
+  <div class="action-zone">
+    <button class="btn btn-primary" type="submit" form="form">Save test</button>
+  </div>
+</div>
+<script>
+  // Demo only. Fit check: cards in the deck × 20 seconds ÷ days until the test (spec §2).
+  const $ = (s) => document.querySelector(s);
+  const CARDS = 35, SECONDS = 20, DAYS = 1;
+  const NEED = Math.round(CARDS * SECONDS / DAYS / 60); // 700 seconds, about 12 min
+  const minutes = $('#minutes');
+  function render() {
+    const have = parseInt(minutes.value, 10) || 0;
+    const fits = have >= NEED;
+    $('#fit-mark').textContent = fits ? 'It fits' : "It doesn't fit";
+    $('#fit-mark').style.animation = 'none'; void $('#fit-mark').offsetWidth; $('#fit-mark').style.animation = '';
+    $('#lede').textContent = `${CARDS} cards at ${SECONDS} seconds each, with ${DAYS} day left, needs about ${NEED} min a day. You have ${have}.`
+      + (fits ? '' : ` Raise it to ${Math.ceil(NEED / 5) * 5} and it fits.`);
+  }
+  const step = (d) => { minutes.value = Math.min(120, Math.max(5, (parseInt(minutes.value, 10) || 15) + d)); render(); };
+  $('#fewer').addEventListener('click', () => step(-5));
+  $('#more').addEventListener('click', () => step(5));
+  minutes.addEventListener('input', render);
+  $('#form').addEventListener('submit', (e) => { e.preventDefault(); location.href = 'deck.html'; });
+
+  // ?minutes=10 shows the "doesn't fit" state for screenshots.
+  const m = new URLSearchParams(location.search).get('minutes');
+  if (m) minutes.value = m;
+  render();
+</script>
+</body>
+</html>

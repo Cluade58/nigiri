@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Add card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="highlighter.css">
+</head>
+<body>
+<div class="screen page-flow" id="screen" style="--hl: var(--hl-history)">
+  <header class="form-bar">
+    <a class="btn-text" href="deck.html" id="done">Close</a>
+    <h1>Add card</h1>
+    <span></span>
+  </header>
+
+  <form class="compose grow" id="form" novalidate>
+    <!-- Opened from a deck: the deck is fixed. -->
+    <p class="for-deck" id="fixed-deck"><span class="swatch is-small" aria-hidden="true"></span>US History unit 2</p>
+
+    <!-- Opened from home: it asks which deck first. -->
+    <div class="field" id="pick-deck" hidden>
+      <label for="deck">Deck</label>
+      <div class="select-wrap">
+        <span class="swatch" id="deck-swatch" aria-hidden="true" hidden></span>
+        <select class="input" id="deck" aria-describedby="deck-error">
+          <option value="" selected disabled>Choose a deck</option>
+          <option data-hl="--hl-bio">AP Bio unit 4</option>
+          <option data-hl="--hl-english">Gatsby vocab</option>
+          <option data-hl="--hl-history">US History unit 2</option>
+        </select>
+        <svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
+      </div>
+      <p class="field-error" id="deck-error" hidden>Choose a deck first</p>
+    </div>
+
+    <div class="field">
+      <label for="front">Front</label>
+      <textarea class="input front" id="front" rows="2" enterkeyhint="next" placeholder="A question or a term"></textarea>
+    </div>
+
+    <div class="field">
+      <label for="back">Back</label>
+      <textarea class="input back" id="back" rows="3" enterkeyhint="done" placeholder="The answer, in your own words"></textarea>
+    </div>
+  </form>
+
+  <div class="action-zone">
+    <p class="status" id="status" role="status">Saved. <span class="deck-name">US History unit 2</span> has <span class="mark" id="count">36 cards</span>.</p>
+    <button class="btn btn-primary" type="submit" form="form">Save card</button>
+  </div>
+</div>
+<script>
+  // Demo only: saving clears the form for the next card.
+  const $ = (s) => document.querySelector(s);
+  const front = $('#front'), back = $('#back'), status = $('#status');
+  const decks = { 'AP Bio unit 4': 12, 'Gatsby vocab': 31, 'US History unit 2': 36 };
+  const fromHome = new URLSearchParams(location.search).get('from') === 'home';
+  let deck = 'US History unit 2';
+
+  if (fromHome) {
+    $('#fixed-deck').hidden = true;
+    $('#pick-deck').hidden = false;
+    $('#done').href = 'home.html';
+    status.hidden = true;
+    deck = '';
+  }
+
+  $('#deck').addEventListener('change', (e) => {
+    const opt = e.target.selectedOptions[0];
+    deck = opt.value;
+    $('#screen').style.setProperty('--hl', `var(${opt.dataset.hl})`);
+    $('#deck-swatch').hidden = false;
+    $('#deck-error').hidden = true;
+    e.target.removeAttribute('aria-invalid');
+  });
+
+  // The keyboard's next key moves to the back. Done saves.
+  front.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); back.focus(); } });
+  back.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('#form').requestSubmit(); } });
+
+  $('#form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!deck) { $('#deck-error').hidden = false; $('#deck').setAttribute('aria-invalid', 'true'); $('#deck').focus(); return; }
+    if (!front.value.trim() || !back.value.trim()) { (front.value.trim() ? back : front).focus(); return; }
+    decks[deck] += 1;
+    document.querySelectorAll('.deck-name').forEach((n) => { n.textContent = deck; });
+    const count = $('#count');
+    count.textContent = `${decks[deck]} cards`;
+    count.style.animation = 'none'; void count.offsetWidth; count.style.animation = '';
+    status.hidden = false;
+    front.value = ''; back.value = '';
+    front.focus();
+  });
+
+  if (fromHome) $('#deck').focus({ preventScroll: true });
+  else front.focus({ preventScroll: true });
+</script>
+</body>
+</html>

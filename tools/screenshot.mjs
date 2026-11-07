@@ -9,7 +9,7 @@
 //   npm run shot -- mockups/home.html --dark --name home-v2
 //
 // Options:
-//   --viewport mobile|tablet|desktop|all   (default: mobile,desktop; comma lists work)
+//   --viewport mobile|tablet|desktop|all   (default: mobile; comma lists work)
 //   --full                                 capture the full scrollable page
 //   --dark                                 emulate prefers-color-scheme: dark
 //   --name <name>                          output file prefix (default: from target)
@@ -29,7 +29,7 @@ const VIEWPORTS = {
 };
 
 function parseArgs(argv) {
-  const opts = { viewport: 'mobile,desktop', out: 'screenshots', wait: 300 };
+  const opts = { viewport: 'mobile', out: 'screenshots', wait: 300 };
   const rest = [];
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
