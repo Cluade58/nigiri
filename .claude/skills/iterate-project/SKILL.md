@@ -1,6 +1,6 @@
 ---
 name: iterate-project
-description: Coordinate research, product decisions, UI design, implementation, QA, and code review for a new or existing project.
+description: Coordinate research, product decisions, UI design, chief-officer review, implementation, QA, and code review for a new or existing project.
 argument-hint: "[goal or approved plan to execute]"
 disable-model-invocation: true
 ---
@@ -9,7 +9,9 @@ The user’s requested goal is supplied below.
 
 $ARGUMENTS
 
-Coordinate competitor-researcher, product-planner, ui-designer, frontend-builder, qa-tester, and code-reviewer from this main conversation.
+Coordinate competitor-researcher, product-planner, ui-designer, chief-officer, frontend-builder, qa-tester, and code-reviewer from this main conversation. learning-specialist and feedback-analyst are production-only (see "Production-only advisers" below).
+
+Accepted decisions in product-spec.md and product-brief.md, and CLAUDE.md's out-of-scope list, take precedence over any agent's general checklist. When a checklist item covers something the project cut or deferred, record it as not applicable rather than reopening it.
 
 ## Establish the current goal
 
@@ -25,6 +27,8 @@ For an approved plan, reuse its research, product decisions, and acceptance chec
 
 For a new feature or UI goal, send the goal, audience, constraints, and current feature set to competitor-researcher. Pass the full sourced report to product-planner. The planner rates benefit, fit, confidence, build effort, dependencies, and maintenance, then decides Build now, Prototype, Later, or Pass. It selects one primary outcome and returns the implementation sequence and three to five acceptance checks. Resolve uncertain source claims through targeted follow-up research.
 
+Send the planner's selection, the research it rests on, the written UI plan, the architecture or data approach, and the acceptance checks to chief-officer for review before they're treated as settled. In planning it returns a plan verdict (PLAN_READY or FIX_REQUIRED) and corrections; route material disagreements back to product-planner or the user. Its review doesn't replace QA or code review, and it can't override an accepted user decision.
+
 For a focused bug, establish its reproduction and route it to the builder and relevant reviewers, using existing planning context.
 
 For UI work, send the selected scope and available screenshots to ui-designer. Its skill sources are frontend-design and Impeccable critique. For a fresh project, get a concrete layout proposal before the first render. For an existing interface, capture its current state. If the user explicitly requested plan review, present the plan and wait for approval. If implementation is authorized and the session permits editing, proceed. Plan Mode remains a planning step until the user approves implementation.
@@ -35,7 +39,17 @@ Send the scope, design decisions, relevant files, and acceptance checks to front
 
 Send the handoff to qa-tester. For UI work, obtain screenshots of the actual rendered result and send them to ui-designer for critique. The main conversation can capture evidence when browser tools are available there. Give code-reviewer the current diff, changed or new files, acceptance checks, and QA evidence.
 
-Count the initial build and its reviews as pass 1. Complete at most three build-and-review passes per invocation. End as soon as the agreed functional checks pass, the UI reviewer passes for a UI goal, and no correctness finding remains within scope.
+After those independent reviews, give chief-officer the builder handoff, QA results, UI critique, code-review findings, and screenshots for the same version. It consolidates them into one repair directive or a verdict for that slice. QA's and code-reviewer's findings stay open until their own checks pass; chief-officer's sign-off can't close them.
+
+## Production-only advisers
+
+learning-specialist and feedback-analyst stay inactive while the project is in planning. Don't dispatch them, even for a plan review. After the user explicitly authorizes implementation:
+- Send learning-specialist slices that change scheduling, study mechanics, Test mode, review history, or readiness.
+- Send feedback-analyst real tester feedback or observations only when they've been supplied. Never simulate testers.
+
+Both return through the main conversation, never edit app code, and share the same three-pass limit.
+
+Count the initial build and its reviews (including chief-officer's) as pass 1. Complete at most three build-and-review passes per invocation; no agent gets a separate loop. End as soon as the agreed functional checks pass, the UI reviewer passes for a UI goal, and no correctness finding remains within scope.
 
 Combine actionable findings into one repair handoff for frontend-builder. Resolve contradictory advice against the user goal and evidence. Retest fixed issues and newly affected behavior. Reuse unchanged research and valid earlier checks. Keep optional preferences in follow-ups.
 

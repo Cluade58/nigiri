@@ -37,8 +37,12 @@
 
 ## Agent workflow
 
-Six agents live in `.claude/agents/`: competitor-researcher, product-planner, ui-designer, frontend-builder, qa-tester, code-reviewer. They're coordinated through `/iterate-project`.
-- Only frontend-builder edits app code.
+Nine agents live in `.claude/agents/`, coordinated through `/iterate-project` ([SKILL.md](.claude/skills/iterate-project/SKILL.md)). Each agent's file holds its full instructions.
+- **Active now:** competitor-researcher, product-planner, ui-designer, qa-tester, code-reviewer, and [chief-officer](.claude/agents/chief-officer.md). Chief-officer reviews important decisions, research quality, UX/UI, architecture and acceptance checks.
+- **Active after implementation is authorized:** frontend-builder.
+- **Inactive until the user authorizes implementation:** [learning-specialist](.claude/agents/learning-specialist.md) (later, for study-mechanics and scheduling changes) and [feedback-analyst](.claude/agents/feedback-analyst.md) (later, only with real tester evidence).
+- Accepted decisions in the spec and brief, and the out-of-scope list above, win over any agent's general checklist.
+- Only frontend-builder edits app code. Chief-officer's sign-off doesn't replace QA or code review.
 - Run the roles one after another, passing evidence explicitly.
 - Allow at most 3 build-and-review passes, stopping early when the checks pass.
 - Only claim results that were actually observed.
