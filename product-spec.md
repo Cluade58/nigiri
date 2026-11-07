@@ -2,7 +2,7 @@
 
 _Version 3, 2026-11-07, after the review of version 2. Earlier versions are in git (`git log -p product-spec.md`)._
 
-**Context:** a pure flashcards app (decks, cards, FSRS reviews, and a test date on a deck), built as a first app for you and a few friends. The goal: it works, it's easy to use, and you keep using it. **The product is the card and how it gets made.** Everything else is built outward from the card and stays shorter than the card section.
+**Context:** **Nigiri**, a pure flashcards app (decks, cards, FSRS reviews, and a test date on a deck), built as a first app for you and a few friends. The goal: it works, it's easy to use, and you keep using it. **The product is the card and how it gets made.** Everything else is built outward from the card and stays shorter than the card section.
 
 **Scope rule:** before adding any feature, name who will use it in the first month. If nobody will, don't add it.
 
@@ -86,8 +86,9 @@ Four records: **Deck, Card, Review, Test**, plus one settings object.
 
 Each one names who uses it in the first month.
 
-- **First open.** One button: **Add card**. *Who:* every friend, on day one.
+- **First open.** One button: **New deck**, because a card needs a deck to go in. *Who:* every friend, on day one.
 - **Home.** One main button, **Review 18 cards**, then your decks, each with how many cards are due. *Who:* everyone, every day.
+- **New deck.** A separate button on home, next to the Decks heading. Type a name, pick one of the six highlighter colours, and tap **Create deck**. Add card then opens in the new deck. Nothing is picked for you: if you skip the colour, Create deck asks for one. *Who:* everyone, when a new class or unit starts.
 - **Review.** Four plain buttons: Again, Hard, Good, Easy. *Who:* everyone.
 - **Done.** "Done", and a button back home. *Who:* everyone, after every session.
 - **Deck page.** It lists the deck's cards. Tap one to edit or delete it. **Add card** and **Add a test** are here too. *Who:* anyone fixing a typo or setting a test date.
@@ -95,7 +96,7 @@ Each one names who uses it in the first month.
 ## 7. Build order and the two-week test
 
 Each step is usable on its own. Stop anywhere and you still have an app.
-1. Deck, card, the Add card screen, and the review screen with ts-fsrs. Use it yourself for a week.
+1. Deck, card, the New deck and Add card screens, and the review screen with ts-fsrs. Put it on GitHub Pages so it runs on your phone, then use it yourself for a week.
 2. Export and restore.
 3. Test date and the fit check.
 4. Polish.

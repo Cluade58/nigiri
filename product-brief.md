@@ -4,7 +4,7 @@ _Rewritten 2026-11-07 after the scope reset. The earlier research-heavy version 
 
 ## What this is
 
-A **pure flashcards app** for you and a few friends, built as your first AI-assisted app. It has decks, cards and FSRS reviews, and a deck can have a test date (Test mode). Nothing else. There's no company and no launch. **Goal: it works, it's easy to use, and you keep using it.**
+**Nigiri** is a pure flashcards app for you and a few friends, built as your first AI-assisted app. It has decks, cards and FSRS reviews, and a deck can have a test date (Test mode). Nothing else. There's no company and no launch. **Goal: it works, it's easy to use, and you keep using it.**
 
 **The product is the card and how it gets made.** The whole product is input: making cards has to be so cheap that you keep doing it. The card-creation flow is in [product-spec.md §1](product-spec.md), and you have the final say on it. Everything else is built outward from it.
 
@@ -12,7 +12,9 @@ A **pure flashcards app** for you and a few friends, built as your first AI-assi
 
 ## Decided
 
-- **Platform:** a phone web app on the home screen. No desktop layout.
+- **Name:** Nigiri.
+- **Platform:** a phone web app on the home screen, hosted on GitHub Pages. No desktop layout.
+- **Decks:** made with a separate **New deck** button on home. You name each deck and pick its highlighter colour ([spec §6](product-spec.md)).
 - **Scheduling:** FSRS via `ts-fsrs@6.0.0` (pinned), default parameters, target 90% (fixed).
 - **Built first:** plain English text cards. Mandarin and math are on the [v2 page](v2-input-flows.md).
 - **One way to make cards: write your own.** No import, and no AI ([spec §1](product-spec.md)).
@@ -30,7 +32,7 @@ A **pure flashcards app** for you and a few friends, built as your first AI-assi
 | Secondary text | `#4A5874` | `#A8B4CB` |
 | Tint | `#EEF3FA` | `#1C2539` |
 | Rules | `#E3E9F2` | `#263049` |
-| Highlighters | Bio `#7BE38A`, Algebra `#7CC8FF`, Spanish `#FF8FC8`, English `#FFB65C`, Chem `#FFE45C`, History `#C3A6FF` | same at 85% opacity |
+| Highlighters (one per deck, you pick) | Green `#7BE38A`, Blue `#7CC8FF`, Pink `#FF8FC8`, Orange `#FFB65C`, Yellow `#FFE45C`, Purple `#C3A6FF` | same at 85% opacity |
 | Error | `#B3261E` | `#FFB4AB` |
 
   Type: Bricolage Grotesque for headings, Atkinson Hyperlegible Next for body, both bundled with the app. The highlighter marks deck colours and what just changed; everything else stays quiet.
@@ -43,12 +45,11 @@ A **pure flashcards app** for you and a few friends, built as your first AI-assi
   - plain CSS variables
   - `@fontsource-variable/bricolage-grotesque` and `@fontsource-variable/atkinson-hyperlegible-next` 5.3.0
   - Vitest 5.1.0, Playwright 1.65.0
-  - a free static host
+  - GitHub Pages, from the `study-app-design` repository (public since 2026-11-07, so Pages is free)
 
 ## Undecided
 
 - **What v2 is.** The two-week test decides ([spec §7](product-spec.md)).
-- **The app's name.**
 
 ## What the research taught (one line each)
 

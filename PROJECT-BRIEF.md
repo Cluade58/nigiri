@@ -1,6 +1,6 @@
 # Project brief
 
-A **pure flashcards app** (decks, cards, FSRS reviews, plus Test mode on a deck, with no tracker or calendar) for the user and a few friends: their first AI-assisted app. No company, no launch, no legal or compliance work. **Goal: it works, it's easy to use, and they keep using it.**
+**Nigiri**: a pure flashcards app (decks, cards, FSRS reviews, plus Test mode on a deck, with no tracker or calendar), hosted on GitHub Pages, for the user and a few friends: their first AI-assisted app. No company, no launch, no legal or compliance work. **Goal: it works, it's easy to use, and they keep using it.**
 
 **The product is the card and how it gets made.** The whole product is input: making cards has to be so cheap that people keep doing it. Every card is written by the person learning it: no import, no AI. The card-creation flow is in [product-spec.md §1](product-spec.md), and the user has the final say on it. Build everything outward from it, and keep every other section shorter than the card section.
 

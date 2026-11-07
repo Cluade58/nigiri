@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="highlighter.css">
 </head>
 <body>
-<div class="screen page-flow" id="screen" style="--hl: var(--hl-history)">
+<div class="screen page-flow" id="screen" style="--hl: var(--hl-purple)">
   <header class="form-bar">
     <a class="btn-text" href="deck.html" id="done">Close</a>
     <h1>Add card</h1>
@@ -27,9 +27,9 @@
         <span class="swatch" id="deck-swatch" aria-hidden="true" hidden></span>
         <select class="input" id="deck" aria-describedby="deck-error">
           <option value="" selected disabled>Choose a deck</option>
-          <option data-hl="--hl-bio">AP Bio unit 4</option>
-          <option data-hl="--hl-english">Gatsby vocab</option>
-          <option data-hl="--hl-history">US History unit 2</option>
+          <option data-hl="--hl-green">AP Bio unit 4</option>
+          <option data-hl="--hl-orange">Gatsby vocab</option>
+          <option data-hl="--hl-purple">US History unit 2</option>
         </select>
         <svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>
       </div>
@@ -57,8 +57,19 @@
   const $ = (s) => document.querySelector(s);
   const front = $('#front'), back = $('#back'), status = $('#status');
   const decks = { 'AP Bio unit 4': 12, 'Gatsby vocab': 31, 'US History unit 2': 36 };
-  const fromHome = new URLSearchParams(location.search).get('from') === 'home';
+  const params = new URLSearchParams(location.search);
+  const fromHome = params.get('from') === 'home';
+  const newDeck = params.get('deck');
   let deck = 'US History unit 2';
+
+  // ?deck=Name&colour=x: arriving from New deck. The deck is fixed, in the colour you picked, and still empty.
+  if (newDeck) {
+    deck = newDeck; decks[deck] = 0;
+    document.getElementById('fixed-deck').lastChild.textContent = newDeck;
+    const colour = ['green', 'blue', 'pink', 'orange', 'yellow', 'purple'].includes(params.get('colour')) ? params.get('colour') : 'yellow';
+    $('#screen').style.setProperty('--hl', `var(--hl-${colour})`);
+    status.hidden = true;
+  }
 
   if (fromHome) {
     $('#fixed-deck').hidden = true;
@@ -88,7 +99,7 @@
     decks[deck] += 1;
     document.querySelectorAll('.deck-name').forEach((n) => { n.textContent = deck; });
     const count = $('#count');
-    count.textContent = `${decks[deck]} cards`;
+    count.textContent = decks[deck] === 1 ? '1 card' : `${decks[deck]} cards`;
     count.style.animation = 'none'; void count.offsetWidth; count.style.animation = '';
     status.hidden = false;
     front.value = ''; back.value = '';

@@ -1,6 +1,6 @@
 # Study App Design
 
-A **pure flashcards app** (decks, cards, FSRS reviews, plus Test mode on a deck, with no tracker or calendar) for the user and a few friends: their first AI-assisted app. No company, no launch. **Goal: it works, it's easy to use, and they keep using it.** Currently in the **planning stage**.
+**Nigiri**: a pure flashcards app (decks, cards, FSRS reviews, plus Test mode on a deck, with no tracker or calendar), hosted on GitHub Pages, for the user and a few friends: their first AI-assisted app. No company, no launch. **Goal: it works, it's easy to use, and they keep using it.** Currently in the **planning stage**.
 
 **The product is the card and how it gets made.** The whole product is input: making cards has to be so cheap that people keep doing it. Every card is written by the person learning it: no import, no AI. The card-creation flow is in [product-spec.md §1](product-spec.md), and the user has the final say on it. Everything else is built outward from it. Version one builds plain English text cards only. Mandarin and math are separate products, written down in [v2-input-flows.md](v2-input-flows.md) and not built yet.
 

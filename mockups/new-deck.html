@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>New deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="highlighter.css">
+</head>
+<body>
+<div class="screen page-flow">
+  <header class="form-bar">
+    <a class="btn-text" href="home.html">Cancel</a>
+    <h1>New deck</h1>
+    <span></span>
+  </header>
+
+  <form class="form grow" id="form" novalidate>
+    <div class="field">
+      <label for="name">Deck name</label>
+      <input class="input" id="name" type="text" autocomplete="off" enterkeyhint="next" placeholder="For example, Chem unit 3" aria-describedby="name-error">
+      <p class="field-error" id="name-error" hidden>Give the deck a name</p>
+    </div>
+
+    <fieldset class="field" aria-describedby="colour-error">
+      <legend>Colour</legend>
+      <div class="colours" id="colours">
+        <label class="colour" style="--hl: var(--hl-green)"><input type="radio" name="colour" value="green" aria-label="Green"><span class="fill"></span><svg class="ok" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5l4 4 8-9"/></svg></label>
+        <label class="colour" style="--hl: var(--hl-blue)"><input type="radio" name="colour" value="blue" aria-label="Blue"><span class="fill"></span><svg class="ok" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5l4 4 8-9"/></svg></label>
+        <label class="colour" style="--hl: var(--hl-pink)"><input type="radio" name="colour" value="pink" aria-label="Pink"><span class="fill"></span><svg class="ok" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5l4 4 8-9"/></svg></label>
+        <label class="colour" style="--hl: var(--hl-orange)"><input type="radio" name="colour" value="orange" aria-label="Orange"><span class="fill"></span><svg class="ok" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5l4 4 8-9"/></svg></label>
+        <label class="colour" style="--hl: var(--hl-yellow)"><input type="radio" name="colour" value="yellow" aria-label="Yellow"><span class="fill"></span><svg class="ok" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5l4 4 8-9"/></svg></label>
+        <label class="colour" style="--hl: var(--hl-purple)"><input type="radio" name="colour" value="purple" aria-label="Purple"><span class="fill"></span><svg class="ok" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5l4 4 8-9"/></svg></label>
+      </div>
+      <p class="field-error" id="colour-error" hidden>Pick a colour</p>
+    </fieldset>
+  </form>
+
+  <div class="action-zone">
+    <button class="btn btn-primary" type="submit" form="form">Create deck</button>
+  </div>
+</div>
+<script>
+  // Demo only: creating a deck opens Add card in it. Nothing is picked for you.
+  const $ = (s) => document.querySelector(s);
+  const name = $('#name');
+  const picked = () => document.querySelector('input[name="colour"]:checked');
+
+  $('#form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const v = name.value.trim();
+    const c = picked();
+    $('#name-error').hidden = !!v;
+    name.setAttribute('aria-invalid', String(!v));
+    $('#colour-error').hidden = !!c;
+    $('#colours').setAttribute('aria-invalid', String(!c));
+    if (!v) { name.focus(); return; }
+    if (!c) { document.querySelector('input[name="colour"]').focus(); return; }
+    location.href = `add-card.html?deck=${encodeURIComponent(v)}&colour=${c.value}`;
+  });
+  name.addEventListener('input', () => { if (name.value.trim()) { $('#name-error').hidden = true; name.removeAttribute('aria-invalid'); } });
+  document.querySelectorAll('input[name="colour"]').forEach((r) => r.addEventListener('change', () => {
+    $('#colour-error').hidden = true; $('#colours').removeAttribute('aria-invalid');
+  }));
+
+  // ?named fills the name and picks yellow, for screenshots.
+  if (new URLSearchParams(location.search).has('named')) {
+    name.value = 'Chem unit 3';
+    document.querySelector('input[value="yellow"]').checked = true;
+  }
+  name.focus({ preventScroll: true });
+</script>
+</body>
+</html>
