@@ -12,12 +12,13 @@
 - [v2-input-flows.md](v2-input-flows.md): the Mandarin and math input flows, written down but not built
 - [UI-DESIGN-BRIEF.md](UI-DESIGN-BRIEF.md): design expectations
 - [publishing.md](publishing.md): where everything lives, the web address, when and how to publish, installing, updates, and the risks
+- PROJECT-STATE.md: chief-officer's running record of the phase, tasks, pass count and blockers. It links to decisions instead of copying them, and it's created on the chief's first run.
 
 ## Working rules
 
 - **Scope:** before adding any feature, name who will use it in the first month. If nobody will, don't add it.
-- **Choices:** present at most two options, with the trade-off in one line each, and let the user choose. Never mark your own suggestions "(proposed)" or ask for approval of them.
-- **Gaps:** if the user hasn't decided something, write "undecided" and stop. Don't fill the gap with a default.
+- **Choices:** when a question goes to the user, present at most two options, with the trade-off in one line each, and let the user choose. Never mark your own suggestions "(proposed)" or ask for approval of them.
+- **Gaps:** if the user hasn't decided something, chief-officer decides it and records why. Every other agent, and any session working without the chief, writes "undecided" and stops instead of filling the gap with a default.
 - **Order:** the card flow comes first. It was written on 2026-11-07 (spec §1). Every other section stays shorter than the card section.
 - **FSRS:** use `ts-fsrs@6.0.0` (pinned), with its v6 calls (`DefaultScheduler`, `newCard`, `review`), never the old v5 names. Details are in [product-spec.md §2 and §7](product-spec.md) and [fsrs-notes.md](fsrs-notes.md). Never hardcode review delays per rating: only the configured learning steps are set delays, and the model may lengthen them. Never design an alternative scheduler.
 - **Out of scope:** desktop layouts, legal or privacy compliance, accessibility audits, migration strategies.
@@ -27,7 +28,7 @@
 
 - Approving a plan confirms its decisions. **Implementation starts only when the user explicitly says to start implementing.**
 - **Implementation includes:** scaffolding the app, writing components, implementing storage or scheduling, and installing app dependencies.
-- Before that, agents produce flows, design plans, and static mockups under `mockups/` when the user asks for them.
+- Before that, agents produce flows, design plans, and static mockups under `mockups/`. Chief-officer decides when a mockup is needed and may write it itself. Static mockups are plain HTML and CSS with no app logic or saved data: they count as design work, not a prototype.
 
 ## Design rule
 
@@ -39,14 +40,18 @@
 
 ## Agent workflow
 
-Nine agents live in `.claude/agents/`, coordinated through `/iterate-project` ([SKILL.md](.claude/skills/iterate-project/SKILL.md)). Each agent's file holds its full instructions.
-- **Active now:** competitor-researcher, product-planner, ui-designer, qa-tester, code-reviewer, and [chief-officer](.claude/agents/chief-officer.md). Chief-officer reviews important decisions, research quality, UX/UI, architecture and acceptance checks.
+Nine agents live in `.claude/agents/`, and each agent's file holds its full instructions. [chief-officer](.claude/agents/chief-officer.md) runs the work: start it with `/iterate-project` ([SKILL.md](.claude/skills/iterate-project/SKILL.md)) or `claude --agent chief-officer`. Its file holds the task contracts, design-skill loading, research standards, phase gates and acceptance rules. This section only adds this project's limits.
+- **Chief-officer makes the calls:** priorities, task order, which specialist gets each task (it delegates to them directly), settling disagreements between agents, accepting or rejecting results, and any product or design question the user hasn't settled (the user handed it that on 2026-11-07). Don't run a second coordinating loop alongside it.
+- **What stays with the user:** the card flow (spec §1), decisions they've already made, and what the chief's file reserves for them: starting implementation, commits, publishing and paid services. The chief records each decision it makes, with the reason, in PROJECT-STATE.md and updates the brief or spec it changes.
+- **Active now:** chief-officer, competitor-researcher, product-planner, ui-designer, qa-tester, code-reviewer.
 - **Active after implementation is authorized:** frontend-builder.
-- **Inactive until the user authorizes implementation:** [learning-specialist](.claude/agents/learning-specialist.md) (later, for study-mechanics and scheduling changes) and [feedback-analyst](.claude/agents/feedback-analyst.md) (later, only with real tester evidence).
-- Accepted decisions in the spec and brief, and the out-of-scope list above, win over any agent's general checklist.
-- Only frontend-builder edits app code. Chief-officer's sign-off doesn't replace QA or code review.
+- **Inactive during planning:** [learning-specialist](.claude/agents/learning-specialist.md) and [feedback-analyst](.claude/agents/feedback-analyst.md). After implementation is authorized, learning-specialist handles study-mechanics and scheduling changes, and feedback-analyst works only from real tester evidence.
+- When a specialist's file says "main conversation", it means whoever called it, usually chief-officer.
+- Only frontend-builder edits app code. Chief-officer may edit the planning documents, PROJECT-STATE.md and static mockups in `mockups/`. Accepted decisions stay in product-brief.md and product-spec.md.
+- Accepted decisions in the spec and brief, and the out-of-scope list above, win over any agent's general checklist. When a checklist item covers something the project cut or deferred, mark it not applicable instead of reopening it.
 - Run the roles one after another, passing evidence explicitly.
-- Allow at most 3 build-and-review passes, stopping early when the checks pass.
+- Planning gets one focused revision round after the first review. Building gets at most 3 build-and-review passes, shared by every role including chief-officer, stopping early when the checks pass.
+- Chief-officer's sign-off doesn't replace QA or code review. Missing evidence and required independent reviews stay visible in its report.
 - Only claim results that were actually observed.
 - Commits, publishing and new dependencies follow the user's authorization.
 

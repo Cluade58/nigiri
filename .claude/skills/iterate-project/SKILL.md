@@ -1,60 +1,30 @@
 ---
 name: iterate-project
-description: Coordinate research, product decisions, UI design, chief-officer review, implementation, QA, and code review for a new or existing project.
+description: Give chief-officer management of the current goal, including decisions, specialist delegation, delivery, and acceptance.
 argument-hint: "[goal or approved plan to execute]"
 disable-model-invocation: true
 ---
 
-The user’s requested goal is supplied below.
-
 $ARGUMENTS
 
-Coordinate competitor-researcher, product-planner, ui-designer, chief-officer, frontend-builder, qa-tester, and code-reviewer from this main conversation. learning-specialist and feedback-analyst are production-only (see "Production-only advisers" below).
+## Dispatch the manager
 
-Accepted decisions in product-spec.md and product-brief.md, and CLAUDE.md's out-of-scope list, take precedence over any agent's general checklist. When a checklist item covers something the project cut or deferred, record it as not applicable rather than reopening it.
+Read CLAUDE.md and the current user request to establish phase and authorization. The project is currently in planning unless the user subsequently authorizes implementation. Preserve later revocations and any assessment-only instruction. Do not treat this command as authorization to build.
 
-## Establish the current goal
+Invoke chief-officer once as the accountable manager. Pass the goal, current phase and authorization reference, accepted requirements, pointers to relevant briefs and PROJECT-STATE.md, existing evidence, and the current pass count if resuming a cycle. It makes routine decisions and directly delegates to the appropriate named specialists using Agent. Do not run a competing main-conversation management loop or repeat the same research/reviews outside the chief's cycle.
 
-Read CLAUDE.md, PROJECT-BRIEF.md, UI-DESIGN-BRIEF.md, and relevant repository instructions when present. Inspect the current files and Git status. For an empty project, identify the minimum usable foundation for the user’s goal. For an existing project, establish what already works. Discover project commands and any preview address from actual configuration or server output.
+The chief's definition owns routing, decision authority, assignment contracts, evidence standards, and stopping rules. Read that definition instead of duplicating it here. Its tools include delegation and coordination-document editing. frontend-builder remains the sole app-code editor. Specialist references to their 'main conversation' mean their coordinating caller for handoffs.
 
-If no goal was supplied, infer the next useful action from an approved plan or the current conversation. Ask a concise question when a missing product decision prevents meaningful progress. Verify that the required named agents are available before dispatching them.
+## Preserve phase and quality boundaries
 
-## Choose the entry point
+During planning, the chief manages research, product choices, written UX/UI design, architecture, and acceptance checks. App code and rendered prototypes require their corresponding user authorization. learning-specialist and feedback-analyst stay inactive during planning.
 
-The project is in planning until the user explicitly says to start implementation. Approval of a plan confirms its scope and decisions. During planning, dispatch research, product planning, and written UI planning; QA and code review may assess acceptance checks and failure cases. Begin scaffolding or app-code edits only after explicit implementation authorization. An authorized prototype is limited to the scope the user approved.
+After implementation authorization, the chief manages the builder, QA, UI critique, independent code review, and scoped repairs. It invokes learning-specialist only for relevant study-mechanics changes and feedback-analyst for real tester evidence. All roles share at most three build-and-review passes, including the initial build. During planning, allow one focused revision round after initial review. Chief acceptance cannot replace required evidence or independent findings.
 
-For an approved plan, reuse its research, product decisions, and acceptance checks. Fill material gaps through the relevant agent. Once the user explicitly authorizes implementation and the session permits editing, begin the build-and-review cycle.
+## Handle unavailable delegation
 
-For a new feature or UI goal, send the goal, audience, constraints, and current feature set to competitor-researcher. Pass the full sourced report to product-planner. The planner rates benefit, fit, confidence, build effort, dependencies, and maintenance, then decides Build now, Prototype, Later, or Pass. It selects one primary outcome and returns the implementation sequence and three to five acceptance checks. Resolve uncertain source claims through targeted follow-up research.
+Check the actual tool result. If the chief cannot delegate because the installed runtime, permissions, or nesting settings withhold Agent, report the limitation. Offer a supported main-agent run with `claude --agent chief-officer`, or relay its explicit assignments through the main conversation when the tool is available there. In relay mode the chief retains decision ownership, and the main conversation executes its dispatches and returns the actual results for judgment. Do not claim nested execution occurred. Never change permissions or spawn-depth settings without the relevant authorization.
 
-Send the planner's selection, the research it rests on, the written UI plan, the architecture or data approach, and the acceptance checks to chief-officer for review before they're treated as settled. In planning it returns a plan verdict (PLAN_READY or FIX_REQUIRED) and corrections; route material disagreements back to product-planner or the user. Its review doesn't replace QA or code review, and it can't override an accepted user decision.
+## Return the outcome
 
-For a focused bug, establish its reproduction and route it to the builder and relevant reviewers, using existing planning context.
-
-For UI work, send the selected scope and available screenshots to ui-designer. Its skill sources are frontend-design and Impeccable critique. For a fresh project, get a concrete layout proposal before the first render. For an existing interface, capture its current state. If the user explicitly requested plan review, present the plan and wait for approval. If implementation is authorized and the session permits editing, proceed. Plan Mode remains a planning step until the user approves implementation.
-
-## Build, verify, and refine
-
-Send the scope, design decisions, relevant files, and acceptance checks to frontend-builder. Let the builder finish before reviewing the resulting version. Keep application-code editing under that role and run the stages sequentially.
-
-Send the handoff to qa-tester. For UI work, obtain screenshots of the actual rendered result and send them to ui-designer for critique. The main conversation can capture evidence when browser tools are available there. Give code-reviewer the current diff, changed or new files, acceptance checks, and QA evidence.
-
-After those independent reviews, give chief-officer the builder handoff, QA results, UI critique, code-review findings, and screenshots for the same version. It consolidates them into one repair directive or a verdict for that slice. QA's and code-reviewer's findings stay open until their own checks pass; chief-officer's sign-off can't close them.
-
-## Production-only advisers
-
-learning-specialist and feedback-analyst stay inactive while the project is in planning. Don't dispatch them, even for a plan review. After the user explicitly authorizes implementation:
-- Send learning-specialist slices that change scheduling, study mechanics, Test mode, review history, or readiness.
-- Send feedback-analyst real tester feedback or observations only when they've been supplied. Never simulate testers.
-
-Both return through the main conversation, never edit app code, and share the same three-pass limit.
-
-Count the initial build and its reviews (including chief-officer's) as pass 1. Complete at most three build-and-review passes per invocation; no agent gets a separate loop. End as soon as the agreed functional checks pass, the UI reviewer passes for a UI goal, and no correctness finding remains within scope.
-
-Combine actionable findings into one repair handoff for frontend-builder. Resolve contradictory advice against the user goal and evidence. Retest fixed issues and newly affected behavior. Reuse unchanged research and valid earlier checks. Keep optional preferences in follow-ups.
-
-If a verification capability is missing, identify exactly which check remains pending and obtain the evidence through the main conversation when possible. Report an unresolved dependency or repeated failure when it prevents progress. After the third pass, report any remaining issues and the next concrete action.
-
-## Report the outcome
-
-Return the resulting behavior, adopted ideas and source links, agent runs, changed files, number of passes, checks performed, screenshots when available, and remaining work. Make completion claims only for checks backed by evidence. Follow the project’s existing authorization rules for publishing, paid services, destructive actions, and Git operations.
+Return the chief's decision, real delegated work, scoped verdict, evidence, changed files if any, and remaining action. Retain the compact project-state record and accepted decisions. Existing user authorization rules for Git operations, publishing, paid services, communication, and destructive actions remain in force.

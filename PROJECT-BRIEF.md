@@ -12,8 +12,8 @@
 
 **Working rules for agents:**
 - **Scope:** before adding any feature, name who will use it in the first month. If nobody will, don't add it.
-- **Choices:** present at most two options, with the trade-off in one line each, and let the user choose. Never label your own suggestion "(proposed)" or ask for approval of it.
-- **Gaps:** if the user hasn't decided something, write "undecided" and stop. Don't fill the gap with a default.
+- **Choices:** when a question goes to the user, present at most two options, with the trade-off in one line each, and let the user choose. Never label your own suggestion "(proposed)" or ask for approval of it.
+- **Gaps:** if the user hasn't decided something, chief-officer decides it and records why. Every other agent writes "undecided" and stops instead of filling the gap with a default. The card flow (spec §1) stays the user's.
 - **Order:** the card flow comes first. It was written on 2026-11-07 (spec §1).
 - **FSRS:** use ts-fsrs 6.0.0 (pinned). Never design an alternative scheduler.
 - **Out of scope:** desktop layouts, legal or privacy compliance, accessibility audits, migration strategies.
