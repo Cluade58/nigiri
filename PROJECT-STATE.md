@@ -51,8 +51,8 @@ Checks 1, 3, 4 and 5 in [spec §5](product-spec.md), plus its "Also test" list. 
 
 ## Open, for the user
 
-- **Domain or the GitHub address** (it costs money). Needed before friends get the link. Picking before the end of step 1 saves one export and restore.
 - **Starting implementation, commits and publishing.**
+- _Resolved 2026-11-07:_ the user chose the free GitHub address `https://cluade58.github.io/nigiri/`, with no domain of their own (product-brief, publishing.md).
 
 ## Open, for later cycles (not blocking step 1)
 

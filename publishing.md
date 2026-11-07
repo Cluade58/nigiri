@@ -27,21 +27,9 @@ Nigiri is a website that installs to the home screen. GitHub stores the code and
 
 ## Web address
 
-**Decided:** `https://cluade58.github.io/nigiri/`.
+**Decided (2026-11-07): `https://cluade58.github.io/nigiri/`, the free GitHub address.** There's no domain of your own, so nothing to buy or renew.
 
-**An address of your own instead, like `www.nigiri-study.com`: undecided.**
-- **Keep the GitHub address:** free and already set up, but the link says "github".
-- **Your own domain on GitHub Pages:** the address is yours and hosting stays free, but it usually costs about $10–20 a year and has to be renewed every year.
-
-**Pick before friends get the link** (after step 2). Picking before the end of step 1 also saves you one export and restore of your own cards. A phone saves cards under the exact address the app came from. If the address changes later, the app opens empty at the new address and everyone's cards stay behind at the old one. Moving them means export, then restore. Changing the address also breaks home-screen icons.
-
-**If you pick your own domain:**
-1. Buy it from a domain seller (a "registrar").
-2. On GitHub, go to Settings → Pages → Custom domain, type it, and tick **Enforce HTTPS**.
-3. At the domain seller, point `www` at `cluade58.github.io`.
-4. The build setting changes from `/nigiri/` to `/`.
-
-If the domain ever runs out, every icon stops working and someone else can buy the name.
+**Keep it fixed.** A phone saves cards under the exact address the app came from. If the address changed later, the app would open empty at the new address, and everyone's cards would stay behind at the old one. Moving them would mean export, then restore, and home-screen icons would break. The address only changes if the GitHub account or the repository is renamed, so don't rename either once anyone has installed.
 
 ## When to publish
 
@@ -104,4 +92,4 @@ It opens full screen and works offline, because `vite-plugin-pwa` keeps a copy o
 
 ## Undecided
 
-- Your own domain or the GitHub address (yours to decide, because it costs money). Needed before friends get the link.
+Nothing. The address and when friends get the link are both decided.
