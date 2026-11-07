@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Review, answer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="highlighter.css">
+</head>
+<body>
+<div class="session">
+  <header class="session-bar">
+    <button class="btn-icon" type="button" aria-label="End session. Your ratings are saved.">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <span class="count">7 of 32</span>
+  </header>
+  <div class="progress" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="32" aria-valuenow="6" aria-valuetext="Card 7 of 32">
+    <span style="width: 18.75%"></span>
+  </div>
+
+  <main class="card">
+    <p class="context"><span class="swatch is-small" style="background: var(--hl-bio)" aria-hidden="true"></span>For Friday's unit 4 test</p>
+    <h1 class="t-card" id="question">What is the role of the electron transport chain in cellular respiration?</h1>
+    <hr class="ink-rule">
+    <div class="answer" id="answer" tabindex="-1">
+      <p>It moves electrons from NADH and FADH₂ along the inner mitochondrial membrane, pumping H⁺ out. That gradient powers ATP synthase, which makes most of the cell's ATP. O₂ takes the electrons and forms water.</p>
+      <figure class="figure">
+        <div class="frame">
+          <svg viewBox="0 0 340 190" role="img" aria-label="Diagram of a mitochondrion, inner membrane folds labelled">
+            <ellipse class="ln" cx="170" cy="110" rx="150" ry="66"/>
+            <path class="ln" d="M42,110 A128,50 0 0 1 84,72.9 L84,128 a6,6 0 0 0 12,0 L96,69.2 A128,50 0 0 1 134,62 L134,128 a6,6 0 0 0 12,0 L146,60.9 A128,50 0 0 1 194,60.9 L194,128 a6,6 0 0 0 12,0 L206,62 A128,50 0 0 1 244,69.2 L244,128 a6,6 0 0 0 12,0 L256,72.9 A128,50 0 0 1 298,110 A128,50 0 0 1 231,154 L231,92 a6,6 0 0 0 -12,0 L219,156.2 A128,50 0 0 1 176,159.9 L176,92 a6,6 0 0 0 -12,0 L164,159.9 A128,50 0 0 1 121,156.2 L121,92 a6,6 0 0 0 -12,0 L109,154 A128,50 0 0 1 42,110 Z"/>
+            <path class="ln" d="M134,26 V86"/>
+            <circle cx="134" cy="88" r="2.5" fill="currentColor"/>
+            <text x="44" y="18">Inner membrane: the chain sits here</text>
+          </svg>
+        </div>
+        <figcaption class="t-meta">Example image</figcaption>
+      </figure>
+    </div>
+  </main>
+
+  <div class="action-zone">
+    <div class="undo">
+      <span>Last card: Good</span>
+      <button class="btn-text" type="button" aria-label="Undo last rating, Good on card 6">Undo</button>
+    </div>
+    <div class="slot">
+      <div class="keys" role="group" aria-label="How well did you know it?">
+        <button class="key" type="button" data-rate="Again" aria-label="Again, next in 10 minutes" aria-keyshortcuts="1"><kbd aria-hidden="true">1</kbd><span class="k-label"><svg class="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7"/></svg>Again</span><span class="k-int">10m</span></button>
+        <button class="key" type="button" data-rate="Hard" aria-label="Hard, next in 1 day" aria-keyshortcuts="2"><kbd aria-hidden="true">2</kbd><span class="k-label"><svg class="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7"/></svg>Hard</span><span class="k-int">1d</span></button>
+        <button class="key" type="button" data-rate="Good" aria-label="Good, next in 3 days" aria-keyshortcuts="3"><kbd aria-hidden="true">3</kbd><span class="k-label"><svg class="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7"/></svg>Good</span><span class="k-int">3d</span></button>
+        <button class="key" type="button" data-rate="Easy" aria-label="Easy, next in 6 days" aria-keyshortcuts="4"><kbd aria-hidden="true">4</kbd><span class="k-label"><svg class="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7"/></svg>Easy</span><span class="k-int">6d</span></button>
+      </div>
+    </div>
+  </div>
+  <p class="sr-only" id="live" role="status" aria-live="polite"></p>
+</div>
+<script>
+  const q = document.getElementById('question');
+  if (q.textContent.trim().length > 140) q.classList.add('is-long');
+
+  const keys = [...document.querySelectorAll('.key')];
+  const live = document.getElementById('live');
+
+  // Demo only: the real app moves to card 8 after the 250ms confirmation.
+  function rate(key, announce) {
+    if (key.disabled) return;
+    key.classList.add('is-rated');
+    keys.forEach((k) => { k.disabled = true; });
+    if (announce) live.textContent = `Rated ${key.dataset.rate}. Card 8 of 32.`;
+  }
+  keys.forEach((k) => k.addEventListener('click', () => rate(k, true)));
+  document.addEventListener('keydown', (e) => {
+    const i = ['1', '2', '3', '4'].indexOf(e.key);
+    if (i > -1) rate(keys[i], true);
+  });
+
+  // ?rated=good renders the confirmed state for screenshots.
+  const preset = new URLSearchParams(location.search).get('rated');
+  const match = preset && keys.find((k) => k.dataset.rate.toLowerCase() === preset.toLowerCase());
+  if (match) {
+    rate(match, false);
+    live.textContent = `Rated ${match.dataset.rate}. Card 8 of 32.`;
+  } else {
+    // After reveal, focus lands on the answer.
+    document.getElementById('answer').focus({ preventScroll: true });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Session done</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="highlighter.css">
+</head>
+<body>
+<div class="session">
+  <main class="done">
+    <h1 class="t-hero">32 cards done</h1>
+    <p class="t-secondary sub">AP Bio unit 4 test, Friday</p>
+
+    <div class="meter" style="--hl: var(--hl-bio); --hatch: var(--hatch-bio); --goal: 90%" role="img"
+         aria-label="Readiness 77% now, up from 74%. 90% by Friday with the plan. Goal 90%.">
+      <span class="goal-label" aria-hidden="true">90% goal</span>
+      <div class="strip">
+        <svg viewBox="0 0 1000 28" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M3,4 C140,2 290,5 440,3 C560,2 660,5 727,3 L737,5 L733,9 L740,13 L735,17 L741,21 L736,25 L725,26 C600,24 450,27 300,25 C180,24 80,26 2,25 C0,18 1,10 3,4 Z"/>
+        </svg>
+        <svg class="gain" viewBox="0 0 1000 28" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M722,4 C738,2 752,5 757,3 L767,5 L763,9 L770,13 L765,17 L771,21 L766,25 L755,26 C744,24 733,27 721,25 C718,18 719,10 722,4 Z"/>
+        </svg>
+        <div class="plan" style="left: 76.6%; width: 13.4%; animation-delay: 650ms"></div>
+      </div>
+      <span class="tick" aria-hidden="true"></span>
+    </div>
+
+    <p class="readiness">77% ready now, up from 74%. <span>90% by Friday if you keep this up.</span></p>
+    <p class="t-secondary tally">In 11 min. Again 3, Hard 5, Good 19, Easy 5.</p>
+
+    <div class="actions">
+      <button class="btn btn-primary" type="button">Back to Today</button>
+      <button class="btn btn-secondary" type="button" aria-describedby="practice-note">Practice more</button>
+      <p class="t-secondary note" id="practice-note">Practice doesn't change your schedule. Use it to cram extra.</p>
+    </div>
+  </main>
+</div>
+</body>
+</html>

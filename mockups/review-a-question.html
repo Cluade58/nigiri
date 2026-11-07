@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Review, question</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="highlighter.css">
+</head>
+<body>
+<div class="session">
+  <header class="session-bar">
+    <button class="btn-icon" type="button" aria-label="End session. Your ratings are saved.">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <span class="count">7 of 32</span>
+  </header>
+  <div class="progress" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="32" aria-valuenow="6" aria-valuetext="Card 7 of 32">
+    <span style="width: 18.75%"></span>
+  </div>
+
+  <main class="card">
+    <p class="context"><span class="swatch is-small" style="background: var(--hl-bio)" aria-hidden="true"></span>For Friday's unit 4 test</p>
+    <h1 class="t-card" id="question">What is the role of the electron transport chain in cellular respiration?</h1>
+  </main>
+
+  <div class="action-zone">
+    <div class="undo">
+      <span>Last card: Good</span>
+      <button class="btn-text" type="button" aria-label="Undo last rating, Good on card 6">Undo</button>
+    </div>
+    <div class="slot">
+      <button class="btn btn-primary" id="show" type="button" aria-keyshortcuts="Space">Show answer <kbd aria-hidden="true">Space</kbd></button>
+    </div>
+  </div>
+</div>
+<script>
+  // Long questions step down to the smaller card size.
+  const q = document.getElementById('question');
+  if (q.textContent.trim().length > 140) q.classList.add('is-long');
+
+  // Demo: reveal goes to the answer mockup. Space reveals unless focus is on another control.
+  const reveal = () => { location.href = 'review-b-answer.html'; };
+  document.getElementById('show').addEventListener('click', reveal);
+  document.addEventListener('keydown', (e) => {
+    if (e.code !== 'Space') return;
+    const a = document.activeElement;
+    if (a && a !== document.body && a.matches('button, a, input, select, textarea, [tabindex]')) return;
+    e.preventDefault();
+    reveal();
+  });
+</script>
+</body>
+</html>

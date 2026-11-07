@@ -1,0 +1,18 @@
+# Downloaded packages (reinstall with `npm install`)
+node_modules/
+
+# Generated screenshots from `npm run shot`
+screenshots/
+
+# Personal Claude Code permissions and tool caches
+.claude/settings.local.json
+.impeccable/
+
+# Secrets and local environment settings
+.env
+.env.*
+
+# Operating system clutter
+Thumbs.db
+desktop.ini
+.DS_Store
