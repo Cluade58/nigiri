@@ -96,6 +96,10 @@
     e.preventDefault();
     if (!deck) { $('#deck-error').hidden = false; $('#deck').setAttribute('aria-invalid', 'true'); $('#deck').focus(); return; }
     if (!front.value.trim() || !back.value.trim()) { (front.value.trim() ? back : front).focus(); return; }
+    if (status.classList.contains('is-error')) {
+      status.className = 'status';
+      status.innerHTML = 'Saved. <span class="deck-name"></span> has <span class="mark" id="count"></span>.';
+    }
     decks[deck] += 1;
     document.querySelectorAll('.deck-name').forEach((n) => { n.textContent = deck; });
     const count = $('#count');
@@ -106,8 +110,18 @@
     front.focus();
   });
 
+  // ?error: the save failed. What you typed stays, and the line above the button says how to retry (spec §3, §6).
+  if (params.has('error')) {
+    front.value = 'Erie Canal';
+    back.value = 'Linked the Great Lakes to New York City, 1825';
+    status.hidden = false;
+    status.className = 'status is-error';
+    status.textContent = 'Not saved. Tap Save card again.';
+  }
+
   if (fromHome) $('#deck').focus({ preventScroll: true });
   else front.focus({ preventScroll: true });
 </script>
+<script src="mockup.js"></script>
 </body>
 </html>

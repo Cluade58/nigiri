@@ -18,7 +18,7 @@ Nigiri is a website that installs to the home screen. GitHub stores the code and
 
 ## What's in the repo
 
-- **The plan:** `CLAUDE.md`, `PROJECT-BRIEF.md`, `product-brief.md`, `product-spec.md`, `UI-DESIGN-BRIEF.md`, `fsrs-notes.md`, `v2-input-flows.md`, and this file.
+- **The plan:** `CLAUDE.md`, `PROJECT-BRIEF.md`, `product-brief.md`, `product-spec.md`, `UI-DESIGN-BRIEF.md`, `fsrs-notes.md`, `v2-input-flows.md`, `PROJECT-STATE.md` (chief-officer's running record), and this file.
 - **Design:** `mockups/`, the phone screens. Start at `mockups/index.html`.
 - **Helpers:** `.claude/agents/` (nine roles) and `.claude/skills/`.
 - **Tools:** `tools/screenshot.mjs`, `package.json`, `package-lock.json`, `.gitignore`.
@@ -33,7 +33,7 @@ Nigiri is a website that installs to the home screen. GitHub stores the code and
 - **Keep the GitHub address:** free and already set up, but the link says "github".
 - **Your own domain on GitHub Pages:** the address is yours and hosting stays free, but it usually costs about $10–20 a year and has to be renewed every year.
 
-**Pick before anyone installs.** A phone saves cards under the exact address the app came from. If the address changes later, the app opens empty at the new address and everyone's cards stay behind at the old one. Moving them means export, then restore. Changing the address also breaks home-screen icons.
+**Pick before friends get the link** (after step 2). Picking before the end of step 1 also saves you one export and restore of your own cards. A phone saves cards under the exact address the app came from. If the address changes later, the app opens empty at the new address and everyone's cards stay behind at the old one. Moving them means export, then restore. Changing the address also breaks home-screen icons.
 
 **If you pick your own domain:**
 1. Buy it from a domain seller (a "registrar").
@@ -46,9 +46,7 @@ If the domain ever runs out, every icon stops working and someone else can buy t
 ## When to publish
 
 - **For you:** at the end of build step 1 ([spec §7](product-spec.md)). Then use it yourself for a week.
-- **For friends: undecided.**
-  - **Right after your week with step 1:** they get it sooner, but there's no backup yet, so a deleted icon loses their cards.
-  - **After step 2 (export and restore):** they wait a little longer, but from day one their cards can be saved to a file.
+- **For friends: after step 2 (export and restore).** Decided 2026-11-07 by chief-officer. They wait a little longer, but from day one their cards can be saved to a file. Before step 2, a deleted icon would lose everything, and a friend who loses their cards in week one is unlikely to come back.
 
 ## How to publish
 
@@ -58,7 +56,7 @@ If the domain ever runs out, every icon stops working and someone else can buy t
 4. You approve the commit and the push.
 5. GitHub builds and publishes it in a minute or two. A green check shows up in the repo's **Actions** tab.
 6. Open the web address on your phone and tap **Add to Home Screen**.
-7. When it's their turn, send your friends the link.
+7. After step 2, send your friends the link, with the message below.
 
 After that, publishing just means pushing.
 
@@ -70,7 +68,17 @@ There's no app store.
 
 It opens full screen and works offline, because `vite-plugin-pwa` keeps a copy of the app on the phone.
 
-**Tell friends on iPhone:** add it to the home screen first, then make cards there. Safari and the home-screen app keep separate cards.
+**Tell friends on iPhone:** add it to the home screen first, then make cards there.
+- Safari and the home-screen app keep separate cards.
+- In a Safari tab, Safari deletes a site's saved data after seven days of using Safari without visiting it. Home-screen apps keep their own count, and WebKit says it doesn't expect their data to be deleted ([WebKit, 2020](https://webkit.org/blog/10218/full-third-party-cookie-blocking-and-more/)).
+- Since Safari 17, the app can also ask to keep its data, and Safari decides partly by whether it was opened from the home screen ([WebKit, 2023](https://webkit.org/blog/14403/updates-to-storage-policy/)). The app asks after the first save ([spec §3](product-spec.md)).
+
+**Message to send friends** (edit it however you like; you send it, nobody else):
+
+> Here's Nigiri, the flashcards app I made: https://cluade58.github.io/nigiri/
+> iPhone: open it in Safari, tap Share, then Add to Home Screen, and always use it from there.
+> Android: open it in Chrome, tap ⋮, then Install app.
+> Your cards stay on your phone only. Every week or so, open Settings and tap Export to save a backup.
 
 ## Updates
 
@@ -96,5 +104,4 @@ It opens full screen and works offline, because `vite-plugin-pwa` keeps a copy o
 
 ## Undecided
 
-- Your own domain or the GitHub address.
-- When friends get the link.
+- Your own domain or the GitHub address (yours to decide, because it costs money). Needed before friends get the link.

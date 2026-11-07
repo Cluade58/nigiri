@@ -33,6 +33,18 @@ Decks         New deck       Front                         Test date  [Wed, Nov 
 2. **Input is never more than one tap away.** Add card sits in the bottom bar on home and on each deck.
 3. **One primary button per screen**, named for exactly what it does. The confirmation reuses the button's verb: Save card, then "Saved".
 
+## States added 2026-11-07 (chief-officer)
+
+Every new state reuses a slot the screen already has, so nothing jumps when it changes.
+- **Nothing due** (home and deck page): "Nothing due right now" takes the Review button's 50px slot, decks with nothing due show no count, and Add card becomes the filled button. It's an empty state that points at making cards.
+- **No cards yet** (deck page): one line, "Add a card whenever something is worth remembering.", and Add card filled.
+- **Rating hint:** "Forgot it? Tap Again. Right but slow? Hard." at 15px secondary, on the line above the keys. The keys don't move.
+- **Waiting:** "Next card in 0:48" at hero size with tabular digits, one line of why, and an outlined **Done for now**. It's outlined because staying is the expected path, and filled "Back to home" on Done means the session is over.
+- **Not saved:** the line above the main button turns to the error colour: "Not saved. Tap Save card again." or "Not saved. Tap your rating again." It doesn't apologise, and colour isn't the only signal.
+- **Step 1 view:** `?step=1` (mockup.js) hides Settings and the test line, which arrive in steps 2 and 3.
+
+Reviewed by ui-designer (Impeccable critique, ui-ux-pro-max checklist) and Impeccable's detector on 2026-11-07. The detector's one advisory, the 17/20/24px heading steps on home, predates these states and stays.
+
 ## Review against the brief
 
 - **No tab bar.** A pure flashcards app has one home, your decks. Settings is an icon on home.

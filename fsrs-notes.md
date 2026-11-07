@@ -64,7 +64,7 @@ People mix these up. That mix-up caused the "fixed delays" confusion in our earl
 ## 3. Differences from Anki that affect us
 
 - **Model:** Anki runs FSRS-6; we run FSRS-7. Their weights can't be converted between models ([FSRS-7 page](https://open-spaced-repetition.github.io/ts-fsrs/guide/model/fsrs-7.md)), so Anki's numbers, formulas and screenshots don't carry over to Nigiri.
-- **Days:** Anki converts learning steps that cross its day boundary into days ([deck options](https://docs.ankiweb.net/manual/deck-options), "Day Boundaries"). The library has no day boundary. Whether "due today" means "due now" or "due by the end of today" is our decision, and it's undecided ([spec §2](product-spec.md)).
+- **Days:** Anki converts learning steps that cross its day boundary into days ([deck options](https://docs.ankiweb.net/manual/deck-options), "Day Boundaries"). The library has no day boundary. Nigiri counts a card as due once its `dueAt` has passed, with no day boundary of its own (decided 2026-11-07, [spec §2](product-spec.md)).
 - **Fuzz:** Anki adds fuzz to reviews, and up to 5 minutes to learning cards ([studying](https://docs.ankiweb.net/studying.html)). We have none, so cards answered alike come due together.
 - **What carries over:**
   - the rating meanings ([studying](https://docs.ankiweb.net/studying.html))
@@ -98,9 +98,9 @@ People mix these up. That mix-up caused the "fixed delays" confusion in our earl
 - **Maximum interval 36,500 days:** the default in both.
 - **No optimizer and no parameter changes:** Anki lists fewer than "a few hundred" reviews as a reason FSRS may perform poorly ([deck options](https://docs.ankiweb.net/manual/deck-options)).
 
-**Still the app's own decisions:**
-- **What "due" means on home:** due right now, or due by the end of today.
-- **What a session does when the next card is minutes away.**
+**The app's own decisions (made 2026-11-07, [spec §2](product-spec.md)):**
+- **Due means due now:** `dueAt <= now`.
+- **When the next card is minutes away:** the session counts down to a card from this session due within 10 minutes (`dueAt <= now + 10 min`), and otherwise ends with Done.
 
 ## 6. Verification scenarios
 
@@ -115,14 +115,27 @@ Each one runs the **pinned** library with a fixed clock (`now` passed in), using
 4. **Easy on a new card:** the card is in Review, due no sooner than the graduating interval (1 day).
 5. **Rating order:** for a review card at one moment, `preview()` gives Hard ≤ Good ≤ Easy.
 6. **Same ratings, different history:** card A is rated Good on time, and card B gets the same ratings but reviewed late. Record both next intervals and stabilities. _Unverified:_ the expectation that B's interval is at least A's (the spacing effect) is a hypothesis for FSRS-7 until this runs.
-7. **Lapse:** a review card rated Again goes to Relearning, due after at least the relearning step (10m), and `lapses` goes up by 1. Good after that returns it to Review. Record whether the new interval is shorter than before the lapse (expected, unverified).
+7. **Lapse:** a review card rated Again goes to Relearning, due after at least the relearning step (10m), and `lapses` goes up by 1. Good after that returns it to Review. Record whether the new interval is shorter than before the lapse (expected, unverified). Also record whether `dueAt <= now + 10 min`, which decides whether the session waits for the card (H7 in §7).
 8. **Target holds:** for a review card with fuzz off and below the cap, predicted recall at `dueAt` is about 0.9 (within a small tolerance). This checks queue item 2's note.
 9. **Exact time:** two reviews 2 hours apart, across midnight, count as 2/24 of a day, not 1 day.
-10. **Early review:** reviewing a card hours before it's due works, and gives a different next interval from an on-time review. This matters if "due by the end of today" is chosen.
+10. **Early review:** reviewing a card hours before it's due works, and gives a different next interval from an on-time review. Due-now never reviews a card early in step 1, so this matters only if Test mode (step 3) ever does.
 11. **Cap:** a card with very high stability gets at most 36,500 days, and Hard, Good and Easy may be equal.
-12. **Repeatability:** the same input card, rating and `now` give identical output, and the input card isn't changed.
+12. **Repeatability:** the same input card, rating and `now` give identical output, and the input card isn't changed. A copy read back from IndexedDB gives the same output as the original object (H4 in §7).
+13. **Clock moved back:** `review()` with `now` earlier than `lastReviewAt` returns valid dates, not NaN (H8 in §7).
 
 ## 7. Still unverified
+
+**Check in the installed library before building the save** (raised by the 2026-11-07 planning code review; all hypotheses until checked). The save guard in [spec §3](product-spec.md) depends on H1 or H2.
+- **H1.** `reps` goes up by 1 on every review, including Again on New, Learning and Relearning cards.
+- **H2.** `lastReviewAt` is set to `now` on every review.
+- **H3.** The card fields have the names in spec §4. Which `scheduleStatus` values DefaultScheduler produces, and whether any means "not active", which the due query would then leave out.
+- **H4.** A card read back from IndexedDB gives the same `review()` output as the original object (scenario 12).
+- **H5.** Whether the revlog carries the card id, and which of its fields are dates (needed for delete and for Restore's checks).
+- **H6.** What type of `cardId` `newCard` accepts. The id must exist before `newCard` runs.
+- **H7.** Whether the model can stretch an Again or relearning step past 10 minutes. If it can, that card leaves the session and shows on home when due (scenario 7).
+- **H8.** `review()` with `now` before `lastReviewAt` (scenario 13).
+
+**Also unverified:**
 
 - That a v6 `newCard` is due at creation (source read by another agent). Scenario 1 settles it.
 - Exactly when model override lengthens a step. The docs don't define the comparison.

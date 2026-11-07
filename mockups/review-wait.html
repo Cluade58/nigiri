@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Review, waiting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="highlighter.css">
+</head>
+<body>
+<div class="session" style="--hl: var(--hl-green)">
+  <header class="session-bar">
+    <a class="btn-icon" href="home.html" aria-label="End session. Your ratings are saved.">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </a>
+    <span class="count">2 left</span>
+    <span></span>
+  </header>
+  <div class="progress" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="18" aria-valuenow="16" aria-valuetext="16 reviewed, 2 left">
+    <span style="width: 88.9%"></span>
+  </div>
+
+  <!-- Nothing is due right now, but a card from this session comes back within 10 minutes (spec §2). -->
+  <main class="card wait">
+    <h1 class="t-hero">Next card in <span class="clock" id="clock" aria-hidden="true">0:48</span><span class="sr-only" id="clock-sr">48 seconds</span></h1>
+    <p class="t-secondary">Cards you're still learning come back after a short wait. Your ratings are saved.</p>
+  </main>
+
+  <div class="action-zone">
+    <div class="slot">
+      <a class="btn btn-secondary btn-wide" href="home.html">Done for now</a>
+    </div>
+  </div>
+</div>
+<script>
+  // Demo only. The time shown is always worked out from the card's due time, never counted down
+  // on its own, so it stays right after the phone sleeps or the app comes back on screen (spec §6).
+  // At zero the app picks again: show the card, keep waiting, or Done. The clock isn't a live
+  // region, so a screen reader isn't interrupted every second, but re-reading gives the current time.
+  const s = parseInt(new URLSearchParams(location.search).get('s'), 10);
+  const dueAt = Date.now() + (Number.isFinite(s) && s > 0 ? s : 48) * 1000;
+  const clock = document.getElementById('clock');
+  const sr = document.getElementById('clock-sr');
+  const fmt = (n) => `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}`;
+  const spoken = (n) => n >= 60 ? `about ${Math.round(n / 60)} minutes` : `${n} seconds`;
+  function tick() {
+    const left = Math.max(0, Math.ceil((dueAt - Date.now()) / 1000));
+    clock.textContent = fmt(left); sr.textContent = spoken(left);
+    if (left === 0) { clearInterval(timer); location.href = 'review-question.html' + location.search; }
+  }
+  const timer = setInterval(tick, 1000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) tick(); });
+  tick();
+</script>
+<script src="mockup.js"></script>
+</body>
+</html>

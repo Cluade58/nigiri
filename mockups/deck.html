@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="highlighter.css">
 </head>
 <body>
-<main class="screen has-bar" style="--hl: var(--hl-purple)">
+<main class="screen has-bar" id="screen" style="--hl: var(--hl-purple)">
   <header class="form-bar">
     <a class="btn-text back-link" href="home.html">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Home</a>
@@ -19,21 +19,21 @@
   <div class="deck-head">
     <span class="swatch" aria-hidden="true"></span>
     <div>
-      <h1 class="t-hero">US History unit 2</h1>
-      <p class="t-secondary counts">35 cards, 6 due</p>
+      <h1 class="t-hero" id="deck-name">US History unit 2</h1>
+      <p class="t-secondary counts" id="counts">35 cards, 6 due</p>
     </div>
   </div>
 
-  <div class="lead">
+  <div class="lead" id="lead">
     <a class="btn btn-primary" href="review-question.html">Review 6 cards</a>
   </div>
 
-  <div class="test-line">
+  <div class="test-line" data-later>
     <span class="t-secondary">No test date yet</span>
     <a class="btn-text" href="deck-test.html">Add a test</a>
   </div>
 
-  <section class="sec" aria-labelledby="cards-title" style="margin-top: var(--s4)">
+  <section class="sec" id="cards" aria-labelledby="cards-title" style="margin-top: var(--s4)">
     <div class="sec-head">
       <h2 class="t-title" id="cards-title">Cards</h2>
       <span class="t-meta">Tap one to edit it</span>
@@ -52,7 +52,7 @@
 
 <nav class="bar" aria-label="Make cards">
   <div class="bar-inner">
-    <a class="btn btn-secondary btn-wide" href="add-card.html">
+    <a class="btn btn-secondary btn-wide" id="add" href="add-card.html">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add card</a>
   </div>
 </nav>
@@ -107,7 +107,24 @@
   });
 
   // ?edit opens the sheet for screenshots.
-  if (new URLSearchParams(location.search).has('edit')) openSheet(document.querySelector('#list li:nth-child(2) button'));
+  const params = new URLSearchParams(location.search);
+  if (params.has('edit')) openSheet(document.querySelector('#list li:nth-child(2) button'));
+
+  // ?clear: cards, but none due right now. ?empty: a new deck with no cards yet.
+  // In both, the Review button's place or the card list gives way, and Add card becomes the main button (spec §6).
+  if (params.has('clear') || params.has('empty')) {
+    $('#lead').innerHTML = '<p class="nothing">Nothing due right now</p>';
+    $('#counts').textContent = '35 cards';
+    $('#add').classList.replace('btn-secondary', 'btn-primary');
+  }
+  if (params.has('empty')) {
+    $('#screen').style.setProperty('--hl', 'var(--hl-yellow)');
+    $('#deck-name').textContent = 'Chem unit 3';
+    $('#counts').textContent = 'No cards yet';
+    $('#lead').innerHTML = '<p class="t-secondary">Add a card whenever something is worth remembering.</p>';
+    $('#cards').hidden = true;
+  }
 </script>
+<script src="mockup.js"></script>
 </body>
 </html>

@@ -62,10 +62,10 @@ Nine agents live in `.claude/agents/`, and each agent's file holds its full inst
   - Flags: `--viewport mobile|tablet|desktop|all`, `--full`, `--dark`, `--name <x>`, `--out <dir>`, `--wait <ms>`, `--keep`.
   - Read the PNGs in `screenshots/` and fix any errors or overflow the script reports.
   - The script is [tools/screenshot.mjs](tools/screenshot.mjs). If its headless Chrome is missing, run `npx puppeteer browsers install chrome-headless-shell`.
-- **Behaviour:** the three acceptance checks in [product-spec.md §5](product-spec.md).
+- **Behaviour:** the five acceptance checks in [product-spec.md §5](product-spec.md). Step 1 must pass checks 1, 3, 4 and 5; check 2 belongs to step 2.
 - **Build order:** follow [product-spec.md §7](product-spec.md). Each step must be usable on its own.
 - **Data rules:**
   - a review and the card's new state save together
-  - the review log is append-only
+  - reviews are never edited, and are removed only together with their card (deleting a card deletes its reviews; the user confirmed this on 2026-11-07)
   - rating buttons turn off after a tap
   - all versions are exactly as listed in product-brief.md

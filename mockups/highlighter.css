@@ -299,3 +299,20 @@ textarea.input { resize: none; display: block; }
 .colour:has(input:checked) .ok { display: block; }
 .colour:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
 .colours[aria-invalid="true"] .colour { box-shadow: inset 0 0 0 1.5px var(--error); }
+
+/* ---------- States added 2026-11-07 (chief-officer) ---------- */
+/* ?step=1 (mockup.js) hides what arrives in build steps 2 and 3. */
+[data-step="1"] [data-later] { display: none !important; }
+
+/* Nothing due: one quiet line in the Review button's place, same height, so nothing below moves. */
+.lead .nothing { min-height: 50px; display: flex; align-items: center; font-weight: 600; }
+
+/* Status lines above the main button: confirmation, hint, or a failed save. */
+.status.is-error, .hint.is-error { font-size: 15px; font-weight: 600; color: var(--error); }
+.hint { font-size: 15px; color: var(--ink-2); margin-bottom: var(--s1); }
+.lead .t-secondary { max-width: 30ch; }
+
+/* Review wait: counting down to a card that's coming back. */
+.wait .t-hero { margin-top: var(--s2); }
+.wait .clock { font-variant-numeric: tabular-nums; }
+.wait .t-secondary { margin-top: var(--s2); max-width: 32ch; }

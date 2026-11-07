@@ -31,6 +31,7 @@
   </main>
 
   <div class="action-zone">
+    <p class="hint" id="hint">Forgot it? Tap Again. Right but slow? Hard.</p>
     <div class="slot">
       <div class="keys" role="group" aria-label="How well did you know it?">
         <button class="key" type="button" data-rate="Again"><span class="k-label"><svg class="check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7"/></svg>Again</span></button>
@@ -61,11 +62,22 @@
   }
   keys.forEach((k) => k.addEventListener('click', () => rate(k, true)));
 
+  // ?error: the rating didn't save. Nothing was logged, the buttons are back on,
+  // and the hint's line says so (spec §3, §6).
+  const params = new URLSearchParams(location.search);
+  if (params.has('error')) {
+    const hint = document.getElementById('hint');
+    hint.classList.add('is-error');
+    hint.textContent = 'Not saved. Tap your rating again.';
+    document.getElementById('live').textContent = hint.textContent;
+  }
+
   // ?rated=good shows the state right after a tap.
-  const preset = new URLSearchParams(location.search).get('rated');
+  const preset = params.get('rated');
   const match = preset && keys.find((k) => k.dataset.rate.toLowerCase() === preset.toLowerCase());
   if (match) rate(match, false);
   else document.getElementById('answer').focus({ preventScroll: true });
 </script>
+<script src="mockup.js"></script>
 </body>
 </html>
