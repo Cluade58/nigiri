@@ -91,6 +91,7 @@ Each one names who uses it in the first month.
 - **New deck.** A separate button on home, next to the Decks heading. Type a name, pick one of the six highlighter colours, and tap **Create deck**. Add card then opens in the new deck. Nothing is picked for you: if you skip the colour, Create deck asks for one. *Who:* everyone, when a new class or unit starts.
 - **Review.** Four plain buttons: Again, Hard, Good, Easy. *Who:* everyone.
 - **Done.** "Done", and a button back home. *Who:* everyone, after every session.
+- **What's new.** After an update, one short line on home says what changed, shown once. You write it for each release. Built in step 4 ([§7](#7-build-order-and-the-two-week-test)). *Who:* every friend, the first time they open the app after you ship a change.
 - **Deck page.** It lists the deck's cards. Tap one to edit or delete it. **Add card** and **Add a test** are here too. *Who:* anyone fixing a typo or setting a test date.
 
 ## 7. Build order and the two-week test
@@ -99,7 +100,7 @@ Each step is usable on its own. Stop anywhere and you still have an app.
 1. Deck, card, the New deck and Add card screens, and the review screen with ts-fsrs. Put it on GitHub Pages so it runs on your phone, then use it yourself for a week.
 2. Export and restore.
 3. Test date and the fit check.
-4. Polish.
+4. Polish, and the What's new note ([§6](#6-around-the-card)).
 
 **The test:** two weeks of your own schoolwork, starting from step 1. Count the cards you add each day. Zero by day five means input is still too expensive. That number, not anyone's opinion, decides what v2 is.
 
