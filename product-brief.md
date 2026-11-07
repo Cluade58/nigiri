@@ -14,7 +14,7 @@ _Rewritten 2026-11-07 after the scope reset. The earlier research-heavy version 
 
 - **Name:** Nigiri.
 - **Platform:** a phone web app on the home screen, hosted on GitHub Pages. No desktop layout.
-- **Web address:** `https://cluade58.github.io/nigiri/`. Keep it fixed once anyone installs, because changing it breaks their home-screen icon.
+- **Web address:** `https://cluade58.github.io/nigiri/`. Keep it fixed once anyone installs, because changing it breaks their home-screen icon and leaves their cards behind ([publishing.md](publishing.md)).
 - **Updates:** silent. A phone picks up the new version the next time the app opens, and nobody reinstalls. After an update, a short "What's new" note shows once on home ([spec §6](product-spec.md)).
 - **Decks:** made with a separate **New deck** button on home. You name each deck and pick its highlighter colour ([spec §6](product-spec.md)).
 - **Scheduling:** FSRS via `ts-fsrs@6.0.0` (pinned), default parameters, target 90% (fixed).
@@ -52,6 +52,8 @@ _Rewritten 2026-11-07 after the scope reset. The earlier research-heavy version 
 ## Undecided
 
 - **What v2 is.** The two-week test decides ([spec §7](product-spec.md)).
+- **Your own domain** (for example `www.nigiri-study.com`) **or the GitHub address** ([publishing.md](publishing.md)).
+- **When friends get the link:** right after your week with step 1, or after step 2 ([publishing.md](publishing.md)).
 
 ## What the research taught (one line each)
 

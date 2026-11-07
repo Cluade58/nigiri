@@ -10,6 +10,7 @@
 - [product-spec.md](product-spec.md): the card, scheduling and Test mode, saving, data, acceptance checks, screens around the card, build order, and the version 1.1 list
 - [v2-input-flows.md](v2-input-flows.md): the Mandarin and math input flows, written down but not built
 - [UI-DESIGN-BRIEF.md](UI-DESIGN-BRIEF.md): design expectations
+- [publishing.md](publishing.md): where everything lives, the web address, when and how to publish, installing, updates, and the risks
 
 ## Working rules
 

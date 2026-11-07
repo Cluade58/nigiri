@@ -8,7 +8,7 @@
 
 **Build order:** [product-spec.md §7](product-spec.md). Features on the version 1.1 list (§8) wait until after the two-week test.
 
-**Read:** [product-brief.md](product-brief.md) for what's decided and undecided, and [product-spec.md](product-spec.md) for the rules.
+**Read:** [product-brief.md](product-brief.md) for what's decided and undecided, [product-spec.md](product-spec.md) for the rules, and [publishing.md](publishing.md) for hosting, installing and updates.
 
 **Working rules for agents:**
 - **Scope:** before adding any feature, name who will use it in the first month. If nobody will, don't add it.
