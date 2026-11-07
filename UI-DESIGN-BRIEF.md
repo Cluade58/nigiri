@@ -12,7 +12,7 @@
 - Each domain has its own input screen and its own review screen. Version one has only plain text cards.
 - Input is designed for the moment someone has something in hand (a line in a textbook, a sentence they heard, a word they just looked up), not for a sit-down card-making session.
 
-Use frontend-design for the design plan (then review it against the brief), and Impeccable's critique to review renders.
+Use frontend-design for the design plan (then review it against the brief), and Impeccable's critique to review renders. Check UX against ui-ux-pro-max's rules and its pre-delivery checklist, but not its palettes, fonts or styles: the tokens here are fixed.
 
 **Basics on every screen:**
 - one clear primary action

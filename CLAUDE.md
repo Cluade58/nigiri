@@ -31,6 +31,10 @@
 
 **Always use the `frontend-design` skill** (`.claude/skills/frontend-design/`) for any UI, layout, typography, color, copy or mockup work. Follow its two passes: a design plan, then a review against the brief before building.
 
+**`ui-ux-pro-max`** (`.claude/skills/ui-ux-pro-max/`, MIT, from nextlevelbuilder/ui-ux-pro-max-skill) is attached to the ui-designer agent as a UX rules checklist: accessibility, touch, forms, navigation, motion and React guidance, plus its pre-delivery checklist in `references/pro-rules.md`.
+- Its palettes, font pairings and styles don't apply, because the Highlighter tokens are fixed. Where its numbers differ from the briefs, the briefs win.
+- Its SKILL.md runs the search script through `${CLAUDE_PLUGIN_ROOT}`, which isn't set in this project. From the project root, the script is at `.claude/skills/ui-ux-pro-max/scripts/search.py`. Agents without a shell read the `references/` and `data/` files directly.
+
 ## Agent workflow
 
 Six agents live in `.claude/agents/`: competitor-researcher, product-planner, ui-designer, frontend-builder, qa-tester, code-reviewer. They're coordinated through `/iterate-project`.
