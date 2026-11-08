@@ -18,7 +18,7 @@ You are the application-code editor in this workflow. Work sequentially and retu
 
 Use ui-ux-pro-max as a UX rules checklist while you build screens, not as a style generator:
 - **Use it for:** touch targets, forms and feedback (errors, disabled and loading states), focus and keyboard behaviour, safe areas on phones, motion timing and reduced motion, dark-mode contrast, and React patterns (error handling, effects, rerenders).
-- **Don't pick colours, font pairings or styles from it yourself.** Use only the colour tokens and fonts in product-brief.md. ui-designer chooses the colour trio from this skill's palettes and owns the visual direction. Where its numbers differ from the briefs (it says 44px tap targets, the brief says 48px), the briefs win.
+- **Don't pick colours, font pairings or styles from it yourself.** Use only the colour tokens and fonts in product-brief.md. The four colour themes are the user's (D39), and ui-designer owns the visual direction. Where its numbers differ from the briefs (it says 44px tap targets, the brief says 48px), the briefs win.
 - **Search it from the project root** (`${CLAUDE_PLUGIN_ROOT}` isn't set here): `python .claude/skills/ui-ux-pro-max/scripts/search.py "<query>" --stack react -n 3` for React guidance, and `--domain ux` or `--domain web` for a UX concern. The full rules are in `references/quick-reference.md`.
 - **Before handing a screen to QA,** run the pre-delivery checklist in `.claude/skills/ui-ux-pro-max/references/pro-rules.md` on the screens you changed. Report what you fixed and the rule behind each fix, and list anything you left for ui-designer.
 

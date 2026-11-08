@@ -70,6 +70,11 @@
     $('#screen').style.setProperty('--hl', `var(--hl-${colour})`);
     $('#screen').style.setProperty('--pen', `var(--pen-${colour})`);
     status.hidden = true;
+  } else if (['green', 'blue', 'pink', 'orange', 'yellow', 'purple'].includes(params.get('colour'))) {
+    // ?colour=x without a deck: the same deck and its "Saved" line in another deck colour, to check
+    // the mark next to each theme's filled button (D39e).
+    $('#screen').style.setProperty('--hl', `var(--hl-${params.get('colour')})`);
+    $('#screen').style.setProperty('--pen', `var(--pen-${params.get('colour')})`);
   }
 
   if (fromHome) {

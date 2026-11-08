@@ -1,70 +1,122 @@
 /* Highlighter: shared foundation for the phone mockups.
    Tokens follow product-brief.md. Mockups only: the real app bundles its fonts.
-   Colours (2026-11-08): ui-ux-pro-max colors.csv row 103 "Flashcard & Study Tool",
-   violet + emerald on lavender, with grape ink instead of the row's slate (D38, the user's
-   "Grape"). Violet marks only acting, choosing and focus; the deck highlighters stay the
-   user's. The earlier navy and slate values are in git. */
+   Colours (D39, the user's decision, 2026-11-08): four themes, each a trio of
+   background (60%), text (30%) and accent (10%). Ink + Cobalt + Snow is the default
+   and sits on :root. A theme is picked in Settings and replaces the phone's light/dark
+   setting (D39a). The accent marks only acting and focus: the one filled button, the rated
+   key, the focus ring and the progress bar. The deck highlighters stay the user's.
+   Earlier palettes (navy, row 103, Grape) are in git. */
 @import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&display=swap");
 
-/* ---------- Tokens ---------- */
-:root {
-  --page: #FAF5FF;        /* row 103 Background */
-  --surface: #FFFFFF;     /* row 103 Card: the edit sheet only */
-  --ink: #2E1D47;         /* grape ink (D38), replaces row 103's slate Foreground */
-  --ink-2: #5E5270;       /* grape secondary (D38), replaces row 103's slate Muted Foreground */
-  --rule: #E6DCF7;        /* row 103 Border, darkened from 1.12 to 1.23 so dividers show */
-  --primary-bg: #7C3AED;  /* row 103 Primary: the one filled button, the rated key */
-  --primary-fg: #FFFFFF;  /* row 103 On Primary */
-  --secondary: #8B5CF6;   /* row 103 Secondary: the review progress fill */
-  --ring: #7C3AED;        /* row 103 Ring: focus */
-  --error: #B91C1C;       /* row 103 Destructive, darkened from 4.50 to 6.03 */
-  --mark-ink: #2E1D47;    /* dark text on every highlighter: the ink in light */
-  --scrim: rgba(46, 29, 71, .5);  /* ink at 50%: the white sheet stays 3.30 off the dimmed page */
-  --sheet-edge: transparent;
+/* ---------- Tokens ----------
+   One block per theme. The blocks also work on any element, so a picker swatch with
+   data-theme="mist" draws itself in Mist whatever theme is active. Measured contrast
+   (WCAG 2.x) is in PROJECT-STATE.md D39. */
 
+/* Shared by the three light themes: deck colours and the light pen tones. */
+:root, [data-theme="snow"], [data-theme="mist"], [data-theme="cream"] {
   /* Deck colours: the light highlight draws the marks and the picker fill;
-     the pen tone draws the 6px swatch, so it reaches 3:1 on the page. */
+     the pen tone draws the 6px swatch, so it reaches 3:1 on every light page (3.50 to 4.22). */
   --hl-green: #7BE38A;  --pen-green: #33934A;
   --hl-blue: #7CC8FF;   --pen-blue: #3384CC;
   --hl-pink: #FF8FC8;   --pen-pink: #D23C8A;
   --hl-orange: #FFB65C; --pen-orange: #C2650C;
   --hl-yellow: #FFE45C; --pen-yellow: #A37F00;
-  --hl-purple: #DAA8F7; --pen-purple: #AD4BD0;  /* moved toward orchid, away from the violet button */
-  --hl-done: #7FDDB9;   /* row 103 Accent #059669, lightened: under dark text it measures 1.47 in dark */
+  --hl-purple: #DAA8F7; --pen-purple: #AD4BD0;
   --hl-alpha: 1;
-  --hl: var(--hl-green);
-  --pen: var(--pen-green);
-
-  --s1: 8px; --s2: 12px; --s3: 20px; --s4: 32px; --s5: 48px;
-  --bar-h: 82px;
+  --surface: #FFFFFF;     /* the edit sheet only */
+  --error: #B91C1C;       /* the one colour outside the trios: "Not saved" must read as red */
+  --sheet-edge: transparent;
   color-scheme: light;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --page: #17111F;        /* grape night (D38) */
-    --surface: #221A2D;
-    --ink: #EDE6F7;
-    --ink-2: #B3A8C4;
-    --rule: #322842;        /* grape hue at D37's divider contrast (1.34) */
-    --primary-bg: #A78BFA;  /* lilac fill with dark text: 6.79 (was #8152E0 + white, 4.98) */
-    --primary-fg: #17111F;
-    --secondary: #A78BFA;
-    --ring: #A78BFA;
-    --error: #F87171;
-    --mark-ink: #17111F;    /* the dark page: 6.64 to 10.62 on the highlights */
-    --scrim: rgba(8, 5, 13, .6);
-    --sheet-edge: #514468;  /* a hairline on the sheet's top curve: 2.22 against the dimmed page */
-    --hl-purple: #E2A0F0;   /* more orchid in dark, so it isn't the lilac button and ring (35 degrees apart) */
-    /* One tone per deck in dark: the highlights already reach 6.6 to 10.6 on the page. */
-    --pen-green: var(--hl-green);
-    --pen-blue: var(--hl-blue);
-    --pen-pink: var(--hl-pink);
-    --pen-orange: var(--hl-orange);
-    --pen-yellow: var(--hl-yellow);
-    --pen-purple: var(--hl-purple);
-    --hl-alpha: .85;
-    color-scheme: dark;
-  }
+
+/* Ink + Cobalt + Snow: the default. */
+:root, [data-theme="snow"] {
+  --page: #F5F7FC;
+  --ink: #17243C;           /* 14.47 on the page */
+  --ink-2: #4C576A;         /* ink toward the page: 6.81 */
+  --rule: #DBDEE5;          /* dividers and the progress track: 1.26 */
+  --primary-bg: #3158C9;    /* cobalt: white text 6.23, 5.81 against the page */
+  --primary-fg: #FFFFFF;
+  --primary-press: #2D50B4; /* cobalt toward the ink: white text 7.20 */
+  --progress: #3158C9;
+  --ring: #3158C9;
+  --mark-ink: #17243C;      /* dark text on every highlighter: 7.40 to 12.19 */
+  --hl-done: #A6BEFF;       /* cobalt's hue as a highlighter: ink on it 8.44 */
+  --scrim: rgba(23, 36, 60, .5);  /* ink at 50%: the white sheet stays 3.30 off the dimmed page */
+}
+
+/* Plum + Berry + Mist. */
+[data-theme="mist"] {
+  --page: #FAF7FB;
+  --ink: #302039;           /* 14.20 */
+  --ink-2: #5F5266;         /* 6.85 */
+  --rule: #E2DEE4;          /* 1.25 */
+  --primary-bg: #9C356B;    /* berry: white text 6.70, 6.30 against the page */
+  --primary-fg: #FFFFFF;
+  --primary-press: #8C3264; /* 7.62 */
+  --progress: #9C356B;
+  --ring: #9C356B;
+  --mark-ink: #302039;      /* 7.20 to 11.86 */
+  --hl-done: #F5A3CE;       /* berry's hue: ink on it 7.91 */
+  --scrim: rgba(48, 32, 57, .5);  /* 3.23 */
+}
+
+/* Espresso + Amber + Cream. */
+[data-theme="cream"] {
+  --page: #FBF8F1;
+  --ink: #33291F;           /* 13.40 */
+  --ink-2: #5E564C;         /* 6.80 */
+  --rule: #E3DFD8;          /* 1.25 */
+  --primary-bg: #A45613;    /* amber: white text 5.36, 5.05 against the page */
+  --primary-fg: #FFFFFF;
+  --primary-press: #934F15; /* 6.23 (mixing toward the page would give 4.32) */
+  --progress: #A45613;
+  --ring: #A45613;
+  --mark-ink: #33291F;      /* 6.78 to 11.17 */
+  --hl-done: #F5BC8A;       /* amber's hue: ink on it 8.42 */
+  --scrim: rgba(51, 41, 31, .5);  /* 3.12 */
+}
+
+/* Midnight + Ice + Sky: the one dark theme. */
+[data-theme="midnight"] {
+  --page: #141B24;
+  --surface: #1E2836;       /* the edit sheet: ink on it 13.61 */
+  --sheet-edge: #56647A;    /* a hairline on the sheet's top curve: 3.18 against the dimmed page (TH-UI-2) */
+  --ink: #F3F5F7;           /* ice: 15.85 */
+  --ink-2: #AEB7C4;         /* 8.56, 7.34 on the sheet */
+  --rule: #2A3340;          /* 1.36 */
+  --primary-bg: #8FB7FF;    /* sky with dark text: 8.57, 8.57 against the page */
+  --primary-fg: #141B24;
+  --primary-press: #80A4E5; /* sky toward the page: 6.90 */
+  --progress: #8FB7FF;      /* 6.31 against the track */
+  --ring: #8FB7FF;
+  --error: #F87171;         /* 6.26, 5.38 on the sheet, 2.53 off the ink */
+  --mark-ink: #141B24;      /* the page: 6.31 to 10.11 on the highlights */
+  --hl-done: #C1D6FB;       /* ice and sky 50/50, drawn at full strength: 11.78, 1.37 off the button */
+  --scrim: rgba(6, 9, 13, .6);
+  /* Deck colours keep the brief's dark column: each highlight at 85% is also its swatch. */
+  --hl-green: #7BE38A;
+  --hl-blue: #7CC8FF;
+  --hl-pink: #FF8FC8;
+  --hl-orange: #FFB65C;
+  --hl-yellow: #FFE45C;
+  --hl-purple: #E2A0F0;
+  --pen-green: var(--hl-green);
+  --pen-blue: var(--hl-blue);
+  --pen-pink: var(--hl-pink);
+  --pen-orange: var(--hl-orange);
+  --pen-yellow: var(--hl-yellow);
+  --pen-purple: var(--hl-purple);
+  --hl-alpha: .85;
+  color-scheme: dark;
+}
+
+:root {
+  --hl: var(--hl-green);
+  --pen: var(--pen-green);
+  --s1: 8px; --s2: 12px; --s3: 20px; --s4: 32px; --s5: 48px;
+  --bar-h: 82px;
 }
 
 /* ---------- Base ---------- */
@@ -135,7 +187,7 @@ a { color: inherit; }
 }
 .btn-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .btn:active:not([disabled]), .key:active:not([disabled]) { transform: scale(.98); }
-.btn-primary:active:not([disabled]) { background: color-mix(in srgb, var(--primary-bg) 88%, var(--page)); }
+.btn-primary:active:not([disabled]) { background: var(--primary-press); }
 [disabled] { opacity: .4; cursor: not-allowed; }
 
 /* ---------- Deck swatch ---------- */
@@ -198,7 +250,9 @@ a { color: inherit; }
 textarea.input { resize: none; display: block; }
 .input:focus-visible { outline: none; border-color: var(--ring); box-shadow: 0 0 0 1.5px var(--ring); }
 .input[aria-invalid="true"] { border-color: var(--error); }
-.helper { font-size: 13px; color: var(--ink-2); }
+/* Focused and invalid: the ring moves 2px out, so it never merges with the red border (Mist, Cream). */
+.input[aria-invalid="true"]:focus-visible { border-color: var(--error); box-shadow: none; outline: 2px solid var(--ring); outline-offset: 2px; }
+.helper { font-size: 15px; color: var(--ink-2); }  /* 15px: you need it to act (rule 9) */
 .field-error { font-size: 15px; font-weight: 600; color: var(--error); }
 .select-wrap { position: relative; }
 .select-wrap .swatch { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); height: 20px; pointer-events: none; }
@@ -245,7 +299,7 @@ textarea.input { resize: none; display: block; }
 .session-bar { height: 56px; display: grid; grid-template-columns: 48px 1fr 48px; align-items: center; margin: 0 calc(-1 * var(--s2)); }
 .session-bar .count { text-align: center; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .progress { height: 2px; background: var(--rule); }
-.progress > span { display: block; height: 100%; background: var(--secondary); }
+.progress > span { display: block; height: 100%; background: var(--progress); }
 .card { flex: 1; padding: var(--s4) 0 var(--s5); }
 .context { display: flex; align-items: center; gap: var(--s1); font-size: 15px; color: var(--ink-2); }
 .card .t-card { margin-top: var(--s2); }
@@ -366,3 +420,80 @@ a.test-line { min-height: 48px; color: inherit; text-decoration: none; }
 /* Edit test: Remove test ends the form, centred, with its own status line above it. */
 .form .remove { display: flex; flex-direction: column; align-items: center; border-top: 1px solid var(--rule); padding-top: var(--s2); }
 .form .remove .status:not(:empty) { margin-bottom: var(--s1); text-align: center; }
+
+/* ---------- Settings (step 2; from ui-designer P-UI-8) ---------- */
+.settings-title { margin-top: var(--s1); }
+.settings .sec.is-first { margin-top: var(--s4); }
+.settings .sec > .t-secondary { margin-top: 4px; max-width: 34ch; }
+.settings .status { min-height: 26px; margin: var(--s2) 0 var(--s1); }
+.settings .after-btn { margin-top: var(--s1); }
+.settings .helper { margin-top: 2px; }
+
+/* Theme picker: four ruled rows, like home's deck list. The whole row is the radio's label.
+   Each chip is a tiny Nigiri screen in its own theme (data-theme on the chip), whatever theme is active. */
+.themes { margin-top: var(--s1); }
+.themes li + li .theme { border-top: 1px solid var(--rule); }
+.theme {
+  position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr) 24px; align-items: center;
+  column-gap: var(--s2); min-height: 64px; padding: var(--s1) 0; cursor: pointer;
+}
+.theme input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.theme .name { font-size: 17px; font-weight: 600; line-height: 1.3; }
+.theme .chip {
+  position: relative; width: 56px; height: 44px; border-radius: 8px; pointer-events: none;
+  background: var(--page); color: var(--ink); border: 1px solid var(--ink);
+  font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 17px; font-weight: 600; line-height: 1;
+  padding: 6px 0 0 8px;
+}
+.theme .chip::after {
+  content: ""; position: absolute; left: 8px; right: 8px; bottom: 7px; height: 6px; border-radius: 3px;
+  background: var(--primary-bg);
+}
+.theme .ok { width: 24px; height: 24px; display: none; fill: none; stroke: var(--ink); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.theme:has(input:checked) .ok { display: block; }
+.theme:has(input:focus-visible) { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: 12px; }
+/* While a row has focus, hide the rules above and below it, so the ring isn't doubled (TH-UI-2). */
+.themes li:has(input:focus-visible) .theme,
+.themes li:has(input:focus-visible) + li .theme { border-top-color: transparent; }
+
+/* ---------- How it feels (2026-11-08, chief-officer from ui-designer P-UI-8; D41–D45) ----------
+   Every new line is quiet: existing tokens and sizes, no new colour, in every theme. */
+/* Home: the cost before the tap, under the Review button. One line each at 360px. */
+.lead .lead-note { margin-top: var(--s2); max-width: none; }
+/* Done: one real number, or the test milestone in its place. */
+/* "pretty", not "balance": balance halved the line at 360px. Numbers keep their noun with a no-break space
+   ("35&nbsp;cards"); the builder does the same in every count string (P-UI-9). */
+.done .done-count { margin-top: var(--s2); max-width: 34ch; text-wrap: pretty; }
+/* The deck name and its full stop move to the next line as one piece; a name longer than the line still wraps. */
+.done-count .keep { display: inline-block; max-width: 100%; }
+.top p, .remind h2 { text-wrap: balance; }
+/* Test screen only: the sticky Save test bar gets an edge, so text scrolling under it doesn't look cut off. */
+#form ~ .action-zone { border-top: 1px solid var(--rule); margin-inline: calc(-1 * var(--s3)); padding-inline: var(--s3); }
+/* Deck page with a test: three facts and one action, one link. Edit test sits on the first row. */
+/* The facts take the full width (so the plan stays one line at 360px); Edit test shares only the first row,
+   which keeps room for it. DOM order stays facts first, Edit test last. */
+.test-line.has-test { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
+.test-line.has-test .test-info { grid-column: 1 / -1; grid-row: 1; }
+.test-line.has-test .link-label { grid-column: 2; grid-row: 1; }
+.test-info { display: grid; gap: 2px; min-width: 0; }
+.test-info > * { text-wrap: pretty; }
+.test-info > .when { padding-right: 6em; }
+/* Test screen: the plan, after the fit check's sentence. */
+.fit .plan { margin-top: var(--s2); }
+/* Settings: one ruled row that opens the explainer. */
+.row-link {
+  margin-top: var(--s5); min-height: 56px; display: flex; align-items: center; justify-content: space-between;
+  gap: var(--s2); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  font-weight: 600; text-decoration: none; color: inherit;
+}
+/* The explainer: a page to read, so a comfortable measure and more air above each heading than below. */
+.explain { padding-bottom: var(--s5); }
+.explain h1 { margin-top: var(--s2); }
+.explain section { margin-top: var(--s4); }
+.explain h2 + * { margin-top: var(--s1); }
+.explain p { max-width: 38ch; text-wrap: pretty; }
+.explain p + p { margin-top: var(--s1); }
+.ratings { display: grid; gap: 4px; }
+.ratings div { display: grid; grid-template-columns: 4.25em minmax(0, 1fr); column-gap: var(--s1); }
+.ratings dt { font-weight: 600; }
+.ratings dd { margin: 0; }

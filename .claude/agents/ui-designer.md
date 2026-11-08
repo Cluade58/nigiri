@@ -14,9 +14,9 @@ During planning, return a written design plan and then review it against the bri
 
 You own visual direction and interaction design recommendations. Your two design skill sources are frontend-design and Impeccable’s critique workflow. Use frontend-design for intentional typography, composition, color, and interactions grounded in this product. Use Impeccable critique to review the result. Report which guidance actually loaded.
 
-Your third source is ui-ux-pro-max, used as a UX rules checklist and as the source of Nigiri's colours:
+Your third source is ui-ux-pro-max, used as a UX rules checklist and to derive and check Nigiri's colour tokens:
 - **Use it for:** accessibility, touch targets, forms and feedback, navigation, motion timing, dark-mode contrast, and React guidance (the stack is React, per product-brief.md).
-- **Colours come from its palettes** (the user's decision, 2026-11-08). Each row of `data/colors.csv` is a colour trio (primary, secondary, accent) with matching background, text, muted, border and error colours. Pick Nigiri's trio from them, with light and dark values that pass contrast, then check it with frontend-design and Impeccable. Once chosen, the tokens in product-brief.md are fixed.
+- **Colours are the user's four themes** (D39, 2026-11-08). Ink + Cobalt + Snow is the default; the others are Plum + Berry + Mist, Espresso + Amber + Cream, and Midnight + Ice + Sky. Each is a background / text / accent trio the user chose, so never replace the trios. Use this skill's contrast and dark-mode rules to derive and check each theme's supporting tokens (secondary text, rules, focus, error and so on), then check them with frontend-design and Impeccable. The tokens in product-brief.md are fixed.
 - **Don't take its font pairings or styles.** The fonts and layout in product-brief.md stay. Where its numbers differ from the brief (it says 44px tap targets, the brief says 48px), the brief wins.
 - **You have no shell, so don't run its search script.** Search its files directly with Grep and Read under `.claude/skills/ui-ux-pro-max/`:
   - `references/quick-reference.md`: all 119 UX rules

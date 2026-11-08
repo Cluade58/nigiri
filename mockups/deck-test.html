@@ -44,6 +44,9 @@
     <section class="fit" aria-labelledby="fit-title">
       <h2 class="t-hero" id="fit-title"><span class="mark" id="fit-mark">It fits</span></h2>
       <p class="lede" id="lede"></p>
+      <!-- The plan in plain words (D44): today's share of the cards not studied yet (fsrs-notes §10 rule 1).
+           After the lede, so nothing above "It fits" moves on a small phone (D36). Not a live region. -->
+      <p class="t-secondary plan" id="plan"></p>
     </section>
     <p class="sr-only" id="fit-status" role="status"></p>
 
@@ -85,6 +88,12 @@
     days = 1; when = 'with the test today'; per = 'today';
   }
   if (params.has('max')) { cards = 400; }
+  // The plan line: N cards not studied yet, today's share S = ceil(N / days left). The test is never a study day.
+  const notStudied = params.has('max') ? 370 : 5;
+  const share = Math.ceil(notStudied / days);
+  $('#plan').textContent = share >= notStudied
+    ? `${notStudied} not studied yet, all due today.`
+    : `${notStudied} not studied yet: ${share} today, all by Thursday.`;
   const need = Math.ceil(cards * SECONDS / days / 60);
   const total = need + (other ? other.minutes : 0);
   const minutes = $('#minutes');
@@ -130,5 +139,6 @@
   }
   render();
 </script>
+<script src="mockup.js"></script>
 </body>
 </html>

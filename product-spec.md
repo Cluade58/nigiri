@@ -1,12 +1,12 @@
 # Product spec
 
-_Version 6, 2026-11-08: a shorter Easy, the Test mode rules, and reminders as step 4 (reasons in PROJECT-STATE.md). Earlier versions are in git (`git log -p product-spec.md`)._
+_Version 7, 2026-11-08: four colour themes you can switch in Settings (D39). Version 6 added a shorter Easy, the Test mode rules, and reminders as step 4 (reasons in PROJECT-STATE.md). Earlier versions are in git (`git log -p product-spec.md`)._
 
 **Context:** **Nigiri**, a pure flashcards app (decks, cards, FSRS reviews, and a test date on a deck), built as a first app for you and a few friends. The goal: it works, it's easy to use, and you keep using it. **The product is the card and how it gets made.** Everything else is built outward from the card and stays shorter than the card section.
 
 **Scope rule:** before adding any feature, name who will use it in the first month. If nobody will, don't add it.
 
-**What's in version one:** decks, Add card, review with FSRS, a test date with a fit check, and export/restore. Every card in it is written by the person learning it.
+**What's in version one:** decks, Add card, review with FSRS, a test date with a fit check, export/restore, and four colour themes. Every card in it is written by the person learning it.
 
 ## Decisions
 
@@ -102,6 +102,7 @@ Four records: **Deck, Card, Review, Test**, plus one settings object.
 - **Card:** id, deck, front, back, created date (the two-week test counts cards per day), plus the scheduling fields ts-fsrs returns: `dueAt`, `lastReviewAt`, `state`, `scheduleStatus`, `stability`, `stabilityFast`, `difficulty`, `reps`, `lapses`, `scheduledDays`, `learningStep`.
 - **Review:** its own id, the card id (indexed) and the deck, plus the `revlog` that ts-fsrs returns, stored as it is (rating 1–4, review time, and so on).
 - **Test:** deck and date. The date is a calendar day kept as text (`YYYY-MM-DD`), never a moment, so it can't shift with time zones. **Settings:** minutes a day, the last What's new note seen, and (step 4) reminders on or off, their time, and whether Done has asked.
+- **Theme (step 2, D39d):** one of four names, kept on this phone outside the database, like a draft, so it applies before the first screen draws. It's never exported, and Restore leaves it alone. If it's missing, unknown or unreadable (a private window), the app uses Ink + Cobalt + Snow.
 - **Other dates stay real dates in storage.** In the export file they become text, so Restore must turn them back into dates and check them, and check that a test date is a real calendar day.
 - **No model-version stamp on cards.** The library's guide suggests one, but the scope reset cut it. If the model ever changes, use the export-wipe-reimport rule in §3.
 
@@ -122,28 +123,32 @@ Step 1 must pass checks 1, 3, 4 and 5. Check 2 belongs to step 2.
 
 **Also test, for the rules above:** session order across two decks, with a learning card coming due before the remaining new cards; Hard on a new card makes it due exactly 90 seconds later; a card due at exactly now + 1:30 gets the countdown, and one at 1:31 ends with Done; jumping the clock mid-wait and coming back on screen shows the card; a double tap on Show answer logs no review; deleting a card removes only its reviews; editing a reviewed card leaves its schedule alone; after Again, home shows "Review 1 card" a minute later with no tap; with storage made to fail, Create deck, Save changes and Delete card lose nothing; a half-typed card survives a reload and comes back in Add card, and Close clears it; storage that won't open shows the explanation screen; reloading on a deck's address opens that deck.
 
+**Step 2 also tests (themes, D39):** one tap on a theme repaints every screen; it survives a reload with no flash of Snow first; the phone's dark mode doesn't change it; Restore leaves it alone.
+
 **Step 3 also tests, with a fixed clock:** 10 new cards and a test 5 days away show 2 new cards a day, and none on test day; with the test tomorrow or today, all are due; adding, editing or removing a test leaves every card's `dueAt` unchanged; the day after the test, the deck acts as if it has none; a phone moved to another time zone keeps the same test day; the fit check adds up two decks' tests.
 
 **Step 4 also tests:** no reminder when nothing is due, at most one a day, and nothing about cards (no text, no deck names) leaves the phone.
 
+**Experience checks E1–E5 (D48)** are in [UI-DESIGN-BRIEF.md](UI-DESIGN-BRIEF.md), "How Nigiri should feel".
+
 ## 6. Around the card
 
 - **First open.** One button: **New deck**, because a card needs a deck to go in. *Who:* every friend, on day one.
-- **Home.** One main button, **Review 18 cards**, then your decks, each with how many cards are due, when any are. A deck with no cards says "No cards yet". When nothing is due, that place says "Nothing due right now" and **Add card** becomes the main button. *Who:* everyone, every day.
-- **New deck.** A button beside home's Decks heading. Type a name, pick one of the six highlighter colours, and tap **Create deck**. Add card then opens in the new deck. Nothing is picked for you: if you skip the colour, Create deck asks for one. *Who:* everyone, when a new class or unit starts.
+- **Home.** One main button, **Review 18 cards**, with about how long it takes (D41, D45), then your decks, each with how many cards are due, when any are. A deck with no cards says "No cards yet". When nothing is due, that place says "Nothing due right now" and **Add card** becomes the main button. *Who:* everyone, every day.- **New deck.** A button beside home's Decks heading. Type a name, pick one of the six highlighter colours, and tap **Create deck**. Add card then opens in the new deck. Nothing is picked for you: if you skip the colour, Create deck asks for one. *Who:* everyone, when a new class or unit starts.
 - **Review.** Four plain buttons: Again, Hard, Good, Easy, with one quiet line above them: "Forgot it? Tap Again. Right but slow? Hard." The top shows cards left, such as "12 left": cards due now plus cards from this session due again within 90 seconds, so a rating that sends the card back (Again, or Hard on a card you're still learning) leaves the count where it was. The bar under it is ratings saved this session out of that plus the cards left. **Waiting** shows "Next card in 0:48", with **Done for now** to go home. The time comes from that card's `dueAt`, never from a timer of its own; at zero the screen picks again. *Who:* everyone.
-- **Not saved.** A failed save puts one line above the button: "Not saved. Tap Save card again." (or whichever button you tapped), "Not deleted. Tap Delete card again.", or, out of space, "Not saved. Free up space on your phone, then try again." *Who:* anyone whose phone fills up.
+- **Not saved.** A failed save puts one line above the button: "Not saved. Tap Save card again." (or whichever button), or, out of space, "Free up space on your phone". *Who:* anyone whose phone fills up.
 - **Storage can't open.** Instead of home: "Nigiri can't open your cards", three fixes, a warning not to remove the app, and **Try again**. *Who:* anyone in a private window or with a full phone.
-- **Done.** "Done", and a button back home. From step 4, Done offers reminders until you answer. *Who:* everyone, after every session.
+- **Done.** "Done", cards reviewed, and a button home (D45). From step 4, Done offers reminders until you answer. *Who:* everyone, after every session.
 - **What's new** (step 5). After an update, one line on home says what changed, once. You write it. *Who:* every friend, after you ship a change.
-- **Deck page.** **Review 6 cards** for just this deck (or "Nothing due right now"), then its cards, newest first. Tap one to edit or delete it. **Add card** and the test line (**Add a test** or **Edit test**) are here too. With no cards, it says "No cards yet" and "Add a card whenever something is worth remembering.", and Add card is the main button. *Who:* anyone fixing a typo or setting a test date.
-- **Settings** (step 2). Export and Restore, then Reminders (step 4). *Who:* everyone, to keep a backup.
+- **Deck page.** **Review 6 cards** for just this deck (or "Nothing due right now"), then its cards, newest first. Tap one to edit or delete it. **Add card** and the test line (**Add a test** or **Edit test**) are here too. With a test: days left, cards studied, today's share (D44). With no cards, it says "No cards yet" and "Add a card whenever something is worth remembering.", and Add card is the main button. *Who:* anyone fixing a typo or setting a test date.
+- **Settings** (step 2). Backup (Export and Restore), then Theme. Reminders (step 4) go between the two. Last, an optional explainer (D43). *Who:* everyone, to keep a backup.
+- **Theme** (step 2, your decision, 2026-11-08). Four rows, each a small preview in its own colours and your names for it: Ink + Cobalt + Snow (the default), Plum + Berry + Mist, Espresso + Amber + Cream, Midnight + Ice + Sky. One tap repaints the app; a check marks the one you're on. There's no Save and no message, and tapping the previous row undoes it. The theme replaces following the phone's light/dark setting. *Who:* you and your friends, once each, in the first week. `mockups/settings.html`.
 
 ## 7. Build order and the two-week test
 
 Each step is usable on its own. Stop anywhere and you still have an app.
-1. Deck, card, the New deck and Add card screens, the deck page (with edit and delete), and the review screen with ts-fsrs. Settings and the test parts stay hidden until steps 2 and 3; `mockups/index.html` shows step 1 as built. Put it on GitHub Pages so it runs on your phone, then use it yourself for a week.
-2. Export and restore, in Settings. Then friends get the link ([publishing.md](publishing.md)).
+1. Deck, card, the New deck and Add card screens, the deck page (with edit and delete), and the review screen with ts-fsrs. Settings and the test parts stay hidden until steps 2 and 3; `mockups/index.html` shows step 1 as built. Step 1 is Ink + Cobalt + Snow only, whatever the phone's light/dark setting. Put it on GitHub Pages so it runs on your phone, then use it yourself for a week.
+2. Export and restore, and the theme picker, in Settings. Then friends get the link ([publishing.md](publishing.md)).
 3. Test date and the fit check.
 4. Reminders, through a small free Cloudflare sender ([publishing.md](publishing.md#reminders-step-4)).
 5. Polish, and the What's new note ([§6](#6-around-the-card)).
@@ -155,6 +160,7 @@ Each step is usable on its own. Stop anywhere and you still have an app.
 - **Keyboard:** on Save card or Done, move focus to Front in the same tap, before waiting for the save, and clear the fields once it succeeds. Choosing a deck from home moves the cursor to Front.
 - **Don't use the v5 names** most tutorials show: `fsrs()`, `FSRS`, `createEmptyCard`, `next`, `repeat`.
 - **The review screen re-checks `dueAt`,** because learning cards come due within minutes.
+- **Themes (D39):** each theme is one `[data-theme]` block of CSS variables, with Ink + Cobalt + Snow on `:root` (`mockups/highlighter.css`). Use no `prefers-color-scheme`. In step 2, an inline script in `index.html` reads the saved theme before the first paint and sets `data-theme` and `<meta name="theme-color">`. The manifest's splash colours are Snow's, because a manifest can't change per person.
 - **Counts follow the clock.** Dexie's live queries rerun when data changes, not when time passes. Recount home, the deck page and the session when the app comes back on screen, and once a minute while it's open.
 - **Hash URLs** (`/nigiri/#/deck/...`): GitHub Pages has no fallback for app routes, so a refresh never shows GitHub's 404. An address for a deck that no longer exists goes home.
 - **Node:** ts-fsrs needs Node 24 or newer; the laptop has 26.13.0. The deploy file uses Node 24 or 26, not 25, which Vitest 5.1.0 doesn't support.
@@ -168,7 +174,7 @@ Each step is usable on its own. Stop anywhere and you still have an app.
 Add these only after two weeks of use, and only the ones you actually miss.
 - **Write your own:** the duplicate-front check; opening in the deck you used last. (Keeping a half-typed card moved into step 1 on 2026-11-08.)
 - **Review:** undo last rating; rating buttons that show when the card comes back; editing a card mid-review.
-- **Test mode:** the readiness number (average predicted recall on test day); a last look at every card before the test (RemNote's "Final Review"; the evidence is weak).
+- **Test mode:** the readiness number (average predicted recall on test day); a last look at every card before the test (RemNote's "Final Review"; the evidence is weak). **If readiness comes (D44):** counted out of every card in the deck, with cards not studied yet counted as not remembered. It isn't shown until every card has been studied at least once. It's worded as cards, never a grade or %: "about 28 of 35 likely to come back to you on test day, if you keep reviewing". It names its assumption (you keep reviewing what's due) and says it's an estimate.
 - **Reminders:** the number on the app icon.
-- **Around the card:** the streak; the session summary; the add-to-home-screen tip.
+- **Around the card:** days studied this week, which never resets to zero (replaces the streak, D45); the session breakdown by rating (Done already shows the cards reviewed); the add-to-home-screen tip.
 - **Decks:** renaming or deleting a deck.

@@ -141,11 +141,25 @@
     $('#cards').hidden = true;
   }
 
-  // ?test: a test is set (step 3). ?test=today: the test is today. The whole line opens Edit test.
+  // ?test: a test is set (step 3): Friday, 3 days left, 30 of 35 studied, today's share 2 (fsrs-notes §10 rule 1).
+  // ?test=today: the test is today. ?test=all: every card studied (the milestone, said in words).
+  // Facts only (D44): studied means at least one review. No percentage, grade or prediction.
+  // The head's "35 cards, 6 due" goes while a test is set: "of 35" is here, and the due count is on the button.
+  // The whole block is one link to Edit test; Edit test stays last, so it's read last.
   if (params.has('test')) {
-    const today = params.get('test') === 'today';
-    $('#test-when').className = 'when';
-    $('#test-when').textContent = today ? 'Test today' : 'Test Friday, Nov 13';
+    const kind = params.get('test');
+    const today = kind === 'today';
+    const all = kind === 'all';
+    $('#counts').hidden = true;
+    $('#test-line').classList.add('has-test');
+    const info = document.createElement('span');
+    info.className = 'test-info';
+    // A space after each row, so the link's spoken name doesn't run the facts together (P-UI-9).
+    const row = (cls, text) => { const s = document.createElement('span'); s.className = cls; s.textContent = text; info.append(s, ' '); };
+    row('when', today ? 'Test today' : 'Test Friday, in 3 days');
+    row('t-secondary', all ? 'All 35 cards studied' : '30 of 35 studied');
+    if (!all) row('t-secondary', today ? '5 not studied yet, all due today' : '5 not studied yet: 2 today, all by Thursday');
+    $('#test-when').replaceWith(info);
     $('#test-action').textContent = 'Edit test';
     $('#test-line').href = 'deck-test.html?edit' + (today ? '&today' : '');
   }

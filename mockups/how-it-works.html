@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>How Nigiri picks your cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="highlighter.css">
+</head>
+<body>
+<!-- The one optional explainer (D43), from a row in Settings (step 2). Never linked from the review screen.
+     It's the only screen that may name FSRS. "With a test date" joins in step 3, with Test mode. -->
+<main class="screen explain">
+  <header class="form-bar">
+    <a class="btn-text back-link" href="settings.html">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Settings</a>
+    <span></span><span></span>
+  </header>
+
+  <h1 class="t-section">How Nigiri picks your cards</h1>
+
+  <section aria-labelledby="ratings">
+    <h2 class="t-title" id="ratings">The four ratings</h2>
+    <dl class="ratings">
+      <div><dt>Again</dt><dd>you forgot.</dd></div>
+      <div><dt>Hard</dt><dd>right, but slow or unsure. It still counts as remembered.</dd></div>
+      <div><dt>Good</dt><dd>right, with some effort.</dd></div>
+      <div><dt>Easy</dt><dd>right, with no effort.</dd></div>
+    </dl>
+  </section>
+
+  <section aria-labelledby="comes-back">
+    <h2 class="t-title" id="comes-back">When a card comes back</h2>
+    <p>Tap Again and the card comes back after 1&nbsp;minute. Hard on a card you're still learning waits 90&nbsp;seconds.</p>
+    <p>Every other wait is at least a&nbsp;day. Nigiri works it out from how you've answered that card before, aiming for you to remember about 9&nbsp;in&nbsp;10 cards when they come back.</p>
+    <p>Easy aims a little higher, about 19&nbsp;in&nbsp;20. So an Easy card still waits longer than Good would, just not as long as it could.</p>
+    <p>There's no daily limit. Review as much as you like.</p>
+    <p class="t-secondary">The maths is called FSRS, if you're curious.</p>
+  </section>
+
+  <section aria-labelledby="with-test" data-later>
+    <h2 class="t-title" id="with-test">With a test date</h2>
+    <p>Cards not studied yet are spread over the days before the test, so each one comes up at least a day early.</p>
+    <p>Take a day off, and the rest spread out over the days left.</p>
+    <p>Move the date, and only that plan changes. Cards you've studied keep their schedule: a test never moves them.</p>
+  </section>
+</main>
+<script src="mockup.js"></script>
+</body>
+</html>

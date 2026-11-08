@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="highlighter.css">
+</head>
+<body>
+<!-- Settings arrives in build step 2 (spec §6, §7): Backup, then Theme. Reminders join in step 4,
+     between the two. From home's gear icon. Export backup is the one filled button. -->
+<main class="screen settings" style="padding-bottom: var(--s5)">
+  <header class="form-bar">
+    <a class="btn-text back-link" href="home.html">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Home</a>
+    <span></span><span></span>
+  </header>
+  <h1 class="t-section settings-title">Settings</h1>
+
+  <section class="sec is-first" aria-labelledby="backup-title">
+    <h2 class="t-title" id="backup-title">Backup</h2>
+    <p class="t-secondary">Your cards are only on this phone. Export a backup now and then.</p>
+    <!-- S2-PLAN writes this line's copy (where the file goes) and the Restore confirm. Kept empty, not hidden. -->
+    <p class="status" id="status" role="status"></p>
+    <button class="btn btn-primary" type="button" id="export">Export backup</button>
+    <div class="after-btn"><button class="btn-text" type="button" id="restore">Restore a backup</button></div>
+    <p class="helper">Replaces every deck and card on this phone.</p>
+  </section>
+
+  <section class="sec" aria-labelledby="theme-title">
+    <h2 class="t-title" id="theme-title">Theme</h2>
+    <!-- One tap applies a theme straight away: no Save, no line. The repaint and the check are the
+         confirmation, and tapping the previous row undoes it. Saved on this phone only, never exported (D39d). -->
+    <ul class="themes" role="radiogroup" aria-labelledby="theme-title">
+      <li><label class="theme"><input type="radio" name="theme" value="snow"><span class="chip" data-theme="snow" aria-hidden="true">Aa</span><span class="name">Ink&nbsp;+ Cobalt&nbsp;+ Snow</span><svg class="ok" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></label></li>
+      <li><label class="theme"><input type="radio" name="theme" value="mist"><span class="chip" data-theme="mist" aria-hidden="true">Aa</span><span class="name">Plum&nbsp;+ Berry&nbsp;+ Mist</span><svg class="ok" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></label></li>
+      <li><label class="theme"><input type="radio" name="theme" value="cream"><span class="chip" data-theme="cream" aria-hidden="true">Aa</span><span class="name">Espresso&nbsp;+ Amber&nbsp;+ Cream</span><svg class="ok" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></label></li>
+      <li><label class="theme"><input type="radio" name="theme" value="midnight"><span class="chip" data-theme="midnight" aria-hidden="true">Aa</span><span class="name">Midnight&nbsp;+ Ice&nbsp;+ Sky</span><svg class="ok" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg></label></li>
+    </ul>
+  </section>
+
+  <!-- D43: the one optional explainer, last. Never linked from the review screen. -->
+  <a class="row-link" href="how-it-works.html">How Nigiri picks your cards<svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5"/></svg></a>
+</main>
+<script src="mockup.js"></script>
+<script>
+  // Demo only, nothing is saved. The checked row follows ?theme (default Snow); a tap repaints the page.
+  // In the app: write the choice to this phone's local storage, set data-theme on <html>, and update
+  // <meta name="theme-color">. An inline script in index.html applies it before the first paint (D39d).
+  // ?focus=midnight shows keyboard focus on a row, for screenshots.
+  const html = document.documentElement;
+  const current = html.dataset.theme || 'snow';
+  document.querySelector(`input[name="theme"][value="${current}"]`).checked = true;
+  document.querySelectorAll('input[name="theme"]').forEach((r) => r.addEventListener('change', () => {
+    if (r.value === 'snow') delete html.dataset.theme; else html.dataset.theme = r.value;
+    window.mockupCarry();
+  }));
+  const f = new URLSearchParams(location.search).get('focus');
+  const target = f && document.querySelector(`input[name="theme"][value="${f}"]`);
+  if (target) target.focus({ focusVisible: true });
+</script>
+</body>
+</html>

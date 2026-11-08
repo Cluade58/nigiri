@@ -24,43 +24,48 @@ _Rewritten 2026-11-07 after the scope reset. The earlier research-heavy version 
 - **Built first:** plain English text cards. Mandarin and math are on the [v2 page](v2-input-flows.md).
 - **One way to make cards: write your own.** No import, and no AI ([spec §1](product-spec.md)).
 - **Domains:** each domain is its own product, with its own input path and its own review screen. They share only the scheduler and the deck.
-- **Test mode is in version one:** one test per deck and the fit check, with no readiness number. The fit check counts a fixed 20 seconds per card and adds up every deck with a test ahead. New cards are spread over the days before the test, so each gets at least a night before it. The date is a calendar day; adding, editing or removing a test never changes a card's schedule; after the test, the deck goes back to normal (decided 2026-11-08; [spec §2](product-spec.md), [fsrs-notes §10](fsrs-notes.md)). A test date is what makes someone open the app on a Tuesday.
+- **Test mode is in version one:** one test per deck and the fit check, with no readiness number. The deck shows how many cards are studied and not studied yet, and today's share (D44). The fit check counts a fixed 20 seconds per card and adds up every deck with a test ahead. New cards are spread over the days before the test, so each gets at least a night before it. The date is a calendar day; adding, editing or removing a test never changes a card's schedule; after the test, the deck goes back to normal (decided 2026-11-08; [spec §2](product-spec.md), [fsrs-notes §10](fsrs-notes.md)). A test date is what makes someone open the app on a Tuesday.
 - **Reminders when cards are due** (your decision, 2026-11-08): build step 4. At most one a day, only when cards are due, and never any card text or deck name. Asked on Done, from the first one after step 4 ships, until you answer. **Sent through a small free sender on Cloudflare** (your choice, 2026-11-08), so they reach iPhone and Android on time. It gets only each phone's push address and next reminder time ([publishing.md](publishing.md#reminders-step-4)).
-- **Pure flashcards:** no assignment tracker and no calendar. Homework gets tracked elsewhere.
-- **No lives and no caps on reviewing.** The streak waits for version 1.1 ([spec §8](product-spec.md)).
+- **Pure flashcards:** no assignment tracker and no calendar. Homework gets tracked elsewhere. Rechecked 2026-11-08 against a direction that mentioned assignments: still out (D40). A test date on a deck is the only thing you schedule.
+- **No lives and no caps on reviewing.** No streak either: progress is counted, never lost. Done says how many cards you reviewed, home welcomes you back after days away, and a test deck says when every card is studied. "Days studied this week", which never resets, waits for version 1.1 ([spec §8](product-spec.md); D45).
+- **How it should feel** (decided 2026-11-08): you open it and know what to do next and roughly how long it takes, Test mode shows facts rather than forecasts, and stopping never loses anything. The principles and the journey are in [UI-DESIGN-BRIEF.md](UI-DESIGN-BRIEF.md), "How Nigiri should feel".
 - **Build order and the two-week test:** [spec §7](product-spec.md).
 - **Visual direction: B, Highlighter.** The reference screens start at `mockups/index.html`.
-- **Colours (your decision, 2026-11-08: "use the skills for the best most appealing colours based on the skills (colour trios)").**
-  - **The trio** comes from ui-ux-pro-max's row 103, "Flashcard & Study Tool": violet `#7C3AED`, lilac `#8B5CF6` and emerald `#059669`, on lavender paper. ui-designer and chief-officer chose it; [PROJECT-STATE.md](PROJECT-STATE.md) D37 has why.
-  - **Grape ink (your decision, 2026-11-08: "I dont rlly like the navy blue white contrast", then "Grape").** Row 103's slate text read as navy on white, so every text colour is now grape-tinted, in both themes. Dark mode follows Grape too: a grape-night page and a lilac button with dark text. The progress bar, Done, error, the white sheet and the deck colours stay as D37 set them; D38 has why.
-  - **The rule:** violet marks acting, choosing and focus, and nothing else; the deck highlighters stay yours.
-  - **History:** the earlier navy Highlighter values are in git: `git show bcb812d:product-brief.md`; row 103's slate ink: `git show de1a806:product-brief.md`.
+- **Colours: four themes you can switch (your decision, 2026-11-08: "Go with these four, the ink colblat snow is the default, this setting should be able to be sewitched").**
+  - **Each theme is a trio you picked:** a background (about 60% of the screen), a text colour (30%), and one accent for the button (10%). **Ink + Cobalt + Snow is the default** on every phone. The themes replace Grape (D38) and the earlier row-103 colours. [PROJECT-STATE.md](PROJECT-STATE.md) D39 has why, and every measured number.
+  - **Switching:** Settings → Theme: four rows, one tap each. It arrives in build step 2; step 1 ships with Snow only. The theme replaces following the phone's light/dark setting, and Midnight is the dark one. It's saved on this phone only and isn't in the export (D39a–D39d).
+  - **The rule:** the accent marks acting and focus only: the one filled button, the key you just rated, the focus ring and the progress bar. Ink draws everything else. The deck highlighters stay yours in every theme.
+  - **Supporting colours** are tints and shades of each trio's own hues, measured to WCAG AA: 4.5:1 for text, 3:1 for UI parts and focus. Error red is the one colour outside the trios, because "Not saved" has to read as red.
+  - **History:** earlier palettes are in git: navy (`git show bcb812d:product-brief.md`), row 103 (`de1a806`), Grape (`116bf50`).
 
-| Token | What it draws | Light | Dark | From |
-|---|---|---|---|---|
-| Page | the page, bars, fields | `#FAF5FF` | `#17111F` | Row 103 Background; dark is Grape's |
-| Surface | the edit sheet only (dark adds a `#514468` hairline on its top edge) | `#FFFFFF` | `#221A2D` | Row 103 Card; dark is Grape's tint |
-| Ink | all text and icons, outlined buttons, rating keys at rest, the rule under the question | `#2E1D47` | `#EDE6F7` | Grape, replacing row 103's slate Foreground |
-| Secondary text | secondary lines, placeholders, field borders, chevrons | `#5E5270` | `#B3A8C4` | Grape, replacing row 103's slate Muted Foreground |
-| Rules | dividers, progress track | `#E6DCF7` | `#322842` | Row 103 Border, darkened so dividers show; dark in Grape's hue |
-| Primary (violet) | the one filled button per screen, the rated key | `#7C3AED`, white text | `#A78BFA`, `#17111F` text | Row 103 Primary; dark is Grape's |
-| Secondary (lilac) | the review progress bar | `#8B5CF6` | `#A78BFA` | Row 103 Secondary |
-| Focus ring | keyboard focus, the field you're typing in | `#7C3AED` | `#A78BFA` | Row 103 Ring |
-| Done (mint) | the highlighter behind "Done" | `#7FDDB9` | same at 85% | Row 103 Accent `#059669`, lightened: it drops to 1.47:1 under dark text in dark mode |
-| Error | error lines, invalid borders | `#B91C1C` | `#F87171` | Row 103 Destructive, darkened from 4.50:1 to 6.03:1 |
-| Text on highlights | dark text on every deck colour and on Done | `#2E1D47` (the ink) | `#17111F` (the page) | Grape |
-| Scrim | behind the edit sheet | ink at 50% | `#08050D` at 60% | Grape |
+| Token | What it draws | Ink + Cobalt + Snow (default) | Plum + Berry + Mist | Espresso + Amber + Cream | Midnight + Ice + Sky |
+|---|---|---|---|---|---|
+| Page (your background, 60%) | the page, bars, fields | `#F5F7FC` | `#FAF7FB` | `#FBF8F1` | `#141B24` |
+| Surface | the edit sheet only | `#FFFFFF` | `#FFFFFF` | `#FFFFFF` | `#1E2836`, with a `#56647A` hairline on its top edge |
+| Ink (your text, 30%) | all text and icons, outlined buttons, rating keys at rest, the rule under the question | `#17243C` | `#302039` | `#33291F` | `#F3F5F7` |
+| Secondary text | secondary lines, placeholders, field borders, chevrons | `#4C576A` | `#5F5266` | `#5E564C` | `#AEB7C4` |
+| Rules | dividers, progress track | `#DBDEE5` | `#E2DEE4` | `#E3DFD8` | `#2A3340` |
+| Primary button (your accent, 10%) and its text | the one filled button per screen | `#3158C9`, white | `#9C356B`, white | `#A45613`, white | `#8FB7FF`, `#141B24` |
+| Pressed button | the filled button while pressed | `#2D50B4` | `#8C3264` | `#934F15` | `#80A4E5` |
+| Rated key | the key you just tapped, with the button's text colour | `#3158C9` | `#9C356B` | `#A45613` | `#8FB7FF` |
+| Focus ring | keyboard focus, the field you're typing in | `#3158C9` | `#9C356B` | `#A45613` | `#8FB7FF` |
+| Progress bar | the review progress, on the rules track | `#3158C9` | `#9C356B` | `#A45613` | `#8FB7FF` |
+| Done highlight | the highlighter behind "Done" (full strength in every theme) | `#A6BEFF` | `#F5A3CE` | `#F5BC8A` | `#C1D6FB` |
+| Error | error lines, invalid borders | `#B91C1C` | `#B91C1C` | `#B91C1C` | `#F87171` |
+| Text on highlights | dark text on every deck colour and on Done | the ink | the ink | the ink | `#141B24` (the page) |
+| Scrim | behind the edit sheet | ink at 50% | ink at 50% | ink at 50% | `#06090D` at 60% |
 
-| Deck colour (you pick one per deck) | Highlight: marks and the picker | Pen: the 6px swatch, light mode | Dark |
+| Deck colour (you pick one per deck) | Highlight: marks and the picker | Pen: the 6px swatch, light themes | Midnight |
 |---|---|---|---|
 | Green | `#7BE38A` | `#33934A` | highlight at 85% |
 | Blue | `#7CC8FF` | `#3384CC` | highlight at 85% |
 | Pink | `#FF8FC8` | `#D23C8A` | highlight at 85% |
 | Orange | `#FFB65C` | `#C2650C` | highlight at 85% |
 | Yellow | `#FFE45C` | `#A37F00` | highlight at 85% |
-| Purple | `#DAA8F7` (was `#C3A6FF`, moved toward orchid so it isn't the button's violet) | `#AD4BD0` | `#E2A0F0` at 85% (more orchid, so it isn't the lilac button and focus ring) |
+| Purple | `#DAA8F7` | `#AD4BD0` | `#E2A0F0` at 85% |
 
-  Light mode needs two tones per deck: a pastel can't reach 3:1 against the page as a thin swatch and also keep dark text readable as a highlight. Dark text sits on every highlight in both themes, like a real pen. Measured contrast is in D38, which replaced D37's numbers.
+  The deck colours are unchanged in every theme. The light themes need two tones per deck: a pastel can't reach 3:1 against the page as a thin swatch and also keep dark text readable as a highlight. Dark text sits on every highlight, like a real pen.
+  **Near pairs:** Cobalt and Sky sit near Blue, Berry near Pink, and Amber near Orange. They stay apart by shape: the accent only fills buttons and keys and draws the 2px ring and progress line, while deck colours only draw 6px swatches, picker tiles, and bands behind text. Neither ever takes the other's role. In the light themes, a deck's highlight is also about 3:1 lighter than the accent. In Midnight every deck colour is as light as Sky, so shape is the only cue (D39e).
 
   Type: Bricolage Grotesque for headings, Atkinson Hyperlegible Next for body, both bundled with the app. Colour marks only what matters: the main button, the key you just rated, focus, deck colours, and the highlighter over what just changed. Everything else stays quiet.
 
@@ -82,6 +87,7 @@ _Rewritten 2026-11-07 after the scope reset. The earlier research-heavy version 
 ## What the research taught (one line each)
 
 - **Gizmo's lives** and **Quizlet's caps** are what students resent most. We have neither.
+- **Gamification** (two guides, read 2026-11-08): Octalysis says progress, creativity and ownership keep people coming back, while scarcity and fear of loss bring burnout. Writing your own cards is the creativity part, so we count effort and never punish a missed day (D45).
 - **RemNote** already schedules around exam dates. Our difference is the fit check: does the plan fit your time?
 - **Anki** is powerful but hard to learn. Ours works with no settings.
 - **Anki's FSRS settings** (checked 2026-11-08): we copy its single-step setup (Again 1 minute, Hard 1.5×), but not its FSRS-6, fuzz, learn-ahead, day boundary, leeches or optimizer ([fsrs-notes §8](fsrs-notes.md)).

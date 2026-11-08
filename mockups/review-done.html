@@ -11,7 +11,11 @@
 <body>
 <div class="session">
   <main class="done" id="done">
-    <h1 class="t-hero" id="done-title" tabindex="-1"><span class="mark" style="--hl: var(--hl-done)">Done</span></h1>
+    <h1 class="t-hero" id="done-title" tabindex="-1"><span class="mark" style="--hl: var(--hl-done); --hl-alpha: 1">Done</span></h1>
+    <!-- D45: one real number, the different cards rated this session ("1 card reviewed."), echoing
+         "Review 18 cards". ?milestone: a deck with a test ahead had its last card studied this session,
+         and the milestone replaces the count. Its swipe follows Done's; reduced motion shows both still. -->
+    <p class="done-count" id="done-count">18 cards reviewed.</p>
 
     <!-- Step 4: asked once, on the first Done after reminders ship (publishing.md, Reminders). -->
     <section class="remind" id="remind" aria-labelledby="remind-title" hidden>
@@ -34,6 +38,9 @@
   // Only Turn on or Not now count as an answer. Leaving by Back to home brings the ask back on the next Done.
   const params = new URLSearchParams(location.search);
   const $ = (s) => document.querySelector(s);
+  if (params.has('milestone')) {
+    $('#done-count').innerHTML = 'You\'ve studied all 35&nbsp;cards in <span class="keep"><span class="mark" style="--hl: var(--hl-green); animation-delay: 600ms">AP Bio unit 4</span>.</span>';
+  }
   if (params.has('remind')) {
     $('#done').classList.add('has-ask');
     $('#remind').hidden = false;
