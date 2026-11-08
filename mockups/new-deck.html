@@ -38,7 +38,9 @@
   </form>
 
   <div class="action-zone">
-    <button class="btn btn-primary" type="submit" form="form">Create deck</button>
+    <!-- A failed save (D17): the name and colour stay, Create deck turns back on, and this line says what to tap. -->
+    <p class="status" id="status" role="status"></p>
+    <button class="btn btn-primary" type="submit" form="form" id="create">Create deck</button>
   </div>
 </div>
 <script>
@@ -49,6 +51,7 @@
 
   $('#form').addEventListener('submit', (e) => {
     e.preventDefault();
+    $('#status').textContent = '';
     const v = name.value.trim();
     const c = picked();
     $('#name-error').hidden = !!v;
@@ -65,9 +68,17 @@
   }));
 
   // ?named fills the name and picks yellow, for screenshots.
-  if (new URLSearchParams(location.search).has('named')) {
+  // ?error and ?full show a failed save: what you picked stays (spec §3, §6).
+  const params = new URLSearchParams(location.search);
+  if (params.has('named') || params.has('error') || params.has('full')) {
     name.value = 'Chem unit 3';
     document.querySelector('input[value="yellow"]').checked = true;
+  }
+  if (params.has('error') || params.has('full')) {
+    $('#status').className = 'status is-error';
+    $('#status').textContent = params.has('full')
+      ? 'Not saved. Free up space on your phone, then try again.'
+      : 'Not saved. Tap Create deck again.';
   }
   name.focus({ preventScroll: true });
 </script>

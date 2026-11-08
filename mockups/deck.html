@@ -28,10 +28,11 @@
     <a class="btn btn-primary" href="review-question.html">Review 6 cards</a>
   </div>
 
-  <div class="test-line" data-later>
-    <span class="t-secondary">No test date yet</span>
-    <a class="btn-text" href="deck-test.html">Add a test</a>
-  </div>
+  <!-- One link in every state (P-UI-3). ?test: a test Friday; ?test=today. After test day it goes back to this. -->
+  <a class="test-line" id="test-line" href="deck-test.html" data-later>
+    <span class="t-secondary" id="test-when">No test date yet</span>
+    <span class="link-label" id="test-action">Add a test</span>
+  </a>
 
   <section class="sec" id="cards" aria-labelledby="cards-title" style="margin-top: var(--s4)">
     <div class="sec-head">
@@ -74,7 +75,12 @@
       <textarea class="input back" id="e-back" rows="3"></textarea>
     </div>
   </div>
-  <button class="btn btn-primary" type="button" id="save">Save changes</button>
+  <!-- One line for both buttons, inside the dialog (aria-modal hides everything outside it).
+       It clears when the sheet opens and on the next tap. -->
+  <div>
+    <p class="status" id="sheet-status" role="status"></p>
+    <button class="btn btn-primary" type="button" id="save">Save changes</button>
+  </div>
   <button class="btn-text" type="button" id="delete" style="justify-self: center">Delete card</button>
 </div>
 <script>
@@ -86,6 +92,7 @@
   document.querySelectorAll('#sheet textarea').forEach((t) => t.addEventListener('input', () => grow(t)));
   function openSheet(btn) {
     current = btn;
+    $('#sheet-status').className = 'status'; $('#sheet-status').textContent = '';
     $('#e-front').value = btn.querySelector('.f').textContent;
     $('#e-back').value = btn.querySelector('.b').textContent;
     $('#scrim').hidden = false; $('#sheet').hidden = false;
@@ -107,8 +114,16 @@
   });
 
   // ?edit opens the sheet for screenshots.
+  // ?edit&error: Save changes failed. ?edit&delete-error: Delete card failed (D17).
+  // Either way nothing changed: the sheet stays open with the card as it was, and the button is back on.
+  // A delete removes the card and its reviews together, or nothing.
   const params = new URLSearchParams(location.search);
   if (params.has('edit')) openSheet(document.querySelector('#list li:nth-child(2) button'));
+  const sheetStatus = $('#sheet-status');
+  if (params.has('edit') && (params.has('error') || params.has('delete-error'))) {
+    sheetStatus.className = 'status is-error';
+    sheetStatus.textContent = params.has('error') ? 'Not saved. Tap Save changes again.' : 'Not deleted. Tap Delete card again.';
+  }
 
   // ?clear: cards, but none due right now. ?empty: a new deck with no cards yet.
   // In both, the Review button's place or the card list gives way, and Add card becomes the main button (spec §6).
@@ -123,6 +138,15 @@
     $('#counts').textContent = 'No cards yet';
     $('#lead').innerHTML = '<p class="t-secondary">Add a card whenever something is worth remembering.</p>';
     $('#cards').hidden = true;
+  }
+
+  // ?test: a test is set (step 3). ?test=today: the test is today. The whole line opens Edit test.
+  if (params.has('test')) {
+    const today = params.get('test') === 'today';
+    $('#test-when').className = 'when';
+    $('#test-when').textContent = today ? 'Test today' : 'Test Friday, Nov 13';
+    $('#test-action').textContent = 'Edit test';
+    $('#test-line').href = 'deck-test.html?edit' + (today ? '&today' : '');
   }
 </script>
 <script src="mockup.js"></script>

@@ -12,7 +12,7 @@
 <div class="screen page-flow" style="--hl: var(--hl-purple)">
   <header class="form-bar">
     <a class="btn-text" href="deck.html">Cancel</a>
-    <h1>Add a test</h1>
+    <h1 id="title">Add a test</h1>
     <span></span>
   </header>
 
@@ -40,39 +40,94 @@
       <p class="helper" id="min-help">Your study time each day, for all your decks.</p>
     </div>
 
-    <section class="fit" aria-labelledby="fit-title" aria-live="polite">
+    <!-- The long text isn't a live region; the short hidden line below is (P-UI-3). -->
+    <section class="fit" aria-labelledby="fit-title">
       <h2 class="t-hero" id="fit-title"><span class="mark" id="fit-mark">It fits</span></h2>
-      <p class="lede" id="lede">35 cards at 20 seconds each, with 1 day left, needs about 12 min a day. You have 15.</p>
+      <p class="lede" id="lede"></p>
     </section>
+    <p class="sr-only" id="fit-status" role="status"></p>
+
+    <!-- Edit test only. Out of the sticky zone, so the fit answer stays visible on small phones. -->
+    <div class="remove" id="remove-zone" hidden>
+      <p class="status" id="remove-status" role="status"></p>
+      <button class="btn-text" type="button" id="remove">Remove test</button>
+    </div>
   </form>
 
   <div class="action-zone">
-    <button class="btn btn-primary" type="submit" form="form">Save test</button>
+    <p class="status" id="status" role="status"></p>
+    <button class="btn btn-primary" type="submit" form="form" id="save">Save test</button>
   </div>
 </div>
 <script>
-  // Demo only. Fit check: cards in the deck × 20 seconds ÷ days until the test (spec §2).
+  // Demo only. Fit check (spec §2): cards × 20 seconds ÷ days left (at least 1), summed over every deck
+  // with a test ahead, rounded up to whole minutes because the check is on the safe side.
+  // ?edit       Edit test, Friday, with another deck's test ahead (AP Bio unit 4 adds 8 min a day)
+  // ?today      a test today
+  // ?max        needs more than 120 minutes, the most the stepper allows
+  // ?minutes=10 the "doesn't fit" state;  ?edit&error / ?edit&remove-error  the failure lines
   const $ = (s) => document.querySelector(s);
-  const CARDS = 35, SECONDS = 20, DAYS = 1;
-  const NEED = Math.round(CARDS * SECONDS / DAYS / 60); // 700 seconds, about 12 min
+  const params = new URLSearchParams(location.search);
+  const MAX = 120, SECONDS = 20;
+  let cards = 35, days = 1, other = null, when = 'with 1 day left', per = 'a day';
+  if (params.has('edit')) {
+    document.title = 'Edit test';
+    $('#title').textContent = 'Edit test';
+    $('#date').value = 'Fri, Nov 13';
+    $('#date-help').textContent = 'In 3 days';
+    $('#remove-zone').hidden = false;
+    days = 3; when = 'with 3 days left';
+    other = { name: 'AP Bio unit 4', minutes: 8 };
+  }
+  if (params.has('today')) {
+    $('#date').value = 'Tue, Nov 10';
+    $('#date-help').textContent = 'Today';
+    days = 1; when = 'with the test today'; per = 'today';
+  }
+  if (params.has('max')) { cards = 400; }
+  const need = Math.ceil(cards * SECONDS / days / 60);
+  const total = need + (other ? other.minutes : 0);
   const minutes = $('#minutes');
+  let announce;
+
   function render() {
     const have = parseInt(minutes.value, 10) || 0;
-    const fits = have >= NEED;
-    $('#fit-mark').textContent = fits ? 'It fits' : "It doesn't fit";
-    $('#fit-mark').style.animation = 'none'; void $('#fit-mark').offsetWidth; $('#fit-mark').style.animation = '';
-    $('#lede').textContent = `${CARDS} cards at ${SECONDS} seconds each, with ${DAYS} day left, needs about ${NEED} min a day. You have ${have}.`
-      + (fits ? '' : ` Raise it to ${Math.ceil(NEED / 5) * 5} and it fits.`);
+    const fits = have >= total;
+    const mark = $('#fit-mark');
+    const answer = fits ? 'It fits' : "It doesn't fit";
+    if (mark.textContent !== answer) { mark.textContent = answer; mark.style.animation = 'none'; void mark.offsetWidth; mark.style.animation = ''; }
+    let text = `${cards} cards at ${SECONDS} seconds each, ${when}, needs about ${need} min ${per}`;
+    if (total > MAX) {
+      text += `, more than the ${MAX} you can set. You can still save the test: reviews start with the cards waiting longest, and none are skipped.`;
+    } else {
+      text += '.';
+      if (other) text += ` Your ${other.name} test adds ${other.minutes}, so ${total} min ${per} in all.`;
+      text += ` You have ${have}.`;
+      if (!fits) text += ` Raise it to ${Math.ceil(total / 5) * 5} and it fits.`;
+    }
+    $('#lede').textContent = text;
+    // One short announcement, 500 ms after the last tap.
+    clearTimeout(announce);
+    announce = setTimeout(() => { $('#fit-status').textContent = `${answer}. Needs ${total} min ${per}, you have ${have}.`; }, 500);
   }
-  const step = (d) => { minutes.value = Math.min(120, Math.max(5, (parseInt(minutes.value, 10) || 15) + d)); render(); };
+  const step = (d) => { minutes.value = Math.min(MAX, Math.max(5, (parseInt(minutes.value, 10) || 15) + d)); render(); };
   $('#fewer').addEventListener('click', () => step(-5));
   $('#more').addEventListener('click', () => step(5));
   minutes.addEventListener('input', render);
-  $('#form').addEventListener('submit', (e) => { e.preventDefault(); location.href = 'deck.html'; });
+  $('#form').addEventListener('submit', (e) => { e.preventDefault(); location.href = 'deck.html?test'; });
+  $('#remove').addEventListener('click', () => { location.href = 'deck.html'; });
 
-  // ?minutes=10 shows the "doesn't fit" state for screenshots.
-  const m = new URLSearchParams(location.search).get('minutes');
+  if (params.has('max')) minutes.value = MAX;
+  const m = params.get('minutes');
   if (m) minutes.value = m;
+  if (params.has('error')) {
+    $('#status').className = 'status is-error';
+    $('#status').textContent = 'Not saved. Tap Save test again.';
+  }
+  if (params.has('remove-error')) {
+    $('#remove-status').className = 'status is-error';
+    $('#remove-status').textContent = 'Not removed. Tap Remove test again.';
+  }
   render();
 </script>
 </body>

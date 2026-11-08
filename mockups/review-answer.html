@@ -53,7 +53,9 @@
     if (key.disabled) return;
     key.classList.add('is-rated');
     keys.forEach((k) => { k.disabled = true; });
-    // Again sends the card back into this session, so the count stays at 12. Any other rating leaves 11.
+    // This card is one you already know, so only Again sends it back into this session (in 1 minute)
+    // and the count stays at 12. Any other rating leaves 11. On a card you're still learning,
+    // Hard sends it back too (in 90 seconds), so the count would stay as well.
     const left = key.dataset.rate === 'Again' ? 12 : 11;
     document.getElementById('left').textContent = `${left} left`;
     if (announce) document.getElementById('live').textContent = key.dataset.rate === 'Again'

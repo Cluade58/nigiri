@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nigiri can't open your cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="highlighter.css">
+</head>
+<body>
+<!-- Shown instead of home when the app can't open its storage at all (spec §3, §6).
+     Never an empty home: cards made there wouldn't save. No highlighter: nothing changed. -->
+<div class="screen page-flow">
+  <main class="empty grow" aria-labelledby="title">
+    <h1 class="t-hero" id="title">Nigiri can't open your cards</h1>
+    <p class="body">It can't tell why, or whether your cards are still there. One of these may fix it:</p>
+    <ul class="fixes">
+      <li>Open Nigiri in a normal window, not a private one.</li>
+      <li>Let your browser save data for this site.</li>
+      <li>Free up space on your phone.</li>
+    </ul>
+    <p class="warn">Don't remove Nigiri from your home screen or clear its site data. That could delete any cards it still has.</p>
+  </main>
+
+  <div class="action-zone">
+    <!-- Keep this line in the page and empty, not hidden, so new text is announced. -->
+    <p class="status" id="status" role="status"></p>
+    <button class="btn btn-primary" type="button" id="retry">Try again</button>
+  </div>
+</div>
+<script>
+  // Demo only. In the app, Try again opens storage again: if it opens, home appears.
+  // The button turns off while it tries. If it fails again, the line says so, so the tap
+  // never looks dead, and focus goes back to the button.
+  const retry = document.getElementById('retry');
+  const status = document.getElementById('status');
+  function failAgain() {
+    status.className = 'status is-error';
+    status.textContent = 'Still can\'t open your cards.';
+  }
+  retry.addEventListener('click', () => {
+    status.textContent = '';
+    retry.disabled = true;
+    setTimeout(() => { retry.disabled = false; failAgain(); retry.focus(); }, 400);
+  });
+  // ?again shows the screen after Try again failed, for screenshots.
+  if (new URLSearchParams(location.search).has('again')) failAgain();
+</script>
+<script src="mockup.js"></script>
+</body>
+</html>

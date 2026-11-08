@@ -4,7 +4,7 @@ _Written 2026-11-07. How Nigiri gets from this folder onto phones. The decisions
 
 ## The short version
 
-Nigiri is a website that installs to the home screen. GitHub stores the code and rebuilds the app on every push. GitHub Pages hands out the files. Each phone runs the app and keeps its own cards. There's no server, no cloud database and no Docker.
+Nigiri is a website that installs to the home screen. GitHub stores the code and rebuilds the app on every push. GitHub Pages hands out the files. Each phone runs the app and keeps its own cards. There's no app server, no cloud database and no Docker. The one exception arrives in step 4: a small reminder sender on Cloudflare, which knows only when each phone wants a reminder, never anything about cards ([Reminders](#reminders-step-4)).
 
 ## Where everything lives
 
@@ -14,6 +14,7 @@ Nigiri is a website that installs to the home screen. GitHub stores the code and
 | The built app | GitHub Pages, at the web address below | Rebuilt on every push |
 | Cards, reviews, tests | Each person's phone, in browser storage (through Dexie) | Never sent to GitHub, and nobody else sees them |
 | Backup | The export file | The only copy that isn't on the phone |
+| Reminder sender (step 4) | A small Cloudflare Worker, on your free Cloudflare account | It holds only each phone's push address and next reminder time, never cards |
 | Downloaded packages | `node_modules/`, on your laptop only | `package.json` and `package-lock.json` keep the exact list, and `npm install` downloads it again |
 
 ## What's in the repo
@@ -71,7 +72,45 @@ It opens full screen and works offline, because `vite-plugin-pwa` keeps a copy o
 ## Updates
 
 - **Silent.** A phone picks up the new version the next time the app opens, and nobody reinstalls.
-- **What's new note.** After an update, one short line on home says what changed, shown once. You write it for each release. It's built in step 4 ([spec §6](product-spec.md)).
+- **What's new note.** After an update, one short line on home says what changed, shown once. You write it for each release. It's built in step 5 ([spec §6](product-spec.md)).
+
+## Reminders (step 4)
+
+_Researched 2026-11-08 by competitor-researcher (R-NOTIF-1). Every page was opened that day, and nothing was tested on a phone yet._
+
+**You decided you want reminders when cards are due,** and on 2026-11-08 you chose **option B, a small free sender on Cloudflare**, because it's the only way that works on iPhone.
+
+**What a home-screen web app can do with no server:**
+
+| Way | iPhone | Android | Works while Nigiri is closed? | Source |
+|---|---|---|---|---|
+| Web Push | iOS 16.4+, home-screen apps only, permission asked from a tap | Yes | Yes, **but a server must send each push** | [WebKit, 2023-02-16](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/), [web.dev](https://web.dev/articles/push-notifications-how-push-works) |
+| Declarative Web Push | iOS 18.4+, home-screen apps | Not found in Chrome | Yes, but still needs a sender: "works exactly as before" | [WebKit, 2025-03-27](https://webkit.org/blog/16535/meet-declarative-web-push/) |
+| Scheduled local notifications (Notification Triggers) | Never shipped | Ended: Chrome stopped the work | — | [Chrome docs](https://developer.chrome.com/docs/web-platform/notification-triggers) |
+| Periodic Background Sync | Not supported | Installed app only; the browser picks when, at most about every 12 hours | Sometimes, at a time Android picks | [Chrome docs](https://developer.chrome.com/docs/capabilities/periodic-background-sync), [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Web_Periodic_Background_Synchronization_API) (2026-08-31) |
+| A notification from the open app | Yes, after permission | Yes | No: a closed app runs nothing | [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Notification/Notification) (2026-10-11) |
+| Number on the app icon (Badging) | iOS 16.4+, needs notification permission | Not supported (Android shows a dot for unread notifications) | iPhone: only through a push | [Chrome docs](https://developer.chrome.com/docs/capabilities/web-apis/badging-api), [caniuse](https://caniuse.com/mdn-api_navigator_setappbadge) |
+| A calendar file (.ics) | **Unverified** from a home-screen app on iOS 26/27 | **Unverified**; Google's help says import works "on a computer" | Yes, once saved: the calendar does the alert. Fixed times, not when cards are due | [Google](https://support.google.com/calendar/answer/37118) |
+
+The researcher read the Safari 26.0, 27.0, 27.1 and 27.2 release posts (Sept 2025 to Oct 2026), and none changes this ([Safari 26.0](https://webkit.org/blog/17333/webkit-features-in-safari-26-0/)).
+
+**Decided (2026-11-08, your choice): B, a small free sender on Cloudflare** (a Worker with a timer for each phone). Reminders arrive on time on both phones. You make a free Cloudflare account and keep this second small program running. Each phone sends only its push address and its next reminder time, never card text or deck names.
+- **The option not chosen:** A, no server. Only Android would get reminders, hours late, and iPhone none while Nigiri is closed.
+- **Free plan, checked 2026-11-08** on Cloudflare's own pages:
+  - 100,000 requests a day, and 10 ms of processing per request or timer; waiting on the network doesn't count ([limits](https://developers.cloudflare.com/workers/platform/limits/)).
+  - Timers (Durable Object alarms) are on the free plan, with SQLite storage, and count toward the same 100,000 a day ([Durable Objects pricing](https://developers.cloudflare.com/durable-objects/platform/pricing/)).
+  - Cloudflare has its own guide for scheduled web push reminders ([guide](https://developers.cloudflare.com/agents/guides/push-notifications/)).
+- **Sign-up:** Cloudflare's account guide asks only for an email and a password, then a verification email ([create an account](https://developers.cloudflare.com/fundamentals/account/create-account/)). It doesn't mention a card. The sign-up form itself wasn't opened, so check it when you make the account.
+- **Still to check in step 4:** that one send (signing the push address, with no message body) fits in 10 ms. It probably does, because the signing is a single fast operation.
+- **You do this yourself:** make the Cloudflare account. Nobody else can make it for you.
+- **Ruled out:** Firebase (scheduled sending needs its paid Blaze plan), OneSignal (delayed sends aren't free), ntfy (every friend installs another app), GitHub Actions (runs "can be delayed" and may be dropped).
+
+**Decided either way (chief, 2026-11-08):**
+- **Step 4,** after Test mode, so steps 1–3 don't wait on your choice.
+- **At most one reminder a day,** only when cards are due, at about the time you finished your first session after step 4 (rounded to the half hour), changeable in Settings. The notification says "Nigiri" and "Cards are due." and opens home.
+- **The ask:** on Done, from the first one after step 4 ships until you answer, from a tap, because iPhone only allows the permission prompt after a tap. "Not now" means it never asks on Done again; Settings has a Reminders switch. Leaving Done without answering isn't a no, so the ask comes back on the next Done (Impeccable critique, 2026-11-08: a habit tap on Back to home shouldn't lose the only ask). It's never shown where reminders can't arrive (an iPhone Safari tab, which only allows them from the home-screen app). Mockup: `mockups/review-done.html?remind`.
+- **What leaves the phone:** only the push address and the next time cards will be due, sent after each session or saved card. Never card text, deck names or counts.
+- **No icon number:** on iPhone it would go stale while Nigiri is closed, unless the sender updates it. It's on the 1.1 list.
 
 ## What can go wrong
 
@@ -84,7 +123,9 @@ It opens full screen and works offline, because `vite-plugin-pwa` keeps a copy o
 - **Hosting:** the computer that hands out your app's files. Here, GitHub Pages.
 - **Domain:** a web address you buy, like `nigiri-study.com`.
 - **Runtime:** what runs the code. Here it's the phone's browser engine, so there's no kernel or server to manage.
-- **Container (Docker):** a box for a server program. Nigiri has no server program, so it doesn't need one.
+- **Container (Docker):** a box for a server program. Nigiri's only server program is the small reminder sender, and Cloudflare runs that without one.
+- **Cloudflare Worker:** a small program that Cloudflare runs for you, on a free account. Nigiri's sends the reminders (step 4).
+- **Push address:** a private address a phone gives out, so that a sender can deliver notifications to it. It says nothing about your cards.
 - **PWA:** a website that installs to the home screen and works offline.
 - **GitHub Actions:** GitHub's robot that builds and publishes the app on every push.
 - **Dexie:** the library that saves cards in the phone's browser storage.
@@ -92,4 +133,4 @@ It opens full screen and works offline, because `vite-plugin-pwa` keeps a copy o
 
 ## Undecided
 
-Nothing. The address and when friends get the link are both decided.
+Nothing. The address, when friends get the link, and how reminders are sent (option B, 2026-11-08) are all decided.

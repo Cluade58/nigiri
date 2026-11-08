@@ -8,7 +8,7 @@
 
 **The card screens come first.** They're designed from the card-creation flow in [product-spec.md §1](product-spec.md). Other screens follow outward from the card.
 - One way to make cards: write your own. No import.
-- **Screens:** home (empty, normal, and nothing due), new deck, add card, deck page (with editing a card, and with no cards yet), review (with the rating hint, the wait for a returning card, and "Not saved"), done, and a deck's test with the fit check. What's on each is in [spec §6](product-spec.md). `mockups/index.html` also shows step 1 as built, without Settings or the test line. Anything on the version 1.1 list (§8) stays off the screens.
+- **Screens:** home (empty, normal, and nothing due), new deck, add card, deck page (with editing a card, and with no cards yet), review (with the rating hint, the wait for a returning card, and "Not saved"), done (with the reminder ask, step 4), the screen shown when storage can't open, and a deck's test with the fit check (add, edit, remove, a test today, and more than 120 minutes). What's on each is in [spec §6](product-spec.md). `mockups/index.html` also shows step 1 as built, without Settings or the test line. Anything on the version 1.1 list (§8) stays off the screens.
 - Each domain has its own input screen and its own review screen. Version one has only plain text cards.
 - Input is designed for the moment someone has something in hand (a line in a textbook, a sentence they heard, a word they just looked up), not for a sit-down card-making session.
 

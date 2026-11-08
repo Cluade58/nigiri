@@ -10,13 +10,43 @@
 </head>
 <body>
 <div class="session">
-  <main class="done">
-    <h1 class="t-hero"><span class="mark" style="--hl: var(--hl-yellow)">Done</span></h1>
+  <main class="done" id="done">
+    <h1 class="t-hero" id="done-title" tabindex="-1"><span class="mark" style="--hl: var(--hl-yellow)">Done</span></h1>
+
+    <!-- Step 4: asked once, on the first Done after reminders ship (publishing.md, Reminders). -->
+    <section class="remind" id="remind" aria-labelledby="remind-title" hidden>
+      <h2 class="t-title" id="remind-title">Want a reminder when cards are due?</h2>
+      <p class="t-secondary">At most one a day, around 8:00 pm, and only when cards are due.</p>
+      <button class="btn btn-primary" type="button" id="turn-on">Turn on reminders</button>
+      <div class="not-now"><button class="btn-text" type="button" id="not-now">Not now</button></div>
+    </section>
+    <p class="status" id="status" role="status" tabindex="-1"></p>
+
     <div class="actions">
-      <a class="btn btn-primary" href="home.html">Back to home</a>
+      <a class="btn btn-primary" id="home" href="home.html">Back to home</a>
     </div>
   </main>
 </div>
 <script src="mockup.js"></script>
+<script>
+  // Demo only. ?remind shows the ask. Reminders go through the Cloudflare sender (option B, chosen 2026-11-08).
+  // In the app, "Turn on reminders" opens the phone's own permission prompt and stays off until it closes.
+  // Only Turn on or Not now count as an answer. Leaving by Back to home brings the ask back on the next Done.
+  const params = new URLSearchParams(location.search);
+  const $ = (s) => document.querySelector(s);
+  if (params.has('remind')) {
+    $('#done').classList.add('has-ask');
+    $('#remind').hidden = false;
+    $('#home').className = 'btn btn-secondary btn-wide';
+    const settle = (text) => {
+      $('#remind').hidden = true;
+      $('#status').textContent = text;
+      $('#status').focus();
+      $('#home').className = 'btn btn-primary';
+    };
+    $('#turn-on').addEventListener('click', () => settle('Reminders on, around 8:00 pm. Change the time in Settings.'));
+    $('#not-now').addEventListener('click', () => settle('Reminders off. You can turn them on in Settings.'));
+  }
+</script>
 </body>
 </html>

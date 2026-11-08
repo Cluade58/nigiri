@@ -110,6 +110,19 @@
     front.focus();
   });
 
+  // In the app, keep the status line in the page and empty it instead of hiding it, so new text is announced.
+  // Keyboard (D18): move focus to Front inside the same tap or Done keypress, before waiting for the save,
+  // so iPhone keeps the keyboard up. Clear both fields only when the save succeeds; if it fails, the text stays.
+  // From home, choosing a deck moves the cursor to Front.
+
+  // ?draft: you left mid-card and came back (keep drafts, spec §3). What you typed is still there,
+  // with no extra line: the cursor goes to the first empty field, or to the end of Back.
+  if (params.has('draft')) {
+    front.value = 'Monroe Doctrine';
+    back.value = 'Europe stays out of the Amer';
+    status.hidden = true;
+  }
+
   // ?error: the save failed. What you typed stays, and the line above the button says how to retry (spec §3, §6).
   if (params.has('error')) {
     front.value = 'Erie Canal';
@@ -120,6 +133,7 @@
   }
 
   if (fromHome) $('#deck').focus({ preventScroll: true });
+  else if (params.has('draft')) { back.focus({ preventScroll: true }); back.setSelectionRange(back.value.length, back.value.length); }
   else front.focus({ preventScroll: true });
 </script>
 <script src="mockup.js"></script>
