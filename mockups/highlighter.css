@@ -1,24 +1,25 @@
 /* Highlighter: shared foundation for the phone mockups.
    Tokens follow product-brief.md. Mockups only: the real app bundles its fonts.
    Colours (2026-11-08): ui-ux-pro-max colors.csv row 103 "Flashcard & Study Tool",
-   violet + emerald on lavender. Violet marks only acting, choosing and focus; the deck
-   highlighters stay the user's. The earlier navy Highlighter values are in git. */
+   violet + emerald on lavender, with grape ink instead of the row's slate (D38, the user's
+   "Grape"). Violet marks only acting, choosing and focus; the deck highlighters stay the
+   user's. The earlier navy and slate values are in git. */
 @import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&display=swap");
 
 /* ---------- Tokens ---------- */
 :root {
   --page: #FAF5FF;        /* row 103 Background */
   --surface: #FFFFFF;     /* row 103 Card: the edit sheet only */
-  --ink: #0F172A;         /* row 103 Foreground */
-  --ink-2: #475569;       /* row 103 Muted Foreground */
+  --ink: #2E1D47;         /* grape ink (D38), replaces row 103's slate Foreground */
+  --ink-2: #5E5270;       /* grape secondary (D38), replaces row 103's slate Muted Foreground */
   --rule: #E6DCF7;        /* row 103 Border, darkened from 1.12 to 1.23 so dividers show */
   --primary-bg: #7C3AED;  /* row 103 Primary: the one filled button, the rated key */
   --primary-fg: #FFFFFF;  /* row 103 On Primary */
   --secondary: #8B5CF6;   /* row 103 Secondary: the review progress fill */
   --ring: #7C3AED;        /* row 103 Ring: focus */
   --error: #B91C1C;       /* row 103 Destructive, darkened from 4.50 to 6.03 */
-  --mark-ink: #0F172A;    /* dark text on every highlighter, both themes */
-  --scrim: rgba(15, 23, 42, .45);
+  --mark-ink: #2E1D47;    /* dark text on every highlighter: the ink in light */
+  --scrim: rgba(46, 29, 71, .5);  /* ink at 50%: the white sheet stays 3.30 off the dimmed page */
   --sheet-edge: transparent;
 
   /* Deck colours: the light highlight draws the marks and the picker fill;
@@ -40,19 +41,20 @@
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --page: #15131F;
-    --surface: #221F31;
-    --ink: #ECE9F5;
-    --ink-2: #ABA5BE;
-    --rule: #2E2A3D;
-    --primary-bg: #8152E0;
-    --primary-fg: #FFFFFF;
-    --secondary: #A88BF7;
-    --ring: #A88BF7;
+    --page: #17111F;        /* grape night (D38) */
+    --surface: #221A2D;
+    --ink: #EDE6F7;
+    --ink-2: #B3A8C4;
+    --rule: #322842;        /* grape hue at D37's divider contrast (1.34) */
+    --primary-bg: #A78BFA;  /* lilac fill with dark text: 6.79 (was #8152E0 + white, 4.98) */
+    --primary-fg: #17111F;
+    --secondary: #A78BFA;
+    --ring: #A78BFA;
     --error: #F87171;
-    --scrim: rgba(5, 4, 10, .6);
-    --sheet-edge: #4A4560;  /* a hairline on the sheet's top curve: 2.17 against the dimmed page */
-    --hl-purple: #E2A0F0;   /* more orchid in dark, so it isn't the lilac focus ring (32 degrees apart, was 21) */
+    --mark-ink: #17111F;    /* the dark page: 6.64 to 10.62 on the highlights */
+    --scrim: rgba(8, 5, 13, .6);
+    --sheet-edge: #514468;  /* a hairline on the sheet's top curve: 2.22 against the dimmed page */
+    --hl-purple: #E2A0F0;   /* more orchid in dark, so it isn't the lilac button and ring (35 degrees apart) */
     /* One tone per deck in dark: the highlights already reach 6.6 to 10.6 on the page. */
     --pen-green: var(--hl-green);
     --pen-blue: var(--hl-blue);

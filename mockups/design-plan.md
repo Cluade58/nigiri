@@ -6,10 +6,11 @@ The app is called Nigiri. Phone only, 390px, checked at 360px. Built from [produ
 
 ## Tokens (from product-brief.md)
 
-**Colours changed 2026-11-08** to ui-ux-pro-max's row 103, "Flashcard & Study Tool". The user asked for the skills' colour trios. The navy values are in git.
-- **Light:** lavender paper `#FAF5FF`, slate ink `#0F172A`, secondary ink `#475569`, rules `#E6DCF7`, the white sheet `#FFFFFF`.
-- **Violet `#7C3AED`** (dark `#8152E0`): the one filled button, the rated key, focus.
-- **Lilac `#8B5CF6`** (dark `#A88BF7`): the progress bar.
+**Colours changed 2026-11-08** to ui-ux-pro-max's row 103, "Flashcard & Study Tool". The user asked for the skills' colour trios. Then the user turned down the row's slate ink ("navy blue white contrast") and picked **Grape** (D38): every text colour is now grape-tinted. The navy and slate values are in git.
+- **Light:** lavender paper `#FAF5FF`, grape ink `#2E1D47`, secondary ink `#5E5270`, rules `#E6DCF7`, the white sheet `#FFFFFF`.
+- **Dark:** grape night `#17111F`, ink `#EDE6F7`, secondary ink `#B3A8C4`, rules `#322842`, the sheet `#221A2D`.
+- **Violet `#7C3AED`** (dark: lilac `#A78BFA` with dark text): the one filled button, the rated key, focus.
+- **Lilac `#8B5CF6`** (dark `#A78BFA`): the progress bar.
 - **Mint `#7FDDB9`:** the highlighter behind "Done". It comes from the emerald accent `#059669`.
 - **Highlighters:** six colours (green, blue, pink, orange, yellow, purple). You pick one for each deck. Each has a light highlight for marks and, in light mode, a stronger pen tone for its swatch. All values are in product-brief.md.
 - **Type:** Bricolage Grotesque for headings and card text, Atkinson Hyperlegible Next for everything else. Sizes 34 / 28 / 24 / 20 / 17 / 15 / 13.

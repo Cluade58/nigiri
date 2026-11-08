@@ -14,8 +14,9 @@
 
 Use frontend-design for the design plan (then review it against the brief), and Impeccable's critique to review renders. Check UX against ui-ux-pro-max's rules and its pre-delivery checklist.
 
-**Colours come from ui-ux-pro-max's palettes** (the user's decision, 2026-11-08). Nigiri uses row 103, "Flashcard & Study Tool" (violet, lilac and emerald on lavender), and the tokens in [product-brief.md](product-brief.md) are now fixed. Its fonts and styles still don't apply.
+**Colours come from ui-ux-pro-max's palettes** (the user's decision, 2026-11-08). Nigiri uses row 103, "Flashcard & Study Tool" (violet, lilac and emerald on lavender), with grape ink instead of the row's slate (the user picked "Grape", D38). The tokens in [product-brief.md](product-brief.md) are now fixed. Its fonts and styles still don't apply.
 - **Violet** draws only the one filled button per screen, the rating key you just tapped, and the focus ring. Outlined buttons, text links and keys at rest stay ink.
+- **Ink is grape, never slate or navy,** in both themes: text, icons, secondary text and the scrim.
 - **Lilac** draws only the review progress bar.
 - **Mint**, from the emerald accent, is the highlighter behind "Done".
 - **The six deck colours** are the user's choice per deck. In light mode each has a stronger pen tone for its swatch.

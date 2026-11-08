@@ -32,22 +32,24 @@ _Rewritten 2026-11-07 after the scope reset. The earlier research-heavy version 
 - **Visual direction: B, Highlighter.** The reference screens start at `mockups/index.html`.
 - **Colours (your decision, 2026-11-08: "use the skills for the best most appealing colours based on the skills (colour trios)").**
   - **The trio** comes from ui-ux-pro-max's row 103, "Flashcard & Study Tool": violet `#7C3AED`, lilac `#8B5CF6` and emerald `#059669`, on lavender paper. ui-designer and chief-officer chose it; [PROJECT-STATE.md](PROJECT-STATE.md) D37 has why.
+  - **Grape ink (your decision, 2026-11-08: "I dont rlly like the navy blue white contrast", then "Grape").** Row 103's slate text read as navy on white, so every text colour is now grape-tinted, in both themes. Dark mode follows Grape too: a grape-night page and a lilac button with dark text. The progress bar, Done, error, the white sheet and the deck colours stay as D37 set them; D38 has why.
   - **The rule:** violet marks acting, choosing and focus, and nothing else; the deck highlighters stay yours.
-  - **History:** the earlier navy Highlighter values are in git: `git show bcb812d:product-brief.md`.
+  - **History:** the earlier navy Highlighter values are in git: `git show bcb812d:product-brief.md`; row 103's slate ink: `git show de1a806:product-brief.md`.
 
-| Token | What it draws | Light | Dark | From row 103 |
+| Token | What it draws | Light | Dark | From |
 |---|---|---|---|---|
-| Page | the page, bars, fields | `#FAF5FF` | `#15131F` | Background |
-| Surface | the edit sheet only (dark adds a `#4A4560` hairline on its top edge) | `#FFFFFF` | `#221F31` | Card |
-| Ink | all text and icons, outlined buttons, rating keys at rest, the rule under the question | `#0F172A` | `#ECE9F5` | Foreground |
-| Secondary text | secondary lines, placeholders, field borders, chevrons | `#475569` | `#ABA5BE` | Muted Foreground |
-| Rules | dividers, progress track | `#E6DCF7` | `#2E2A3D` | Border, darkened so dividers show |
-| Primary (violet) | the one filled button per screen, the rated key | `#7C3AED`, white text | `#8152E0`, white text | Primary and On Primary |
-| Secondary (lilac) | the review progress bar | `#8B5CF6` | `#A88BF7` | Secondary |
-| Focus ring | keyboard focus, the field you're typing in | `#7C3AED` | `#A88BF7` | Ring |
-| Done (mint) | the highlighter behind "Done" | `#7FDDB9` | same at 85% | Accent `#059669`, lightened: it drops to 1.47:1 under dark text in dark mode |
-| Error | error lines, invalid borders | `#B91C1C` | `#F87171` | Destructive, darkened from 4.50:1 to 6.03:1 |
-| Scrim | behind the edit sheet | ink at 45% | `#05040A` at 60% | Foreground |
+| Page | the page, bars, fields | `#FAF5FF` | `#17111F` | Row 103 Background; dark is Grape's |
+| Surface | the edit sheet only (dark adds a `#514468` hairline on its top edge) | `#FFFFFF` | `#221A2D` | Row 103 Card; dark is Grape's tint |
+| Ink | all text and icons, outlined buttons, rating keys at rest, the rule under the question | `#2E1D47` | `#EDE6F7` | Grape, replacing row 103's slate Foreground |
+| Secondary text | secondary lines, placeholders, field borders, chevrons | `#5E5270` | `#B3A8C4` | Grape, replacing row 103's slate Muted Foreground |
+| Rules | dividers, progress track | `#E6DCF7` | `#322842` | Row 103 Border, darkened so dividers show; dark in Grape's hue |
+| Primary (violet) | the one filled button per screen, the rated key | `#7C3AED`, white text | `#A78BFA`, `#17111F` text | Row 103 Primary; dark is Grape's |
+| Secondary (lilac) | the review progress bar | `#8B5CF6` | `#A78BFA` | Row 103 Secondary |
+| Focus ring | keyboard focus, the field you're typing in | `#7C3AED` | `#A78BFA` | Row 103 Ring |
+| Done (mint) | the highlighter behind "Done" | `#7FDDB9` | same at 85% | Row 103 Accent `#059669`, lightened: it drops to 1.47:1 under dark text in dark mode |
+| Error | error lines, invalid borders | `#B91C1C` | `#F87171` | Row 103 Destructive, darkened from 4.50:1 to 6.03:1 |
+| Text on highlights | dark text on every deck colour and on Done | `#2E1D47` (the ink) | `#17111F` (the page) | Grape |
+| Scrim | behind the edit sheet | ink at 50% | `#08050D` at 60% | Grape |
 
 | Deck colour (you pick one per deck) | Highlight: marks and the picker | Pen: the 6px swatch, light mode | Dark |
 |---|---|---|---|
@@ -56,9 +58,9 @@ _Rewritten 2026-11-07 after the scope reset. The earlier research-heavy version 
 | Pink | `#FF8FC8` | `#D23C8A` | highlight at 85% |
 | Orange | `#FFB65C` | `#C2650C` | highlight at 85% |
 | Yellow | `#FFE45C` | `#A37F00` | highlight at 85% |
-| Purple | `#DAA8F7` (was `#C3A6FF`, moved toward orchid so it isn't the button's violet) | `#AD4BD0` | `#E2A0F0` at 85% (more orchid, so it isn't the lilac focus ring) |
+| Purple | `#DAA8F7` (was `#C3A6FF`, moved toward orchid so it isn't the button's violet) | `#AD4BD0` | `#E2A0F0` at 85% (more orchid, so it isn't the lilac button and focus ring) |
 
-  Light mode needs two tones per deck: a pastel can't reach 3:1 against the page as a thin swatch and also keep dark text readable as a highlight. Dark text sits on every highlight in both themes, like a real pen. Measured contrast is in D37.
+  Light mode needs two tones per deck: a pastel can't reach 3:1 against the page as a thin swatch and also keep dark text readable as a highlight. Dark text sits on every highlight in both themes, like a real pen. Measured contrast is in D38, which replaced D37's numbers.
 
   Type: Bricolage Grotesque for headings, Atkinson Hyperlegible Next for body, both bundled with the app. Colour marks only what matters: the main button, the key you just rated, focus, deck colours, and the highlighter over what just changed. Everything else stays quiet.
 
