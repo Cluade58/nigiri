@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F5F7FC">
+<meta name="description" content="Flashcards you write yourself.">
+<title>Nigiri</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+<script>
+  // Theme before the first paint (D39d). The theme lives on this phone only, outside the database.
+  // Missing, unknown or unreadable (a private window) means Ink + Cobalt + Snow.
+  // Keep the key and colours in step with src/lib/theme.ts.
+  (function () {
+    var page = { snow: '#F5F7FC', mist: '#FAF7FB', cream: '#FBF8F1', midnight: '#141B24' };
+    var theme = 'snow';
+    try {
+      var saved = window.localStorage.getItem('nigiri:theme');
+      if (saved && Object.prototype.hasOwnProperty.call(page, saved)) theme = saved;
+    } catch (e) { /* unreadable storage: keep Snow */ }
+    document.documentElement.setAttribute('data-theme', theme);
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', page[theme]);
+  })();
+</script>
+</head>
+<body>
+<div id="root"></div>
+<script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

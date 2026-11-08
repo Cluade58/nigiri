@@ -1,0 +1,789 @@
+/* Highlighter, ported from mockups/highlighter.css (the reference screens) into the app.
+   Tokens follow product-brief.md and are fixed. Colours (D39, the user's decision, 2026-11-08): four
+   themes, each a trio of background (60%), text (30%) and accent (10%). Ink + Cobalt + Snow is the
+   default and sits on :root; index.html sets data-theme before the first paint. No prefers-color-scheme
+   (D39a). The accent marks only acting and focus: the one filled button, the rated key, the focus ring
+   and the progress bar. The deck highlighters stay the user's. Fonts are bundled (src/main.tsx). */
+
+/* ---------- Tokens ----------
+   One block per theme. The blocks also work on any element, so a picker swatch with
+   data-theme="mist" draws itself in Mist whatever theme is active. Measured contrast
+   (WCAG 2.x) is in PROJECT-STATE.md D39. */
+
+/* Shared by the three light themes: deck colours and the light pen tones. */
+:root, [data-theme="snow"], [data-theme="mist"], [data-theme="cream"] {
+  /* Deck colours: the light highlight draws the marks and the picker fill;
+     the pen tone draws the 6px swatch, so it reaches 3:1 on every light page (3.50 to 4.22). */
+  --hl-green: #7BE38A;  --pen-green: #33934A;
+  --hl-blue: #7CC8FF;   --pen-blue: #3384CC;
+  --hl-pink: #FF8FC8;   --pen-pink: #D23C8A;
+  --hl-orange: #FFB65C; --pen-orange: #C2650C;
+  --hl-yellow: #FFE45C; --pen-yellow: #A37F00;
+  --hl-purple: #DAA8F7; --pen-purple: #AD4BD0;
+  --hl-alpha: 1;
+  --surface: #FFFFFF;     /* the edit sheet only */
+  --error: #B91C1C;       /* the one colour outside the trios: "Not saved" must read as red */
+  --sheet-edge: transparent;
+  color-scheme: light;
+}
+
+/* Ink + Cobalt + Snow: the default. */
+:root, [data-theme="snow"] {
+  --page: #F5F7FC;
+  --ink: #17243C;           /* 14.47 on the page */
+  --ink-2: #4C576A;         /* ink toward the page: 6.81 */
+  --rule: #DBDEE5;          /* dividers and the progress track: 1.26 */
+  --primary-bg: #3158C9;    /* cobalt: white text 6.23, 5.81 against the page */
+  --primary-fg: #FFFFFF;
+  --primary-press: #2D50B4; /* cobalt toward the ink: white text 7.20 */
+  --progress: #3158C9;
+  --ring: #3158C9;
+  --mark-ink: #17243C;      /* dark text on every highlighter: 7.40 to 12.19 */
+  --hl-done: #A6BEFF;       /* cobalt's hue as a highlighter: ink on it 8.44 */
+  --scrim: rgba(23, 36, 60, .5);  /* ink at 50%: the white sheet stays 3.30 off the dimmed page */
+}
+
+/* Plum + Berry + Mist. */
+[data-theme="mist"] {
+  --page: #FAF7FB;
+  --ink: #302039;           /* 14.20 */
+  --ink-2: #5F5266;         /* 6.85 */
+  --rule: #E2DEE4;          /* 1.25 */
+  --primary-bg: #9C356B;    /* berry: white text 6.70, 6.30 against the page */
+  --primary-fg: #FFFFFF;
+  --primary-press: #8C3264; /* 7.62 */
+  --progress: #9C356B;
+  --ring: #9C356B;
+  --mark-ink: #302039;      /* 7.20 to 11.86 */
+  --hl-done: #F5A3CE;       /* berry's hue: ink on it 7.91 */
+  --scrim: rgba(48, 32, 57, .5);  /* 3.23 */
+}
+
+/* Espresso + Amber + Cream. */
+[data-theme="cream"] {
+  --page: #FBF8F1;
+  --ink: #33291F;           /* 13.40 */
+  --ink-2: #5E564C;         /* 6.80 */
+  --rule: #E3DFD8;          /* 1.25 */
+  --primary-bg: #A45613;    /* amber: white text 5.36, 5.05 against the page */
+  --primary-fg: #FFFFFF;
+  --primary-press: #934F15; /* 6.23 (mixing toward the page would give 4.32) */
+  --progress: #A45613;
+  --ring: #A45613;
+  --mark-ink: #33291F;      /* 6.78 to 11.17 */
+  --hl-done: #F5BC8A;       /* amber's hue: ink on it 8.42 */
+  --scrim: rgba(51, 41, 31, .5);  /* 3.12 */
+}
+
+/* Midnight + Ice + Sky: the one dark theme. */
+[data-theme="midnight"] {
+  --page: #141B24;
+  --surface: #1E2836;       /* the edit sheet: ink on it 13.61 */
+  --sheet-edge: #56647A;    /* a hairline on the sheet's top curve: 3.18 against the dimmed page (TH-UI-2) */
+  --ink: #F3F5F7;           /* ice: 15.85 */
+  --ink-2: #AEB7C4;         /* 8.56, 7.34 on the sheet */
+  --rule: #2A3340;          /* 1.36 */
+  --primary-bg: #8FB7FF;    /* sky with dark text: 8.57, 8.57 against the page */
+  --primary-fg: #141B24;
+  --primary-press: #80A4E5; /* sky toward the page: 6.90 */
+  --progress: #8FB7FF;      /* 6.31 against the track */
+  --ring: #8FB7FF;
+  --error: #F87171;         /* 6.26, 5.38 on the sheet, 2.53 off the ink */
+  --mark-ink: #141B24;      /* the page: 6.31 to 10.11 on the highlights */
+  --hl-done: #C1D6FB;       /* ice and sky 50/50, drawn at full strength: 11.78, 1.37 off the button */
+  --scrim: rgba(6, 9, 13, .6);
+  /* Deck colours keep the brief's dark column: each highlight at 85% is also its swatch. */
+  --hl-green: #7BE38A;
+  --hl-blue: #7CC8FF;
+  --hl-pink: #FF8FC8;
+  --hl-orange: #FFB65C;
+  --hl-yellow: #FFE45C;
+  --hl-purple: #E2A0F0;
+  --pen-green: var(--hl-green);
+  --pen-blue: var(--hl-blue);
+  --pen-pink: var(--hl-pink);
+  --pen-orange: var(--hl-orange);
+  --pen-yellow: var(--hl-yellow);
+  --pen-purple: var(--hl-purple);
+  --hl-alpha: .85;
+  color-scheme: dark;
+}
+
+:root {
+  --hl: var(--hl-green);
+  --pen: var(--pen-green);
+  --s1: 8px; --s2: 12px; --s3: 20px; --s4: 32px; --s5: 48px;
+  --bar-h: 82px;
+  --font-head: "Bricolage Grotesque Variable", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible Next Variable", system-ui, sans-serif;
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.45;
+}
+h1, h2, h3, p, ul, ol, figure, fieldset, legend { margin: 0; padding: 0; }
+fieldset { border: 0; min-width: 0; }
+ul, ol { list-style: none; }
+a { color: inherit; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* ---------- Type ---------- */
+.t-hero { font-family: var(--font-head); font-size: 34px; font-weight: 700; line-height: 1.08; letter-spacing: -0.01em; text-wrap: balance; }
+.t-card { font-family: var(--font-head); font-size: 28px; font-weight: 600; line-height: 1.15; text-wrap: pretty; }
+.t-card.is-long { font-size: 22px; }
+.t-section { font-family: var(--font-head); font-size: 24px; font-weight: 600; line-height: 1.2; }
+.t-title { font-family: var(--font-head); font-size: 20px; font-weight: 600; line-height: 1.2; }
+.t-label { font-size: 15px; font-weight: 600; }
+.t-secondary { font-size: 15px; color: var(--ink-2); }
+.t-meta { font-size: 13px; color: var(--ink-2); }
+
+/* ---------- Highlighter mark: what just changed ----------
+   Dark text on the highlighter in both themes, like a real pen. */
+.mark {
+  color: var(--mark-ink); font-weight: 700; padding: 0 3px; margin: 0 -1px;
+  background: linear-gradient(color-mix(in srgb, var(--hl) calc(var(--hl-alpha) * 100%), transparent), color-mix(in srgb, var(--hl) calc(var(--hl-alpha) * 100%), transparent)) no-repeat 0 55% / 100% 78%;
+  border-radius: 2px;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  animation: swipe 420ms 120ms cubic-bezier(.3, .7, .2, 1) both;
+}
+@keyframes swipe { from { background-size: 0% 78%; } }
+
+/* ---------- Buttons (the only pills) ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s1);
+  min-height: 48px; padding: 0 var(--s4);
+  font: inherit; font-weight: 600; font-size: 17px; text-decoration: none;
+  border-radius: 25px; cursor: pointer;
+  transition: transform 80ms ease-out;
+}
+.btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-primary { height: 50px; width: 100%; background: var(--primary-bg); color: var(--primary-fg); border: 0; }
+.btn-secondary { height: 50px; padding: 0 var(--s3); background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
+.btn-wide { width: 100%; }
+.btn-text {
+  min-height: 48px; padding: 0 var(--s1); margin: 0 calc(-1 * var(--s1));
+  background: none; border: 0; color: var(--ink);
+  font: inherit; font-size: 17px; font-weight: 600; cursor: pointer;
+  text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px;
+  display: inline-flex; align-items: center;
+}
+.btn-icon {
+  display: inline-grid; place-items: center; width: 48px; height: 48px; padding: 0;
+  background: none; border: 0; border-radius: 25px; color: var(--ink); cursor: pointer;
+}
+.btn-icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.btn:active:not([disabled]), .key:active:not([disabled]) { transform: scale(.98); }
+.btn-primary:active:not([disabled]) { background: var(--primary-press); }
+[disabled] { opacity: .4; cursor: not-allowed; }
+
+/* ---------- Deck swatch ---------- */
+.swatch {
+  flex: none; display: inline-block; width: 6px; height: 22px; border-radius: 2px;
+  background: var(--pen); opacity: var(--hl-alpha);
+}
+.swatch.is-small { height: 16px; }
+
+/* ---------- Screen frame ---------- */
+.screen { max-width: 560px; margin: 0 auto; padding: 0 var(--s3); }
+.screen.has-bar { padding-bottom: calc(var(--bar-h) + var(--s4) + env(safe-area-inset-bottom)); }
+.top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s2); padding-top: var(--s3); }
+.top h1 { font-family: var(--font-head); font-size: 24px; font-weight: 600; line-height: 1.2; }
+.top p { margin-top: 4px; }
+.top .btn-icon { margin: -6px -12px 0 0; }
+
+/* Bottom bar: input is one tap away */
+.bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  background: var(--page); border-top: 1px solid var(--rule);
+  padding: 15px var(--s3) calc(15px + env(safe-area-inset-bottom));
+}
+.bar-inner { max-width: 520px; margin: 0 auto; display: grid; grid-template-columns: 1fr; }
+
+/* Form screens: a slim bar with the exit on the left */
+.form-bar {
+  height: 56px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+}
+.form-bar .btn-text { justify-self: start; text-decoration: none; }
+.form-bar h1 { font-size: 17px; font-weight: 600; }
+
+/* ---------- Home ---------- */
+.lead { margin-top: var(--s4); }
+.sec { margin-top: var(--s5); }
+.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s2); }
+
+.decks { margin-top: var(--s1); }
+.decks li + li .deck { border-top: 1px solid var(--rule); }
+.deck {
+  display: grid; grid-template-columns: 6px minmax(0, 1fr) auto 16px; align-items: center;
+  column-gap: var(--s2); min-height: 72px; padding: var(--s2) 0; text-decoration: none; color: inherit;
+}
+.deck .swatch { align-self: stretch; height: auto; min-height: 22px; }
+.deck .name { display: block; font-size: 17px; font-weight: 600; line-height: 1.3; }
+.deck .sub { display: block; font-size: 15px; color: var(--ink-2); line-height: 1.35; margin-top: 2px; }
+.deck .due { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.deck .due.is-none { font-weight: 400; color: var(--ink-2); }
+.chev { width: 16px; height: 16px; fill: none; stroke: var(--ink-2); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- Fields ---------- */
+.field { display: grid; gap: var(--s1); }
+.field > label, .field > legend, .field > .label { font-size: 15px; font-weight: 600; padding: 0; }
+.input {
+  width: 100%; min-height: 52px; padding: 13px 16px;
+  font: inherit; font-size: 17px; line-height: 1.4; color: var(--ink); background: var(--page);
+  border: 1.5px solid var(--ink-2); border-radius: 12px;
+}
+.input::placeholder { color: var(--ink-2); opacity: 1; }
+textarea.input { resize: none; display: block; }
+.input:focus-visible { outline: none; border-color: var(--ring); box-shadow: 0 0 0 1.5px var(--ring); }
+.input[aria-invalid="true"] { border-color: var(--error); }
+/* Focused and invalid: the ring moves 2px out, so it never merges with the red border (Mist, Cream). */
+.input[aria-invalid="true"]:focus-visible { border-color: var(--error); box-shadow: none; outline: 2px solid var(--ring); outline-offset: 2px; }
+.helper { font-size: 15px; color: var(--ink-2); }  /* 15px: you need it to act (rule 9) */
+.field-error { font-size: 15px; font-weight: 600; color: var(--error); }
+.select-wrap { position: relative; }
+.select-wrap .swatch { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); height: 20px; pointer-events: none; }
+.select-wrap select { appearance: none; -webkit-appearance: none; padding-left: 34px; padding-right: 44px; cursor: pointer; font-weight: 600; }
+.select-wrap .chev { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); pointer-events: none; stroke: var(--ink); }
+
+.stepper { display: flex; align-items: center; gap: var(--s2); }
+.stepper .step { width: 48px; height: 48px; padding: 0; border-radius: 25px; border: 1.5px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer; display: grid; place-items: center; transition: transform 80ms ease-out; }
+.stepper .step:active:not([disabled]) { transform: scale(.98); }
+.stepper .step svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.stepper .input { width: 88px; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; padding: 0 8px; }
+.stepper .unit { font-size: 15px; color: var(--ink-2); }
+
+/* ---------- Add card ---------- */
+.compose { display: grid; align-content: start; gap: var(--s3); padding-top: var(--s1); padding-bottom: var(--s4); }
+.compose .front { font-family: var(--font-head); font-size: 20px; font-weight: 600; }
+.compose textarea.front { min-height: 84px; }
+.compose .front::placeholder { font-family: var(--font-body); font-size: 17px; font-weight: 400; }
+.compose textarea.back { min-height: 112px; }
+
+/* Sticky zone above the keyboard */
+.action-zone {
+  position: sticky; bottom: 0; z-index: 5; background: var(--page);
+  padding: var(--s2) 0 calc(var(--s3) + env(safe-area-inset-bottom));
+}
+/* An empty status line takes no height (it stays in the DOM for aria-live); a line that appears grows the
+   sticky zone upward, so the button under it doesn't move (UI-CRIT-1 required 2). */
+.action-zone .status:not(:empty) { margin-bottom: var(--s2); }
+
+/* ---------- Deck page ---------- */
+.deck-head { padding-top: var(--s2); display: grid; grid-template-columns: 6px 1fr; column-gap: var(--s2); align-items: stretch; }
+.deck-head .swatch { height: auto; }
+.deck-head .counts { margin-top: 4px; }
+.test-line { margin-top: var(--s4); display: flex; align-items: center; justify-content: space-between; gap: var(--s2); padding: var(--s2) 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.card-list li a, .card-list li button {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); column-gap: var(--s3);
+  width: 100%; padding: var(--s2) 0; min-height: 56px; text-align: left;
+  font: inherit; color: inherit; background: none; border: 0; cursor: pointer;
+}
+.card-list li + li > * { border-top: 1px solid var(--rule); }
+.card-list .f { font-weight: 600; }
+.card-list .b { color: var(--ink-2); }
+
+/* ---------- Review session (focus mode: no bars) ---------- */
+.session { max-width: 560px; margin: 0 auto; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; padding: 0 var(--s3); }
+.session-bar { height: 56px; display: grid; grid-template-columns: 48px 1fr 48px; align-items: center; margin: 0 calc(-1 * var(--s2)); }
+.session-bar .count { text-align: center; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.progress { height: 2px; background: var(--rule); }
+.progress > span { display: block; height: 100%; background: var(--progress); }
+.card { flex: 1; padding: var(--s4) 0 var(--s5); }
+.context { display: flex; align-items: flex-start; gap: var(--s1); font-size: 15px; color: var(--ink-2); }
+.card .t-card { margin-top: var(--s2); }
+.ink-rule { border: 0; height: 1.5px; background: var(--ink); margin: var(--s4) 0 var(--s3); }
+.answer { max-width: 60ch; }
+.answer:focus { outline: none; }
+
+.slot { min-height: 64px; display: flex; align-items: flex-end; }
+.session .action-zone { padding-top: 0; }
+
+.keys { width: 100%; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s1); }
+.key {
+  position: relative; height: 64px; padding: 0 2px;
+  display: grid; align-content: center; justify-items: center; gap: 2px;
+  background: transparent; color: var(--ink); border: 1.5px solid var(--ink); border-radius: 12px;
+  font: inherit; cursor: pointer; transition: transform 80ms ease-out;
+}
+.key .k-label { display: inline-flex; align-items: center; gap: 4px; font-size: 17px; font-weight: 600; line-height: 1.1; }
+.key .check { display: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.key.is-rated { background: var(--primary-bg); color: var(--primary-fg); border-color: var(--primary-bg); }
+.key.is-rated .check { display: block; }
+.key.is-rated[disabled] { opacity: 1; }
+
+/* Edit sheet */
+.scrim { position: fixed; inset: 0; z-index: 20; background: var(--scrim); }
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 21;
+  max-width: 560px; margin: 0 auto; background: var(--surface);
+  border-radius: 16px 16px 0 0; padding: var(--s1) var(--s3) calc(var(--s3) + env(safe-area-inset-bottom));
+  display: grid; gap: var(--s3);
+  box-shadow: inset 0 1px 0 var(--sheet-edge);
+  animation: rise 220ms cubic-bezier(.3, .7, .2, 1) both;
+}
+@keyframes rise { from { transform: translateY(24px); opacity: 0; } }
+.sheet .grip { justify-self: center; width: 36px; height: 4px; border-radius: 2px; background: var(--rule); }
+.sheet-head { display: flex; align-items: center; justify-content: space-between; }
+.sheet .compose { padding: 0; gap: var(--s2); }
+
+/* Done */
+.done { flex: 1; display: flex; flex-direction: column; padding: var(--s5) 0 calc(var(--s3) + env(safe-area-inset-bottom)); }
+.done .actions { margin-top: auto; padding-top: var(--s5); }
+.done .t-hero { margin-top: 96px; }
+
+/* ---------- Add a test ---------- */
+.form { display: grid; align-content: start; gap: var(--s4); padding-top: var(--s1); padding-bottom: var(--s4); }
+.for-deck { display: flex; align-items: flex-start; gap: var(--s1); font-weight: 600; }
+.fit { border-top: 1px solid var(--rule); padding-top: var(--s4); }
+.fit h2 { text-wrap: balance; }
+.fit .lede { margin-top: var(--s1); }
+
+/* ---------- Page helpers ---------- */
+.page-flow { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+.grow { flex: 1; }
+.empty { padding-top: var(--s4); }
+.top.is-bare { justify-content: flex-end; }
+.empty .t-secondary { margin-top: var(--s2); max-width: 30ch; }
+.done .actions .btn { width: 100%; }
+.back-link { text-decoration: none; gap: 2px; margin-left: -12px; }
+.back-link svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* ---------- Colour picker (New deck) ---------- */
+.colours { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.colour { position: relative; height: 52px; border-radius: 12px; cursor: pointer; }
+.colour input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.colour .fill {
+  position: absolute; inset: 7px 5px; background: var(--hl); opacity: var(--hl-alpha);
+  box-shadow: inset 0 0 0 2px var(--pen);
+  border-radius: 3px 8px 4px 9px; pointer-events: none;
+}
+.colour .ok { position: absolute; inset: 0; margin: auto; width: 20px; height: 20px; display: none; fill: none; stroke: var(--mark-ink); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.colour:has(input:checked) { box-shadow: inset 0 0 0 2px var(--ink); }
+.colour:has(input:checked) .ok { display: block; }
+.colour:has(input:focus-visible) { outline: 2px solid var(--ring); outline-offset: 2px; }
+.colours[aria-invalid="true"] .colour { box-shadow: inset 0 0 0 1.5px var(--error); }
+
+/* ---------- States added 2026-11-07 (chief-officer) ---------- */
+/* ?step=1 (mockup.js) hides what arrives in build steps 2 and 3. */
+[data-step="1"] [data-later] { display: none !important; }
+
+/* Nothing due: one quiet line in the Review button's place, same height, so nothing below moves. */
+.lead .nothing { min-height: 50px; display: flex; align-items: center; font-weight: 600; }
+
+/* Status lines above the main button: confirmation, hint, or a failed save. */
+.status.is-error, .hint.is-error { font-size: 15px; font-weight: 600; color: var(--error); }
+
+/* ---------- States added 2026-11-08 (chief-officer, from ui-designer P-UI-2) ---------- */
+/* Storage can't open: home's empty frame. The fixes are alternatives, not steps, so no numbers. */
+.empty .body { margin-top: var(--s3); max-width: 34ch; }
+.fixes { margin-top: var(--s2); padding-left: 1.25em; list-style: disc; display: grid; gap: var(--s1); max-width: 34ch; }
+.empty .warn { margin-top: var(--s3); font-weight: 600; max-width: 34ch; }
+/* A status line inside the edit sheet takes space only when it has text. */
+.sheet .status:not(:empty) { margin-bottom: var(--s2); }
+.hint { font-size: 15px; color: var(--ink-2); margin-bottom: var(--s1); }
+.lead .t-secondary { max-width: 30ch; }
+
+/* Review wait: counting down to a card that's coming back. */
+.wait .t-hero { margin-top: var(--s2); }
+.wait .clock { font-variant-numeric: tabular-nums; }
+.wait .t-secondary { margin-top: var(--s2); max-width: 32ch; }
+
+/* Done: the once-only reminder ask (step 4). A ruled question, not a card. */
+.done.has-ask .t-hero { margin-top: var(--s5); }
+.remind { margin-top: var(--s5); border-top: 1px solid var(--rule); padding-top: var(--s4); }
+.remind p { margin-top: var(--s1); max-width: 34ch; }
+.remind .btn-primary { margin-top: var(--s3); }
+.remind .not-now { display: flex; justify-content: center; margin-top: var(--s1); }
+.done .status:not(:empty) { margin-top: var(--s5); max-width: 34ch; }
+
+/* Deck page: the test line is one link, at least 48px, the same frame in every state. */
+a.test-line { min-height: 48px; color: inherit; text-decoration: none; }
+.test-line .when { font-weight: 600; }
+.test-line .link-label { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px; white-space: nowrap; }
+
+/* Edit test: Remove test ends the form, centred, with its own status line above it. */
+.form .remove { display: flex; flex-direction: column; align-items: center; border-top: 1px solid var(--rule); padding-top: var(--s2); }
+.form .remove .status:not(:empty) { margin-bottom: var(--s1); text-align: center; }
+
+/* ---------- Settings (step 2; from ui-designer P-UI-8) ---------- */
+.settings-title { margin-top: var(--s1); }
+.settings .sec.is-first { margin-top: var(--s4); }
+.settings .sec > .t-secondary { margin-top: 4px; max-width: 34ch; }
+.settings .status:not(:empty) { margin-top: var(--s2); }
+.settings .sec > .btn-primary { margin-top: var(--s3); }
+.settings .after-btn { margin-top: var(--s1); }
+.settings .helper { margin-top: 2px; }
+
+/* Theme picker: four ruled rows, like home's deck list. The whole row is the radio's label.
+   Each chip is a tiny Nigiri screen in its own theme (data-theme on the chip), whatever theme is active. */
+.themes { margin-top: var(--s1); }
+.themes li + li .theme { border-top: 1px solid var(--rule); }
+.theme {
+  position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr) 24px; align-items: center;
+  column-gap: var(--s2); min-height: 64px; padding: var(--s1) 0; cursor: pointer;
+}
+.theme input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.theme .name { font-size: 17px; font-weight: 600; line-height: 1.3; }
+.theme .chip {
+  position: relative; width: 56px; height: 44px; border-radius: 8px; pointer-events: none;
+  background: var(--page); color: var(--ink); border: 1px solid var(--ink);
+  font-family: var(--font-head); font-size: 17px; font-weight: 600; line-height: 1;
+  padding: 6px 0 0 8px;
+}
+.theme .chip::after {
+  content: ""; position: absolute; left: 8px; right: 8px; bottom: 7px; height: 6px; border-radius: 3px;
+  background: var(--primary-bg);
+}
+.theme .ok { width: 24px; height: 24px; display: none; fill: none; stroke: var(--ink); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.theme:has(input:checked) .ok { display: block; }
+.theme:has(input:focus-visible) { outline: 2px solid var(--ring); outline-offset: 2px; border-radius: 12px; }
+/* While a row has focus, hide the rules above and below it, so the ring isn't doubled (TH-UI-2). */
+.themes li:has(input:focus-visible) .theme,
+.themes li:has(input:focus-visible) + li .theme { border-top-color: transparent; }
+
+/* ---------- How it feels (2026-11-08, chief-officer from ui-designer P-UI-8; D41–D45) ----------
+   Every new line is quiet: existing tokens and sizes, no new colour, in every theme. */
+/* Home: the cost before the tap, under the Review button. One line each at 360px. */
+.lead .lead-note { margin-top: var(--s2); max-width: none; }
+/* Done: one real number, or the test milestone in its place. */
+/* "pretty", not "balance": balance halved the line at 360px. Numbers keep their noun with a no-break space
+   ("35&nbsp;cards"); the builder does the same in every count string (P-UI-9). */
+.done .done-count { margin-top: var(--s2); max-width: 34ch; text-wrap: pretty; }
+/* The deck name and its full stop move to the next line as one piece; a name longer than the line still wraps. */
+.done-count .keep { display: inline-block; max-width: 100%; }
+.top p, .remind h2 { text-wrap: balance; }
+/* Test screen only: the sticky Save test bar gets an edge, so text scrolling under it doesn't look cut off. */
+#form ~ .action-zone { border-top: 1px solid var(--rule); margin-inline: calc(-1 * var(--s3)); padding-inline: var(--s3); }
+/* Deck page with a test: three facts and one action, one link. Edit test sits on the first row. */
+/* The facts take the full width (so the plan stays one line at 360px); Edit test shares only the first row,
+   which keeps room for it. DOM order stays facts first, Edit test last. */
+.test-line.has-test { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; }
+.test-line.has-test .test-info { grid-column: 1 / -1; grid-row: 1; }
+.test-line.has-test .link-label { grid-column: 2; grid-row: 1; }
+.test-info { display: grid; gap: 2px; min-width: 0; }
+.test-info > * { text-wrap: pretty; }
+.test-info > .when { padding-right: 6em; }
+/* Test screen: the plan, after the fit check's sentence. */
+.fit .plan { margin-top: var(--s2); }
+/* Settings: one ruled row that opens the explainer. */
+.row-link {
+  margin-top: var(--s5); min-height: 56px; display: flex; align-items: center; justify-content: space-between;
+  gap: var(--s2); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+  font-weight: 600; text-decoration: none; color: inherit;
+}
+/* The explainer: a page to read, so a comfortable measure and more air above each heading than below. */
+.explain { padding-bottom: var(--s5); }
+.explain h1 { margin-top: var(--s2); }
+.explain section { margin-top: var(--s4); }
+.explain h2 + * { margin-top: var(--s1); }
+.explain p { max-width: 38ch; text-wrap: pretty; }
+.explain p + p { margin-top: var(--s1); }
+.ratings { display: grid; gap: 4px; }
+.ratings div { display: grid; grid-template-columns: 4.25em minmax(0, 1fr); column-gap: var(--s1); }
+.ratings dt { font-weight: 600; }
+.ratings dd { margin: 0; }
+
+/* ======================================================================
+   App additions (build pass B1). Everything below uses the tokens above.
+   ====================================================================== */
+
+/* Keyboard focus is never hidden under the fixed phone bar (focus-not-obscured; UI-BENTO-1 builder notes). */
+html:has(.bar) { scroll-padding-bottom: calc(var(--bar-h) + var(--s2) + env(safe-area-inset-bottom)); }
+
+/* Press feedback on every tappable thing (UI rule 1; P-UI-9's list): Rules fills a pressed row (D51). */
+.btn-text { border-radius: 8px; }
+.btn-text:active:not([disabled]) { background: var(--rule); }
+.btn-icon:active { background: var(--rule); }
+.btn-secondary:active:not([disabled]) { background: var(--rule); }
+.card-list li button:active { background: var(--rule); }
+@media (hover: hover) {
+  .card-list li button:hover { background: color-mix(in srgb, var(--rule) 60%, transparent); }
+}
+.card-list li button { border-radius: 0; }
+
+/* User text keeps its line breaks and wraps long words instead of pushing the page sideways. */
+.t-card, .answer p, .card-list .f, .card-list .b, .deck .name, .for-deck, .context, .deck-head h1 {
+  overflow-wrap: anywhere;
+}
+.t-card, .answer p { white-space: pre-line; }
+
+/* Add card from Today: the select's text lines up with the other fields until a deck is picked (TH-UI-2 backlog). */
+.select-wrap select.no-swatch { padding-left: 16px; }
+
+/* ---------- Today: the bento (UI-BENTO-1, D49–D51) ----------
+   Index cards on a desk: Surface, a 1px rule border, a 16px radius, no shadow. Two rails: Now (Study,
+   Tests) and Yours (Last 7 days, Decks). DOM order is reading order at every width. */
+.today { max-width: 560px; margin: 0 auto; padding: 0 12px var(--s4); }
+.today.has-bar { padding-bottom: calc(var(--bar-h) + var(--s3) + env(safe-area-inset-bottom)); }
+.app-head {
+  min-height: 56px; padding-top: env(safe-area-inset-top);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s2);
+}
+.app-head .brand { font-family: var(--font-head); font-size: 20px; font-weight: 700; line-height: 1; padding-left: 2px; }
+.app-head .btn-icon { margin-right: -8px; }
+
+.rails { display: grid; gap: 12px; align-items: start; }
+.rail { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.tile { background: var(--surface); border: 1px solid var(--rule); border-radius: 16px; padding: 20px; min-width: 0; }
+/* Midnight's tiles use the page fill, so their row dividers stay visible (D51, chief's settlement 3). */
+[data-theme="midnight"] .tile { background: var(--page); }
+
+/* Tiles with a list sit their heading on the ink line, like the rule under a review question. */
+.tile-head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s2);
+  min-height: 48px; padding-bottom: var(--s1); border-bottom: 1.5px solid var(--ink);
+}
+/* A heading with a control beside it gets the 48px row (.tile-head); a heading alone sits at the top
+   like Study's date, so the tiles' first lines line up. */
+.tile-title { font-family: var(--font-head); font-size: 20px; font-weight: 600; line-height: 1.2; }
+.tile-head .btn-secondary { height: auto; min-height: 48px; padding: 0 var(--s2); font-size: 15px; gap: 6px; }
+.tile-head .btn-secondary svg { width: 18px; height: 18px; }
+
+/* Study: the biggest tile and the one filled button. */
+.study h1 { font-family: var(--font-head); font-size: 24px; font-weight: 600; line-height: 1.2; text-wrap: balance; }
+.study h1.t-hero { font-size: 34px; font-weight: 700; line-height: 1.08; }
+.study .welcome { margin-top: 4px; }
+.study .first-lines { margin-top: var(--s2); max-width: 34ch; }
+/* "Nothing due right now" sits 12px under the date, with the next-due line 4px under it (UI-CRIT-1). */
+.study .nothing { margin-top: var(--s2); font-weight: 600; }
+.study .next-due, .study .empty-note { margin-top: var(--s1); max-width: 40ch; }
+.study .nothing + .next-due { margin-top: 4px; }
+.study .empty-note { margin-top: var(--s2); }
+.study-row { margin-top: var(--s3); display: grid; gap: 12px; }
+.study .nothing + .next-due + .study-row, .study .empty-note + .study-row { margin-top: var(--s3); }
+.study .lead-note { margin-top: 12px; }
+
+/* Last 7 days: two plain lines with tabular numbers, no big-number treatment. */
+.week p { font-size: 17px; font-variant-numeric: tabular-nums; }
+.week .tile-title + p { margin-top: 4px; }
+
+/* Decks: the existing ruled rows. A pressed row fills with Rules and bleeds 8px into the padding,
+   so its text doesn't move; the rules beside a focused row hide, so the ring isn't doubled. */
+.tile .decks { margin-top: 0; }
+.tile .decks li + li .deck { border-top: 0; }
+.tile .decks li + li { border-top: 1px solid var(--rule); }
+.tile .deck { margin-inline: -8px; padding-inline: 8px; border-radius: 12px; }
+.tile .deck:active { background: var(--rule); }
+@media (hover: hover) { .tile .deck:hover { background: var(--rule); } }
+.tile .decks li:has(.deck:focus-visible),
+.tile .decks li:has(.deck:focus-visible) + li { border-top-color: transparent; }
+
+/* The phone bar lines up with the tiles. */
+.bar.is-today { padding-inline: 12px; }
+.bar.is-today .bar-inner { max-width: 536px; }
+
+@media (min-width: 48em) {
+  .today, .today.has-bar { max-width: 1152px; padding: 0 32px var(--s5); }
+  .rails { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+  .rail { gap: 20px; }
+  .study-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .study-row .btn-primary { width: auto; flex: 1 1 14rem; min-width: 14rem; max-width: 22rem; }
+  .study-row .btn-secondary { height: auto; min-height: 50px; }
+  .study-row .btn-primary.is-add { flex: 0 1 auto; min-width: 14rem; }
+}
+@media (min-width: 64em) {
+  .rails { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+  .tile { padding: 32px; }
+  .app-head { min-height: 64px; }
+  .study h1 { font-size: 34px; font-weight: 700; line-height: 1.08; }
+}
+
+/* ---------- Loading: the page colour only, for the few milliseconds storage takes to open. ---------- */
+.booting { min-height: 100vh; min-height: 100dvh; }
+
+/* Buttons grow with enlarged text instead of clipping it (UI-BENTO-1 builder notes: min-height, not height). */
+.btn-primary, .btn-secondary { height: auto; min-height: 50px; }
+.key { height: auto; min-height: 64px; }
+
+/* ======================================================================
+   Build pass B2: Settings, Test mode, the Done milestone, the desktop rules.
+   Existing tokens only; no new colour, size or radius.
+   ====================================================================== */
+
+/* Deck page card rows carry a chevron, like every row that opens something (D61(6), rule 3). */
+.card-list li button { grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) 16px; align-items: start; }
+.card-list li button .chev { align-self: center; }
+
+/* ---------- Today: the Tests tile (D50, UI-BENTO-1) ----------
+   Rows like the deck list, without the due column: swatch, the facts, chevron. The fit line comes
+   last after a rule: 17px ink, the verdict in weight 600, no highlighter. */
+.test-row { grid-template-columns: 6px minmax(0, 1fr) 16px; }
+.test-facts { display: grid; gap: 2px; min-width: 0; }
+.test-facts > * { display: block; }
+.test-facts .when { font-size: 15px; font-weight: 600; line-height: 1.35; }
+.test-facts .sub { margin-top: 0; text-wrap: pretty; }
+.test-facts .name { overflow-wrap: anywhere; }
+.fit-line { margin-top: var(--s2); padding-top: var(--s2); border-top: 1px solid var(--rule); font-size: 17px; max-width: 60ch; text-wrap: pretty; }
+.fit-line strong { font-weight: 600; }
+
+/* ---------- Deck page test line ---------- */
+.test-line .t-secondary { text-wrap: pretty; }
+.lead > .study-row:first-child { margin-top: 0; }
+
+/* ---------- Test screen ---------- */
+.input[type="date"] { display: block; appearance: none; -webkit-appearance: none; text-align: left; min-height: 52px; }
+.input[type="date"]::-webkit-date-and-time-value { text-align: left; }
+.stepper .step[aria-disabled="true"] { opacity: .4; cursor: not-allowed; }
+.stepper .step[aria-disabled="true"]:active { transform: none; }
+.fit .lede { text-wrap: pretty; max-width: 60ch; }
+.fit .plan { text-wrap: pretty; }
+/* The sticky Save test bar gets an edge, so text scrolling under it doesn't look cut off (P-RUN-6). */
+.test-zone { border-top: 1px solid var(--rule); margin-inline: calc(-1 * var(--s3)); padding-inline: var(--s3); }
+/* Remove test: after Save test, behind a rule, never inside the sticky bar (D36, D51(5)). */
+.remove-zone {
+  display: flex; flex-direction: column; align-items: center;
+  border-top: 1px solid var(--rule); padding: var(--s2) 0 calc(var(--s3) + env(safe-area-inset-bottom));
+}
+.remove-zone .status:not(:empty) { margin-bottom: var(--s1); text-align: center; }
+.test-screen:has(.remove-zone) .test-zone { padding-bottom: 16px; }
+
+/* ---------- Settings ---------- */
+.settings { padding-bottom: var(--s5); }
+.settings .status { overflow-wrap: anywhere; }
+.row-link .chev { flex: none; }
+
+/* The Restore confirm: a native modal dialog drawn as the sheet (phone) or the centred dialog (48em up). */
+dialog.sheet {
+  top: auto; bottom: 0; left: 0; right: 0; width: 100%; max-width: 560px; max-height: calc(100dvh - 24px);
+  margin: 0 auto; border: 0; color: var(--ink); overflow: auto;
+}
+dialog.sheet:not([open]) { display: none; }
+dialog.sheet::backdrop { background: rgba(23, 36, 60, .5); background: var(--scrim, rgba(23, 36, 60, .5)); }
+.confirm { padding-top: var(--s3); gap: var(--s2); }
+.confirm p { max-width: 40ch; text-wrap: pretty; }
+.confirm-actions { display: grid; gap: var(--s1); margin-top: var(--s2); }
+.confirm .status:not(:empty) { margin-top: var(--s2); }
+.confirm-actions .btn-text { justify-self: center; }
+
+/* ---------- Review and Done in a column ---------- */
+.session-wrap { min-height: 100vh; min-height: 100dvh; }
+
+/* ---------- Desktop rules for the other screens (UI-BENTO-1 §5) ---------- */
+@media (min-width: 48em) {
+  /* Review and Done: a 40rem column, centred vertically; the keys stay in the sticky zone at its bottom. */
+  .session-wrap { display: flex; align-items: center; }
+  .session { width: 100%; max-width: 40rem; min-height: min(100dvh, 48rem); }
+
+  /* Forms: a 35rem column. The action zone stops being sticky and sits 32px under the last field. */
+  .screen.is-form { max-width: 35rem; min-height: 0; }
+  .is-form .grow { flex: none; }
+  .is-form .action-zone { position: static; padding-top: 0; display: flex; flex-direction: column; align-items: flex-start; }
+  .is-form .action-zone .btn-primary { width: auto; min-width: 14rem; }
+  .is-form .action-zone .status { order: 1; }
+  .is-form .action-zone .status:not(:empty) { margin: var(--s2) 0 0; }
+  .is-form .empty { padding-bottom: var(--s4); }
+  .test-zone { border-top: 0; margin-inline: 0; padding-inline: 0; }
+  .remove-zone { align-items: flex-start; }
+  .remove-zone .status:not(:empty) { text-align: left; }
+
+  /* Settings and the explainer: a 35rem column. */
+  .screen.is-column { max-width: 35rem; }
+
+  /* Deck page: a 45rem column; Add card sits beside Review, like Today. */
+  .screen.deck-screen { max-width: 45rem; padding-bottom: var(--s5); }
+  .deck-screen .study-row .btn-primary:not(.is-add) { flex: 1 1 14rem; min-width: 14rem; max-width: 22rem; }
+  .deck-screen .lead .nothing + .study-row, .deck-screen .lead .t-secondary + .study-row { margin-top: var(--s2); }
+
+  /* The edit sheet and the Restore confirm become a centred dialog: 35rem, radius 16 all round,
+     Midnight's hairline all round, a 200ms fade and scale from .98. */
+  .sheet, dialog.sheet {
+    inset: 0; margin: auto; width: min(35rem, calc(100% - 64px)); max-width: none;
+    height: fit-content; max-height: calc(100dvh - 64px); overflow: auto;
+    border-radius: 16px; padding: var(--s4);
+    box-shadow: 0 0 0 1px var(--sheet-edge);
+    animation: pop 200ms cubic-bezier(.3, .7, .2, 1) both;
+  }
+  .sheet .grip { display: none; }
+  .confirm-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); }
+  .confirm-actions .btn-primary { width: auto; min-width: 14rem; }
+}
+@keyframes pop { from { opacity: 0; transform: scale(.98); } }
+/* A heading on the ink line with no control beside it (Tests) sits at the top like the other tiles'
+   first lines, instead of in the 48px control row. */
+.tile-head.is-bare { min-height: 0; }
+
+/* ---------- B2 pre-delivery fixes (ui-ux-pro-max checklist) ---------- */
+/* press-feedback (UI rule 1): the new rows fill with Rules while pressed, bleeding sideways so text
+   doesn't move (D51(3)). */
+a.test-line:active, .row-link:active, .theme:active { background: var(--rule); box-shadow: -8px 0 0 var(--rule), 8px 0 0 var(--rule); }
+@media (hover: hover) {
+  a.test-line:hover, .row-link:hover, .theme:hover {
+    background: color-mix(in srgb, var(--rule) 60%, transparent);
+    box-shadow: -8px 0 0 color-mix(in srgb, var(--rule) 60%, transparent), 8px 0 0 color-mix(in srgb, var(--rule) 60%, transparent);
+  }
+}
+/* long-token-wrapping: deck names inside sentences wrap instead of pushing the page sideways. */
+.fit .lede, .fit-line, .confirm p, .test-info, .done-count, .test-facts { overflow-wrap: anywhere; }
+/* focus-not-obscured: on phones a form's Save button sits in a sticky zone at the bottom, so keyboard
+   focus scrolls clear of it. From 48em the zone isn't sticky. */
+@media (max-width: 47.99em) {
+  html:has(.is-form .action-zone) { scroll-padding-bottom: calc(120px + env(safe-area-inset-bottom)); }
+}
+/* Headings that take focus on arrival (focus-on-route-change) don't draw a ring for a tap. */
+h1[tabindex="-1"]:focus:not(:focus-visible) { outline: none; }
+/* No lone word on a line (UI-BENTO-1 builder notes): "anytime." was left alone at 320px. */
+.study .lead-note, .study .first-lines, .study .welcome, .study .next-due, .study .empty-note { text-wrap: pretty; }
+/* The Restore confirm's question doesn't leave "phone?" alone at 360px. */
+.confirm h2 { text-wrap: balance; }
+
+/* ======================================================================
+   Build pass 2 (R1): D63's study-early pill, and the UI-CRIT-1 fixes. Existing tokens only.
+   ====================================================================== */
+
+/* Deck page: the test link and, with a test ahead and cards held back, the study-early pill, inside one
+   pair of rules (the rules move from the link to the block). The pill sits 8px under the link and 12px
+   under the plan line; the note about due cards 8px under the pill. */
+.test-block { margin-top: var(--s4); border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.test-block > .test-line { margin-top: 0; border-top: 0; border-bottom: 0; }
+.test-block.has-early > .test-line { padding-bottom: 4px; }
+.early { display: flex; flex-direction: column; align-items: flex-start; padding: var(--s1) 0 var(--s2); }
+.early .early-note { margin-top: var(--s1); max-width: 40ch; text-wrap: pretty; }
+/* The compact outlined pill, as Today's New deck: 15px/600 ink, a 1.5px ink border, 48px tall, 16px sides,
+   never stretched and never filled. */
+.btn.btn-compact { height: auto; min-height: 48px; padding: 0 16px; font-size: 15px; gap: 6px; }
+
+/* Edit sheet: why a scrim tap or Escape didn't close it. Ink, not red: nothing failed. */
+.status.is-note { font-size: 15px; font-weight: 600; color: var(--ink); }
+/* The storage screen while Try again waits: secondary text, not red, because nothing has failed yet. */
+.status.is-pending { font-size: 15px; color: var(--ink-2); }
+h2[tabindex="-1"]:focus:not(:focus-visible) { outline: none; }
+@media (min-width: 48em) {
+  /* Once a line shows, the centred dialog keeps its bottom edge, so it grows upward like the phone sheet. */
+  .sheet.is-held { top: auto; bottom: var(--held-bottom); margin-block: 0; max-height: calc(100dvh - var(--held-bottom) - 32px); }
+}
+
+/* Today from 48em to 63.99em: Study's buttons stack full width, Review then Add card, 12px apart. */
+@media (min-width: 48em) and (max-width: 63.99em) {
+  .study .study-row { display: grid; gap: 12px; }
+  .study .study-row .btn { width: 100%; min-width: 0; max-width: none; }
+}
+
+/* Long deck names wrap without a lone word (UI-CRIT-1). */
+.deck .name, .test-facts .name { text-wrap: pretty; }
+/* The export file name is one piece, and so is a date in a Restore line (UI-CRIT-2 req 3). */
+.file-name, .no-break { white-space: nowrap; }
+/* A focused Tests or Decks row draws its ring inside, so the ink line under the heading stays visible;
+   the rules beside it stay hidden. */
+.tile .deck:focus-visible { outline-offset: -2px; }
+/* The deck mark lines up with the first line when the name wraps (review header, form chip). */
+.context .swatch, .for-deck .swatch { margin-top: 3px; margin-top: calc((1lh - 16px) / 2); }
+
+/* Phones: the forms' sticky bar is 80px or less plus the safe area (UI-CRIT-1 required 2). */
+.is-form .action-zone { padding-bottom: calc(16px + env(safe-area-inset-bottom)); }

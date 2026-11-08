@@ -1,6 +1,6 @@
 # Study App Design
 
-**Nigiri**: a pure flashcards app (decks, cards, FSRS reviews, plus Test mode on a deck, with no tracker or calendar), hosted on GitHub Pages, for the user and a few friends: their first AI-assisted app. No company, no launch. **Goal: it works, it's easy to use, and they keep using it.** Currently in the **planning stage**.
+**Nigiri**: a pure flashcards app (decks, cards, FSRS reviews, plus Test mode on a deck, with no tracker or calendar), hosted on GitHub Pages, for the user and a few friends: their first AI-assisted app. No company, no launch. **Goal: it works, it's easy to use, and they keep using it.** Currently **building the first working draft** (the user authorized implementation on 2026-11-08).
 
 **The product is the card and how it gets made.** The whole product is input: making cards has to be so cheap that people keep doing it. Every card is written by the person learning it: no import, no AI. The card-creation flow is in [product-spec.md §1](product-spec.md), and the user has the final say on it. Everything else is built outward from it. Version one builds plain English text cards only. Mandarin and math are separate products, written down in [v2-input-flows.md](v2-input-flows.md) and not built yet.
 
@@ -20,8 +20,8 @@
 - **Choices:** when a question goes to the user, present at most two options, with the trade-off in one line each, and let the user choose. Never mark your own suggestions "(proposed)" or ask for approval of them.
 - **Gaps:** if the user hasn't decided something, chief-officer decides it and records why. Every other agent, and any session working without the chief, writes "undecided" and stops instead of filling the gap with a default.
 - **Order:** the card flow comes first. It was written on 2026-11-07 (spec §1). Every other section stays shorter than the card section.
-- **FSRS:** use `ts-fsrs@6.0.0` (pinned), with its v6 calls (`DefaultScheduler`, `newCard`, `review`), never the old v5 names. Details are in [product-spec.md §2 and §7](product-spec.md) and [fsrs-notes.md](fsrs-notes.md). Never hardcode review delays per rating: only the configured learning steps are set delays, and the model may lengthen them. Never design an alternative scheduler.
-- **Out of scope:** desktop layouts, legal or privacy compliance, accessibility audits, migration strategies.
+- **FSRS:** use `ts-fsrs@6.0.0` (pinned), with its v6 calls (`DefaultScheduler`, `newCard`, `review`), never the old v5 names. Details are in [product-spec.md §2 and §7](product-spec.md) and [fsrs-notes.md](fsrs-notes.md). Never hardcode review delays per rating. The only set delays are the 1-minute learning and relearning steps (Again) and the library's built-in Hard step on a card still in them (90 seconds). Model override is off, so the model never lengthens them. Everything else is calculated by FSRS-7, with desired retention 0.9, and 0.95 for Easy. Never design an alternative scheduler.
+- **Out of scope:** desktop layouts beyond Today's bento grid and a centred column for the other screens (the user's choice, 2026-11-08: "Bento Today + desktop", D49), legal or privacy compliance, accessibility audits, migration strategies.
 - **Talking to the user:** they're learning to build software. Use plain language and explain decisions briefly.
 
 ## Planning gate
@@ -49,9 +49,8 @@
 Nine agents live in `.claude/agents/`, and each agent's file holds its full instructions. [chief-officer](.claude/agents/chief-officer.md) runs the work: start it with `/iterate-project` ([SKILL.md](.claude/skills/iterate-project/SKILL.md)) or `claude --agent chief-officer`. Its file holds the task contracts, design-skill loading, research standards, phase gates and acceptance rules. This section only adds this project's limits.
 - **Chief-officer makes the calls:** priorities, task order, which specialist gets each task (it delegates to them directly), settling disagreements between agents, accepting or rejecting results, and any product or design question the user hasn't settled (the user handed it that on 2026-11-07). Don't run a second coordinating loop alongside it.
 - **What stays with the user:** the card flow (spec §1), decisions they've already made, and what the chief's file reserves for them: starting implementation, commits, publishing and paid services. The chief records each decision it makes, with the reason, in PROJECT-STATE.md and updates the brief or spec it changes.
-- **Active now:** chief-officer, competitor-researcher, product-planner, ui-designer, qa-tester, code-reviewer.
-- **Active after implementation is authorized:** frontend-builder.
-- **Inactive during planning:** [learning-specialist](.claude/agents/learning-specialist.md) and [feedback-analyst](.claude/agents/feedback-analyst.md). After implementation is authorized, learning-specialist handles study-mechanics and scheduling changes, and feedback-analyst works only from real tester evidence.
+- **Active now (implementation authorized 2026-11-08):** chief-officer, competitor-researcher, product-planner, ui-designer, frontend-builder, qa-tester, code-reviewer, and [learning-specialist](.claude/agents/learning-specialist.md), which handles study-mechanics and scheduling changes.
+- **Only with real tester evidence:** [feedback-analyst](.claude/agents/feedback-analyst.md). There's none yet, so it doesn't run.
 - When a specialist's file says "main conversation", it means whoever called it, usually chief-officer.
 - Only frontend-builder edits app code. Chief-officer may edit the planning documents, PROJECT-STATE.md and static mockups in `mockups/`. Accepted decisions stay in product-brief.md and product-spec.md.
 - Accepted decisions in the spec and brief, and the out-of-scope list above, win over any agent's general checklist. When a checklist item covers something the project cut or deferred, mark it not applicable instead of reopening it.

@@ -1,6 +1,19 @@
 # UI design expectations
 
-**Phone only:** a web app on the home screen, designed at 390px and checked at 360px. No desktop layout.
+**Phone first, and it widens (D49, the user's decision, 2026-11-08: "Bento Today + desktop"):** a web app on the home screen, designed at 390px and checked at 360px and 320px. Today is a bento grid of tiles that becomes two rails from 48em and widens up to 1152px. Every other screen keeps its phone layout, in a centred column. Review stays focused on the question, the answer and the keys.
+
+**Today (D50, D51; plan UI-BENTO-1):**
+- **Tiles:** Study, then Tests, Last 7 days and Decks.
+  - **Study** is the biggest, and comes first on phones. It holds the one filled button, the minutes line, and the next-due line when nothing is due.
+  - **Tests** appears only when a test is today or ahead.
+  - **Last 7 days** shows cards added and cards reviewed; a zero line is hidden.
+  - **Decks** is the list, plus New deck.
+- **Not on Today:** no assignment, agenda or calendar tile, and no filler tile.
+- **Look:** tiles are index cards: Surface, a 1px rule border, a 16px radius, no shadow. Only the tiles with lists get the 1.5px ink line under their heading. Content sets every height. DOM order is reading order at every width.
+- **Desktop column widths for the other screens:**
+  - review and Done: 40rem
+  - forms and Settings: 35rem
+  - deck page: 45rem; on desktop its edit sheet becomes a centred dialog
 
 **Direction: B, Highlighter.** Tokens and type are in [product-brief.md](product-brief.md); the reference screens start at `mockups/index.html`, and the plan behind them is `mockups/design-plan.md`. New screens extend that system.
 
@@ -91,8 +104,8 @@ The user asked to apply three guides: Craig Kirkwood's *UX Design Principles* (N
 **Left out, and why:**
 - Personas, empathy maps, journey maps, card sorting: the users are you and a few friends, and there are about ten screens.
 - Heat maps and A/B tests: a handful of users can't fill them.
-- Desktop versions and switching between them: phone only.
-- Bento grids, parallax and other trends: the direction is decided (Highlighter, ruled rows).
+- Separate desktop designs for screens other than Today: they keep the phone layout in a centred column (D49).
+- Parallax and other trends: the direction is decided (Highlighter, ruled rows). _Changed 2026-11-08:_ Today's bento grid is in, by the user's choice (D49).
 - Accessibility audits and legal accessibility: out of scope. Contrast stays WCAG AA, as decided.
 - Wizards, FAQs and voice input: help is one line on the screen, and typing is the only input in version one.
 

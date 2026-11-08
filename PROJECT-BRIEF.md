@@ -16,4 +16,4 @@
 - **Gaps:** if the user hasn't decided something, chief-officer decides it and records why. Every other agent writes "undecided" and stops instead of filling the gap with a default. The card flow (spec §1) stays the user's.
 - **Order:** the card flow comes first. It was written on 2026-11-07 (spec §1).
 - **FSRS:** use ts-fsrs 6.0.0 (pinned). Never design an alternative scheduler.
-- **Out of scope:** desktop layouts, legal or privacy compliance, accessibility audits, migration strategies.
+- **Out of scope:** desktop layouts beyond Today's bento grid and a centred column for the other screens (the user's choice, 2026-11-08: "Bento Today + desktop", D49), legal or privacy compliance, accessibility audits, migration strategies.
