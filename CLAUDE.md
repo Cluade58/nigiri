@@ -37,7 +37,8 @@
 **`ui-ux-pro-max`** (`.claude/skills/ui-ux-pro-max/`, MIT, from nextlevelbuilder/ui-ux-pro-max-skill) is attached to two agents as a UX rules checklist: accessibility, touch, forms, navigation, motion and React guidance, plus its pre-delivery checklist in `references/pro-rules.md`.
 - **ui-designer** uses it to design and review screens.
 - **frontend-builder** (added 2026-11-08) uses it while building, and runs the pre-delivery checklist on the screens it changed before QA.
-- Its palettes, font pairings and styles don't apply, because the Highlighter tokens are fixed. Where its numbers differ from the briefs, the briefs win.
+- **Colours come from its palettes** (the user, 2026-11-08: "use the skills for the best most appealing colours based on the skills (colour trios)"). ui-designer picks Nigiri's colour trio (primary, secondary, accent) with them, and checks it with frontend-design and Impeccable. Once chosen, the tokens in product-brief.md are fixed, and the builder uses only those.
+- Its font pairings and styles don't apply: the fonts and layout stay as decided. Where its numbers differ from the briefs, the briefs win.
 - Its SKILL.md runs the search script through `${CLAUDE_PLUGIN_ROOT}`, which isn't set in this project. From the project root, the script is at `.claude/skills/ui-ux-pro-max/scripts/search.py`. Agents without a shell read the `references/` and `data/` files directly.
 
 ## Agent workflow

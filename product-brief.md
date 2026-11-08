@@ -30,18 +30,37 @@ _Rewritten 2026-11-07 after the scope reset. The earlier research-heavy version 
 - **No lives and no caps on reviewing.** The streak waits for version 1.1 ([spec §8](product-spec.md)).
 - **Build order and the two-week test:** [spec §7](product-spec.md).
 - **Visual direction: B, Highlighter.** The reference screens start at `mockups/index.html`.
+- **Colours (your decision, 2026-11-08: "use the skills for the best most appealing colours based on the skills (colour trios)").**
+  - **The trio** comes from ui-ux-pro-max's row 103, "Flashcard & Study Tool": violet `#7C3AED`, lilac `#8B5CF6` and emerald `#059669`, on lavender paper. ui-designer and chief-officer chose it; [PROJECT-STATE.md](PROJECT-STATE.md) D37 has why.
+  - **The rule:** violet marks acting, choosing and focus, and nothing else; the deck highlighters stay yours.
+  - **History:** the earlier navy Highlighter values are in git: `git show bcb812d:product-brief.md`.
 
-| Token | Light | Dark |
-|---|---|---|
-| Page | `#F8FAFD` | `#141B2B` |
-| Ink | `#1B2A4A` | `#E6ECF7` |
-| Secondary text | `#4A5874` | `#A8B4CB` |
-| Tint | `#EEF3FA` | `#1C2539` |
-| Rules | `#E3E9F2` | `#263049` |
-| Highlighters (one per deck, you pick) | Green `#7BE38A`, Blue `#7CC8FF`, Pink `#FF8FC8`, Orange `#FFB65C`, Yellow `#FFE45C`, Purple `#C3A6FF` | same at 85% opacity |
-| Error | `#B3261E` | `#FFB4AB` |
+| Token | What it draws | Light | Dark | From row 103 |
+|---|---|---|---|---|
+| Page | the page, bars, fields | `#FAF5FF` | `#15131F` | Background |
+| Surface | the edit sheet only (dark adds a `#4A4560` hairline on its top edge) | `#FFFFFF` | `#221F31` | Card |
+| Ink | all text and icons, outlined buttons, rating keys at rest, the rule under the question | `#0F172A` | `#ECE9F5` | Foreground |
+| Secondary text | secondary lines, placeholders, field borders, chevrons | `#475569` | `#ABA5BE` | Muted Foreground |
+| Rules | dividers, progress track | `#E6DCF7` | `#2E2A3D` | Border, darkened so dividers show |
+| Primary (violet) | the one filled button per screen, the rated key | `#7C3AED`, white text | `#8152E0`, white text | Primary and On Primary |
+| Secondary (lilac) | the review progress bar | `#8B5CF6` | `#A88BF7` | Secondary |
+| Focus ring | keyboard focus, the field you're typing in | `#7C3AED` | `#A88BF7` | Ring |
+| Done (mint) | the highlighter behind "Done" | `#7FDDB9` | same at 85% | Accent `#059669`, lightened: it drops to 1.47:1 under dark text in dark mode |
+| Error | error lines, invalid borders | `#B91C1C` | `#F87171` | Destructive, darkened from 4.50:1 to 6.03:1 |
+| Scrim | behind the edit sheet | ink at 45% | `#05040A` at 60% | Foreground |
 
-  Type: Bricolage Grotesque for headings, Atkinson Hyperlegible Next for body, both bundled with the app. The highlighter marks deck colours and what just changed; everything else stays quiet.
+| Deck colour (you pick one per deck) | Highlight: marks and the picker | Pen: the 6px swatch, light mode | Dark |
+|---|---|---|---|
+| Green | `#7BE38A` | `#33934A` | highlight at 85% |
+| Blue | `#7CC8FF` | `#3384CC` | highlight at 85% |
+| Pink | `#FF8FC8` | `#D23C8A` | highlight at 85% |
+| Orange | `#FFB65C` | `#C2650C` | highlight at 85% |
+| Yellow | `#FFE45C` | `#A37F00` | highlight at 85% |
+| Purple | `#DAA8F7` (was `#C3A6FF`, moved toward orchid so it isn't the button's violet) | `#AD4BD0` | `#E2A0F0` at 85% (more orchid, so it isn't the lilac focus ring) |
+
+  Light mode needs two tones per deck: a pastel can't reach 3:1 against the page as a thin swatch and also keep dark text readable as a highlight. Dark text sits on every highlight in both themes, like a real pen. Measured contrast is in D37.
+
+  Type: Bricolage Grotesque for headings, Atkinson Hyperlegible Next for body, both bundled with the app. Colour marks only what matters: the main button, the key you just rated, focus, deck colours, and the highlighter over what just changed. Everything else stays quiet.
 
 - **Stack (exact versions):**
   - React 19.3.1, TypeScript 6.0.3

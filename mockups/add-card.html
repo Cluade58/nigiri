@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="highlighter.css">
 </head>
 <body>
-<div class="screen page-flow" id="screen" style="--hl: var(--hl-purple)">
+<div class="screen page-flow" id="screen" style="--hl: var(--hl-purple); --pen: var(--pen-purple)">
   <header class="form-bar">
     <a class="btn-text" href="deck.html" id="done">Close</a>
     <h1>Add card</h1>
@@ -68,6 +68,7 @@
     document.getElementById('fixed-deck').lastChild.textContent = newDeck;
     const colour = ['green', 'blue', 'pink', 'orange', 'yellow', 'purple'].includes(params.get('colour')) ? params.get('colour') : 'yellow';
     $('#screen').style.setProperty('--hl', `var(--hl-${colour})`);
+    $('#screen').style.setProperty('--pen', `var(--pen-${colour})`);
     status.hidden = true;
   }
 
@@ -83,6 +84,7 @@
     const opt = e.target.selectedOptions[0];
     deck = opt.value;
     $('#screen').style.setProperty('--hl', `var(${opt.dataset.hl})`);
+    $('#screen').style.setProperty('--pen', `var(${opt.dataset.hl.replace('--hl-', '--pen-')})`);
     $('#deck-swatch').hidden = false;
     $('#deck-error').hidden = true;
     e.target.removeAttribute('aria-invalid');

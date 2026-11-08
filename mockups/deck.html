@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="highlighter.css">
 </head>
 <body>
-<main class="screen has-bar" id="screen" style="--hl: var(--hl-purple)">
+<main class="screen has-bar" id="screen" style="--hl: var(--hl-purple); --pen: var(--pen-purple)">
   <header class="form-bar">
     <a class="btn-text back-link" href="home.html">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Home</a>
@@ -134,6 +134,7 @@
   }
   if (params.has('empty')) {
     $('#screen').style.setProperty('--hl', 'var(--hl-yellow)');
+    $('#screen').style.setProperty('--pen', 'var(--pen-yellow)');
     $('#deck-name').textContent = 'Chem unit 3';
     $('#counts').textContent = 'No cards yet';
     $('#lead').innerHTML = '<p class="t-secondary">Add a card whenever something is worth remembering.</p>';

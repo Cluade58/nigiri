@@ -4,10 +4,14 @@ _Redone 2026-11-07, then cut down to version one after the spec review (product-
 
 The app is called Nigiri. Phone only, 390px, checked at 360px. Built from [product-spec.md](../product-spec.md) §1 and §6, in direction B, Highlighter. Nothing on the version 1.1 list (§8) appears on these screens.
 
-## Tokens (unchanged from product-brief.md)
+## Tokens (from product-brief.md)
 
-- **Paper** `#F8FAFD`, **ink** `#1B2A4A`, **secondary ink** `#4A5874`, **tint** `#EEF3FA`, **rules** `#E3E9F2`
-- **Highlighters:** six colours (green, blue, pink, orange, yellow, purple). You pick one for each deck.
+**Colours changed 2026-11-08** to ui-ux-pro-max's row 103, "Flashcard & Study Tool". The user asked for the skills' colour trios. The navy values are in git.
+- **Light:** lavender paper `#FAF5FF`, slate ink `#0F172A`, secondary ink `#475569`, rules `#E6DCF7`, the white sheet `#FFFFFF`.
+- **Violet `#7C3AED`** (dark `#8152E0`): the one filled button, the rated key, focus.
+- **Lilac `#8B5CF6`** (dark `#A88BF7`): the progress bar.
+- **Mint `#7FDDB9`:** the highlighter behind "Done". It comes from the emerald accent `#059669`.
+- **Highlighters:** six colours (green, blue, pink, orange, yellow, purple). You pick one for each deck. Each has a light highlight for marks and, in light mode, a stronger pen tone for its swatch. All values are in product-brief.md.
 - **Type:** Bricolage Grotesque for headings and card text, Atkinson Hyperlegible Next for everything else. Sizes 34 / 28 / 24 / 20 / 17 / 15 / 13.
 
 ## Layout
@@ -29,7 +33,10 @@ Decks         New deck       Front                         Test date  [Wed, Nov 
 
 ## Principles
 
-1. **The highlighter marks deck colours and what just changed or matters most.** That means the count after you save a card ("36 cards"), "Done", and the fit check's answer. With readiness cut, these are the only highlighter marks. Nothing else is coloured.
+1. **The highlighter marks deck colours and what just changed or matters most.**
+   - **The marks:** the count after you save a card ("36 cards") and the fit check's answer, both in the deck's colour, and "Done" in mint. With readiness cut, these are the only highlighter marks.
+   - **Violet is the pen you press with:** the one filled button, the key you just rated, and focus. Lilac is the progress bar.
+   - Nothing else is coloured.
 2. **Input is never more than one tap away.** Add card sits in the bottom bar on home and on each deck.
 3. **One primary button per screen**, named for exactly what it does. The confirmation reuses the button's verb: Save card, then "Saved".
 

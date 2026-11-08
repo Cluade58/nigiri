@@ -1,18 +1,21 @@
 # Project state
 
-_Kept by chief-officer. Decisions live in [product-spec.md](product-spec.md) and [product-brief.md](product-brief.md); this file records why they were made, who owns what, and what's next. Last updated 2026-11-08 (second cycle)._
+_Kept by chief-officer. Decisions live in [product-spec.md](product-spec.md) and [product-brief.md](product-brief.md); this file records why they were made, who owns what, and what's next. Last updated 2026-11-08 (third cycle: colours)._
 
 ## Phase
 
 - **Planning. Implementation isn't authorized.**
   - **2026-11-08, earlier:** the user put the project back in planning ("dont start nbuilding until i say so"). Asked whether to start step 1, they said **"Not yet"**.
-  - **This cycle's request (2026-11-08):** "Ok, now research short term spaced rep, for the test mode. in the app use notifications for reviews are due to study. Dont make the easy for fsrs soo long. desired retention shld be at around 90%".
+  - **Second cycle's request (2026-11-08):** "Ok, now research short term spaced rep, for the test mode. in the app use notifications for reviews are due to study. Dont make the easy for fsrs soo long. desired retention shld be at around 90%".
   - Building starts only when the user says so ([CLAUDE.md](CLAUDE.md), Planning gate).
-- **This cycle's goal:**
+- **Second cycle's goal:**
   - research short-horizon spacing and settle the open Test mode rules;
   - research what reminders a no-server home-screen app can send, and plan them;
   - shorten Easy with a supported ts-fsrs lever, keeping retention around 90%.
 - **One iteration:** research, decisions, doc edits, report. No revision round.
+- **Third cycle (2026-11-08):** the user asked: "Remember that the actual website is going to have a frotnend too, for that, use the skills for the best most appealing colours based on the skills (colour trios)".
+  - Colours now come from ui-ux-pro-max's palettes. The coordinator updated CLAUDE.md and ui-designer.md to say so.
+  - This cycle's work: choose the trio, apply it to the mockups, one rendered review. Still planning, and no commits. The result is D37.
 - **Verdict:** PLAN_READY for build steps 1–3. Step 4 (reminders): the user chose option B, the Cloudflare sender, on 2026-11-08 ("Free Cloudflare sender"). Its delivery details are S4-PLAN ([publishing.md](publishing.md#reminders-step-4)).
 - **Build passes:** 0 of 3.
 
@@ -53,7 +56,7 @@ _Kept by chief-officer. Decisions live in [product-spec.md](product-spec.md) and
 | D25 | **The "storage can't open" screen:** "Nigiri can't open your cards", three fixes, a warning not to remove the app, and Try again (with "Still can't open your cards." if it fails again). | From ui-designer (P-UI-2). A home-screen app has no reload button, and reinstalling is the instinct that can erase cards. | spec §6; `storage-error.html` |
 | D26 | **Anki's other settings:** fuzz off, maximum interval default; optimizer, reschedule, health check, historical retention, simulator, Easy Days, load balancing, leeches and daily limits cut. | Nobody uses them in month one, or they need fuzz or history Nigiri won't have. | fsrs-notes §8 |
 
-### Made 2026-11-08, this cycle
+### Made 2026-11-08, second cycle
 
 | # | Decision | Why | Where |
 |---|---|---|---|
@@ -68,6 +71,12 @@ _Kept by chief-officer. Decisions live in [product-spec.md](product-spec.md) and
 | D35 | **The reminder ask:** on Done, from a tap (iPhone requires it), until answered; "Not now" ends it; Settings has a switch. Not shown where reminders can't arrive. No icon number (1.1 list). | From ui-designer (P-UI-3). Chief changed one rule after the Impeccable critique: leaving Done by Back to home no longer counts as "Not now", so a habit tap can't lose the only ask. | publishing.md; spec §6; `review-done.html?remind` |
 | D36 | **Remove test sits at the end of the form,** not in the sticky bar. | Observed at 360×640: in the sticky bar it cut the "It fits" answer in half. | `deck-test.html?edit` |
 
+### Made 2026-11-08, third cycle (colours)
+
+| # | Decision | Why | Where |
+|---|---|---|---|
+| D37 | **Colours: ui-ux-pro-max row 103, "Flashcard & Study Tool"**: violet `#7C3AED`, lilac `#8B5CF6`, emerald `#059669` (used as mint `#7FDDB9`), on lavender `#FAF5FF` with slate ink `#0F172A`. Dark values are derived. **Roles:** violet draws only the one filled button, the rated key and focus; lilac draws the progress bar; mint draws "Done" (was yellow); deck colours stay the user's. In light mode, each deck gets a pen tone for its swatch. Purple moves to orchid: `#DAA8F7`, with pen `#AD4BD0`, in light, and `#E2A0F0` in dark. In dark, the sheet gets a `#4A4560` hairline on its top edge (2.17 against the dimmed page). Error is `#B91C1C` / `#F87171`. Chief picked the row from ui-designer's proposal (P-UI-4). | **Why 103:** it's the skill's exact product row and its top result in both search modes. **The runner-up, row 150 (blue), wasn't shown as an option.** Its `#2563EB` sits on the user's Blue deck colour, so it would force a change to a colour the user picks, and it barely changes the old navy look. Rows 9, 78, 93 and 43 fail accent contrast (2.95–3.18) or collide with the Orange and Yellow decks. **Adaptations, all for contrast or dark mode:** row Border 1.12 → 1.23, so dividers show; Destructive 4.50 → 6.03; Accent under dark text measures 1.47 in dark mode, so it's lightened to mint for both themes. **Pen tones:** the old light swatches measured 1.22–2.01 against the page, and one value can't reach both 3:1 as a swatch and 4.5:1 under dark text. **Measured (WCAG 2.x, light / dark):** button text 5.70 / 4.98; rated key text 5.70 / 4.98; key labels 16.64 / 15.32; secondary text 7.06 / 7.74; error 6.03 / 6.63; focus ring 5.31 / 6.73; progress against the track 3.22 / 5.08; swatches 3.50–4.17 / 6.59–10.62; text on highlights 8.51–14.03 / 6.41–10.33. Not reopened: fonts, layout, screens, copy. | product-brief tokens; UI-DESIGN-BRIEF; `mockups/highlighter.css`; design-plan |
+
 ## Tasks
 
 | ID | Owner | Task | Status |
@@ -81,6 +90,9 @@ _Kept by chief-officer. Decisions live in [product-spec.md](product-spec.md) and
 | R-NOTIF-1 | competitor-researcher | What a no-server home-screen app can do for reminders | Done 2026-11-08. Nothing was tested on a phone. |
 | P-RUN-2 | chief | Easy levers in pinned ts-fsrs 6.0.0, fixed clock, scratch folder outside the project | Done: fsrs-notes §9, scenarios 4, 5, 8, 15 |
 | P-UI-3 | ui-designer | Written plan and copy: reminder ask, Settings row, Test mode states | Done (frontend-design loaded; Impeccable degraded, written plan only). Chief built the mockups, checked 390 px light/dark and 360×640 (no overflow), and ran a degraded Impeccable critique (detector clean). **ui-designer's rendered critique of P-UI-2 and P-UI-3 hasn't run.** |
+| P-UI-4 | ui-designer | Choose the colour trio from ui-ux-pro-max's palettes (written plan, frontend-design's two passes) | Done 2026-11-08. It proposed row 103 with row 150 as the alternative; chief chose 103 alone (D37). Loaded: frontend-design and ui-ux-pro-max (the Skill tool loaded the user-level copy; the project's CSV and references were read directly). Impeccable's SKILL.md loaded, but its launcher didn't run (no shell). |
+| P-RUN-3 | chief | Apply D37 to `mockups/highlighter.css` and the mockup HTML. Measure contrast. Screenshot 33 states, light and dark, at 390×844 (`npm run shot`) and 360×640 (a scratch wrapper with the same checks, because the tool has no 360 viewport). | Done. Before shots are in `screenshots/colour-before/`, after shots in `screenshots/colour-after/`. Impeccable's detector on `mockups/` found only the older type-step advisory on home and index. |
+| P-UI-5 | ui-designer | Rendered critique of D37 (Impeccable critique, pro-rules checklist) | Done 2026-11-08: **PASS**, Impeccable heuristics 30/40, with no required fixes. Chief applied both optional changes (purple in dark, the dark sheet's edge) and re-shot. Loaded: frontend-design, Impeccable (`critique.md`; its launcher didn't run, as there's no shell), and ui-ux-pro-max. Impeccable's own two isolated sub-agents didn't run: ui-designer did the design review and chief ran the detector, kept apart until both were done. No critique snapshot was saved. |
 | S1-BUILD | frontend-builder | Build step 1 per spec §7 | Waiting for the user to say to start |
 | S2-PLAN | chief | Draw Settings (Export, Restore, confirm; the Reminders row joins in step 4). Check that export saves a file from an iPhone home-screen app. | Next planning task |
 | S4-PLAN | chief | Reminders through the Cloudflare sender (option B): the Worker's design, what it stores, the 10 ms check, and how a phone signs up | Unblocked 2026-11-08 (the user chose B). Plan it before step 4. The user makes the Cloudflare account. |
@@ -104,4 +116,4 @@ _Kept by chief-officer. Decisions live in [product-spec.md](product-spec.md) and
 - ui-designer's rendered critique of the P-UI-2 and P-UI-3 mockups.
 - A phone test of anything step 4 relies on, through the Cloudflare sender.
 - Side finding (fsrs-notes §9): the model predicts about 87% recall when cards come due, not 90%, because cards rated Good right after an Again wait the 1-day minimum. It comes from the step rule, not Easy. Revisit only if the two-week test shows too many lapses.
-- **Backlog:** a pressed state on `.btn-text`; `aria-disabled` on the stepper's ends at 5 and 120 (P-UI-3).
+- **Backlog:** a pressed state on `.btn-text`; `aria-disabled` on the stepper's ends at 5 and 120 (P-UI-3). From P-UI-5: the sheet grip is about 1.3:1 (fine while Cancel is the exit; it needs 3:1 if swipe-to-dismiss is ever specified); `review-answer.html?rated=good` says "11 left" but keeps the 12-left bar width (mockup content).

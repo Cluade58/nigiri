@@ -1,28 +1,38 @@
 /* Highlighter: shared foundation for the phone mockups.
-   Tokens follow product-brief.md. Mockups only: the real app bundles its fonts. */
+   Tokens follow product-brief.md. Mockups only: the real app bundles its fonts.
+   Colours (2026-11-08): ui-ux-pro-max colors.csv row 103 "Flashcard & Study Tool",
+   violet + emerald on lavender. Violet marks only acting, choosing and focus; the deck
+   highlighters stay the user's. The earlier navy Highlighter values are in git. */
 @import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&display=swap");
 
 /* ---------- Tokens ---------- */
 :root {
-  --page: #F8FAFD;
-  --ink: #1B2A4A;
-  --ink-2: #4A5874;
-  --tint: #EEF3FA;
-  --track: rgba(27, 42, 74, .07);
-  --rule: #E3E9F2;
-  --primary-bg: #1B2A4A;
-  --primary-fg: #FFFFFF;
-  --error: #B3261E;
-  --mark-ink: #1B2A4A;
+  --page: #FAF5FF;        /* row 103 Background */
+  --surface: #FFFFFF;     /* row 103 Card: the edit sheet only */
+  --ink: #0F172A;         /* row 103 Foreground */
+  --ink-2: #475569;       /* row 103 Muted Foreground */
+  --rule: #E6DCF7;        /* row 103 Border, darkened from 1.12 to 1.23 so dividers show */
+  --primary-bg: #7C3AED;  /* row 103 Primary: the one filled button, the rated key */
+  --primary-fg: #FFFFFF;  /* row 103 On Primary */
+  --secondary: #8B5CF6;   /* row 103 Secondary: the review progress fill */
+  --ring: #7C3AED;        /* row 103 Ring: focus */
+  --error: #B91C1C;       /* row 103 Destructive, darkened from 4.50 to 6.03 */
+  --mark-ink: #0F172A;    /* dark text on every highlighter, both themes */
+  --scrim: rgba(15, 23, 42, .45);
+  --sheet-edge: transparent;
 
-  --hl-green: #7BE38A;
-  --hl-blue: #7CC8FF;
-  --hl-pink: #FF8FC8;
-  --hl-orange: #FFB65C;
-  --hl-yellow: #FFE45C;
-  --hl-purple: #C3A6FF;
+  /* Deck colours: the light highlight draws the marks and the picker fill;
+     the pen tone draws the 6px swatch, so it reaches 3:1 on the page. */
+  --hl-green: #7BE38A;  --pen-green: #33934A;
+  --hl-blue: #7CC8FF;   --pen-blue: #3384CC;
+  --hl-pink: #FF8FC8;   --pen-pink: #D23C8A;
+  --hl-orange: #FFB65C; --pen-orange: #C2650C;
+  --hl-yellow: #FFE45C; --pen-yellow: #A37F00;
+  --hl-purple: #DAA8F7; --pen-purple: #AD4BD0;  /* moved toward orchid, away from the violet button */
+  --hl-done: #7FDDB9;   /* row 103 Accent #059669, lightened: under dark text it measures 1.47 in dark */
   --hl-alpha: 1;
   --hl: var(--hl-green);
+  --pen: var(--pen-green);
 
   --s1: 8px; --s2: 12px; --s3: 20px; --s4: 32px; --s5: 48px;
   --bar-h: 82px;
@@ -30,15 +40,26 @@
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --page: #141B2B;
-    --ink: #E6ECF7;
-    --ink-2: #A8B4CB;
-    --tint: #1C2539;
-    --track: rgba(230, 236, 247, .08);
-    --rule: #263049;
-    --primary-bg: #E6ECF7;
-    --primary-fg: #1B2A4A;
-    --error: #FFB4AB;
+    --page: #15131F;
+    --surface: #221F31;
+    --ink: #ECE9F5;
+    --ink-2: #ABA5BE;
+    --rule: #2E2A3D;
+    --primary-bg: #8152E0;
+    --primary-fg: #FFFFFF;
+    --secondary: #A88BF7;
+    --ring: #A88BF7;
+    --error: #F87171;
+    --scrim: rgba(5, 4, 10, .6);
+    --sheet-edge: #4A4560;  /* a hairline on the sheet's top curve: 2.17 against the dimmed page */
+    --hl-purple: #E2A0F0;   /* more orchid in dark, so it isn't the lilac focus ring (32 degrees apart, was 21) */
+    /* One tone per deck in dark: the highlights already reach 6.6 to 10.6 on the page. */
+    --pen-green: var(--hl-green);
+    --pen-blue: var(--hl-blue);
+    --pen-pink: var(--hl-pink);
+    --pen-orange: var(--hl-orange);
+    --pen-yellow: var(--hl-yellow);
+    --pen-purple: var(--hl-purple);
     --hl-alpha: .85;
     color-scheme: dark;
   }
@@ -63,7 +84,7 @@ a { color: inherit; }
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
-:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 [hidden] { display: none !important; }
 
 /* ---------- Type ---------- */
@@ -118,7 +139,7 @@ a { color: inherit; }
 /* ---------- Deck swatch ---------- */
 .swatch {
   flex: none; display: inline-block; width: 6px; height: 22px; border-radius: 2px;
-  background: var(--hl); opacity: var(--hl-alpha);
+  background: var(--pen); opacity: var(--hl-alpha);
 }
 .swatch.is-small { height: 16px; }
 
@@ -173,7 +194,7 @@ a { color: inherit; }
 }
 .input::placeholder { color: var(--ink-2); opacity: 1; }
 textarea.input { resize: none; display: block; }
-.input:focus-visible { outline: none; border-color: var(--ink); box-shadow: 0 0 0 1.5px var(--ink); }
+.input:focus-visible { outline: none; border-color: var(--ring); box-shadow: 0 0 0 1.5px var(--ring); }
 .input[aria-invalid="true"] { border-color: var(--error); }
 .helper { font-size: 13px; color: var(--ink-2); }
 .field-error { font-size: 15px; font-weight: 600; color: var(--error); }
@@ -222,7 +243,7 @@ textarea.input { resize: none; display: block; }
 .session-bar { height: 56px; display: grid; grid-template-columns: 48px 1fr 48px; align-items: center; margin: 0 calc(-1 * var(--s2)); }
 .session-bar .count { text-align: center; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .progress { height: 2px; background: var(--rule); }
-.progress > span { display: block; height: 100%; background: var(--ink); }
+.progress > span { display: block; height: 100%; background: var(--secondary); }
 .card { flex: 1; padding: var(--s4) 0 var(--s5); }
 .context { display: flex; align-items: center; gap: var(--s1); font-size: 15px; color: var(--ink-2); }
 .card .t-card { margin-top: var(--s2); }
@@ -242,17 +263,18 @@ textarea.input { resize: none; display: block; }
 }
 .key .k-label { display: inline-flex; align-items: center; gap: 4px; font-size: 17px; font-weight: 600; line-height: 1.1; }
 .key .check { display: none; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
-.key.is-rated { background: var(--ink); color: var(--page); border-color: var(--ink); }
+.key.is-rated { background: var(--primary-bg); color: var(--primary-fg); border-color: var(--primary-bg); }
 .key.is-rated .check { display: block; }
 .key.is-rated[disabled] { opacity: 1; }
 
 /* Edit sheet */
-.scrim { position: fixed; inset: 0; z-index: 20; background: rgba(12, 18, 32, .45); }
+.scrim { position: fixed; inset: 0; z-index: 20; background: var(--scrim); }
 .sheet {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 21;
-  max-width: 560px; margin: 0 auto; background: var(--page);
+  max-width: 560px; margin: 0 auto; background: var(--surface);
   border-radius: 16px 16px 0 0; padding: var(--s1) var(--s3) calc(var(--s3) + env(safe-area-inset-bottom));
   display: grid; gap: var(--s3);
+  box-shadow: inset 0 1px 0 var(--sheet-edge);
   animation: rise 220ms cubic-bezier(.3, .7, .2, 1) both;
 }
 @keyframes rise { from { transform: translateY(24px); opacity: 0; } }
@@ -292,12 +314,13 @@ textarea.input { resize: none; display: block; }
 .colour input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
 .colour .fill {
   position: absolute; inset: 7px 5px; background: var(--hl); opacity: var(--hl-alpha);
+  box-shadow: inset 0 0 0 2px var(--pen);
   border-radius: 3px 8px 4px 9px; pointer-events: none;
 }
 .colour .ok { position: absolute; inset: 0; margin: auto; width: 20px; height: 20px; display: none; fill: none; stroke: var(--mark-ink); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
 .colour:has(input:checked) { box-shadow: inset 0 0 0 2px var(--ink); }
 .colour:has(input:checked) .ok { display: block; }
-.colour:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
+.colour:has(input:focus-visible) { outline: 2px solid var(--ring); outline-offset: 2px; }
 .colours[aria-invalid="true"] .colour { box-shadow: inset 0 0 0 1.5px var(--error); }
 
 /* ---------- States added 2026-11-07 (chief-officer) ---------- */

@@ -12,7 +12,14 @@
 - Each domain has its own input screen and its own review screen. Version one has only plain text cards.
 - Input is designed for the moment someone has something in hand (a line in a textbook, a sentence they heard, a word they just looked up), not for a sit-down card-making session.
 
-Use frontend-design for the design plan (then review it against the brief), and Impeccable's critique to review renders. Check UX against ui-ux-pro-max's rules and its pre-delivery checklist, but not its palettes, fonts or styles: the tokens here are fixed.
+Use frontend-design for the design plan (then review it against the brief), and Impeccable's critique to review renders. Check UX against ui-ux-pro-max's rules and its pre-delivery checklist.
+
+**Colours come from ui-ux-pro-max's palettes** (the user's decision, 2026-11-08). Nigiri uses row 103, "Flashcard & Study Tool" (violet, lilac and emerald on lavender), and the tokens in [product-brief.md](product-brief.md) are now fixed. Its fonts and styles still don't apply.
+- **Violet** draws only the one filled button per screen, the rating key you just tapped, and the focus ring. Outlined buttons, text links and keys at rest stay ink.
+- **Lilac** draws only the review progress bar.
+- **Mint**, from the emerald accent, is the highlighter behind "Done".
+- **The six deck colours** are the user's choice per deck. In light mode each has a stronger pen tone for its swatch.
+- **Contrast:** WCAG AA in both themes. That's 4.5:1 for text, and 3:1 for large text and UI parts.
 
 **Basics on every screen:**
 - one clear primary action
