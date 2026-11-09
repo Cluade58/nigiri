@@ -3,10 +3,12 @@
 // A failed save keeps the sheet open with what you typed, and one line says what to tap (D17).
 import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import { useApp } from '../app/context';
+import { useHoldNav } from '../app/Nav';
 import { WIDE } from '../app/hooks';
 import { OUT_OF_SPACE, notSaved } from '../lib/copy';
 import type { Card } from '../lib/db';
 import { isQuotaError } from '../lib/errors';
+import { FORMAT_HINT } from '../lib/marks';
 import { EmptySideError, cleanSide, deleteCard, saveCardText } from '../lib/saves';
 
 /** Text boxes grow to fit, so the whole answer shows while you fix it. */
@@ -35,6 +37,8 @@ export function EditSheet({ card, onClose }: { card: Card; onClose: (deleted: bo
   const titleRef = useRef<HTMLHeadingElement>(null);
   const frontRef = useRef<HTMLTextAreaElement>(null);
   const backRef = useRef<HTMLTextAreaElement>(null);
+  // The tab bar and sidebar are inert while the sheet is open, like the screen behind it (CR-4 m2).
+  useHoldNav();
 
   useEffect(() => {
     grow(frontRef.current);
@@ -180,12 +184,17 @@ export function EditSheet({ card, onClose }: { card: Card; onClose: (deleted: bo
               rows={3}
               value={back}
               aria-invalid={invalid === 'back' || undefined}
+              aria-describedby="e-back-hint"
               onChange={(e) => {
                 setBack(e.target.value);
                 if (invalid === 'back') setInvalid(null);
                 grow(e.target);
               }}
             />
+            {/* Round 1 plan §7: the sheet shows the marks as typed, with the same hint as Add card. */}
+            <p className="helper format-hint" id="e-back-hint">
+              {FORMAT_HINT}
+            </p>
           </div>
         </div>
         {/* One line for both buttons, inside the dialog (aria-modal hides everything outside it). */}

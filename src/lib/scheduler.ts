@@ -7,6 +7,7 @@ import {
   type DefaultSchedulerOptions,
   type DefaultSchedulerRevlog,
   type Grade,
+  Rating,
   State,
 } from 'ts-fsrs';
 
@@ -109,4 +110,60 @@ export function newCardFields(scheduler: Scheduler, cardId: string, now: Date): 
 
 export function isNewCard(card: Pick<SchedFields, 'state'>): boolean {
   return card.state === State.New;
+}
+
+/** The four grades in key order. */
+export const GRADES: readonly Grade[] = [Rating.Again, Rating.Hard, Rating.Good, Rating.Easy];
+
+export interface Preview {
+  /** D23's review time for a tap at `at`: the moment each duration is measured from. */
+  from: Date;
+  /** When the card would come back after each grade. */
+  dueAt: Record<Grade, Date>;
+}
+
+/**
+ * D69(1): when the card comes back after each rating, if it were rated at `at`. It runs the same
+ * reviewCard the save runs, four times, on a copy, so the times on the keys are the ones a tap saves.
+ * Nothing is saved and the input card is not changed.
+ */
+export function previewDue(scheduler: Scheduler, card: SchedFields, at: Date): Preview {
+  const copy = pickSched(card);
+  const from = reviewTime(at, copy.lastReviewAt);
+  const dueAt = {} as Record<Grade, Date>;
+  for (const grade of GRADES) dueAt[grade] = reviewCard(scheduler, pickSched(copy), grade, at).card.dueAt;
+  return { from, dueAt };
+}
+
+const NB = '\u00A0';
+const unit = (n: number, one: string, many: string) => `${n}${NB}${n === 1 ? one : many}`;
+
+/**
+ * D69(2): how long until the card comes back, in words for the keys ("1 min", "90 sec", "5 days").
+ * Exactly 60 s is "1 min"; other times under 2 minutes are whole seconds, which matches the waiting
+ * countdown; then minutes, hours, days, months (30.44 days) and whole years, capped at 100 years.
+ * The number and its unit are joined by a no-break space.
+ */
+export function formatReturn(ms: number): string {
+  const s = Math.max(0, ms) / 1000;
+  if (s === 60) return unit(1, 'min', 'min');
+  if (s < 120) return unit(Math.round(s), 'sec', 'sec');
+  const min = s / 60;
+  if (min < 60) {
+    const m = Math.round(min);
+    return m >= 60 ? unit(1, 'hour', 'hours') : unit(m, 'min', 'min');
+  }
+  const hours = min / 60;
+  if (hours < 24) {
+    const h = Math.round(hours);
+    return h >= 24 ? unit(1, 'day', 'days') : unit(h, 'hour', 'hours');
+  }
+  const days = hours / 24;
+  if (days < 31) return unit(Math.round(days), 'day', 'days');
+  if (days < 365) {
+    const months = Math.round(days / 30.44);
+    if (months < 12) return unit(months, 'month', 'months');
+  }
+  const years = Math.min(100, Math.max(1, Math.round(days / 365.25)));
+  return unit(years, 'year', 'years');
 }

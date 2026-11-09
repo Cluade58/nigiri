@@ -22,10 +22,13 @@ test('J1: make a deck and three cards, review them, and everything survives a re
   await expect(page.getByRole('status').filter({ hasText: 'Saved.' })).toHaveText('Saved. Biology has 3 cards.');
 
   await page.getByRole('link', { name: 'Close' }).click();
-  await page.getByRole('link', { name: 'Home' }).click();
+  // The deck page's Back would go to Add card's screen; the Today tab (or sidebar row) goes home.
+  await page.getByRole('link', { name: 'Today', exact: true }).click();
 
   // Today: the one filled button and the time it takes (3 × 20 s).
-  const review = page.getByRole('link', { name: 'Review 3 cards' });
+  // Scoped to the page's content: from 64em the sidebar has its own outlined Review and deck rows.
+  const main = page.getByRole('main');
+  const review = main.getByRole('link', { name: 'Review 3 cards' });
   await expect(review).toBeVisible();
   await expect(page.getByText('About 1 minute.')).toBeVisible();
 
@@ -55,7 +58,7 @@ test('J1: make a deck and three cards, review them, and everything survives a re
   await page.getByRole('link', { name: 'Back to home' }).click();
   await page.reload();
   await expect(page.getByText('Nothing due right now')).toBeVisible();
-  const deckRow = page.getByRole('link', { name: /Biology/ });
+  const deckRow = page.getByRole('main').getByRole('link', { name: /Biology/ });
   await expect(deckRow).toContainText('3 cards');
   expect(await countRecords(page, 'decks')).toBe(1);
   expect(await countRecords(page, 'cards')).toBe(3);

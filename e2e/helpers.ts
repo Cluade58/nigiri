@@ -77,7 +77,8 @@ export function readAllStores(page: Page): Promise<Record<StoreName, unknown[]>>
 
 /** From Today: New deck, a name and a colour, Create deck. Ends on Add card in the new deck. */
 export async function createDeck(page: Page, name: string, colour: string) {
-  await page.getByRole('link', { name: 'New deck' }).click();
+  // In the page's content: from 64em the sidebar has its own New deck.
+  await page.getByRole('main').getByRole('link', { name: 'New deck' }).first().click();
   await page.getByLabel('Deck name').fill(name);
   await page.getByRole('radio', { name: colour }).check();
   await page.getByRole('button', { name: 'Create deck' }).click();

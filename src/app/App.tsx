@@ -3,8 +3,11 @@ import { HashRouter, Navigate, Route, Routes, useParams, useSearchParams } from 
 import { AddCard } from '../screens/AddCard';
 import { CrashScreen } from '../screens/CrashScreen';
 import { DeckPage } from '../screens/DeckPage';
+import { Decks } from '../screens/Decks';
 import { HowItWorks } from '../screens/HowItWorks';
 import { NewDeck } from '../screens/NewDeck';
+import { Practice } from '../screens/Practice';
+import { Progress } from '../screens/Progress';
 import { Review } from '../screens/Review';
 import { Settings } from '../screens/Settings';
 import { StorageError } from '../screens/StorageError';
@@ -12,6 +15,7 @@ import { TestScreen } from '../screens/TestScreen';
 import { Today } from '../screens/Today';
 import { AppContext, type AppServices } from './context';
 import { ErrorBoundary } from './ErrorBoundary';
+import { Shell } from './Nav';
 import { StartupError, startServices } from './startup';
 
 type Boot =
@@ -35,6 +39,12 @@ function ReviewRoute() {
   const [params] = useSearchParams();
   const early = deckId !== undefined && params.get('early') === '1';
   return <Review key={`${deckId ?? 'all'}${early ? ':early' : ''}`} deckId={deckId} early={early} />;
+}
+
+/** D77: the practice round; a fresh shuffle for each deck. */
+function PracticeRoute() {
+  const { deckId } = useParams();
+  return <Practice key={deckId} deckId={deckId ?? ''} />;
 }
 
 function TestRoute() {
@@ -82,17 +92,22 @@ export function App() {
       <ErrorBoundary>
         <HashRouter>
           <Routes>
-            <Route path="/" element={<Today />} />
-            <Route path="/new-deck" element={<NewDeck />} />
-            <Route path="/add" element={<AddCardRoute />} />
-            <Route path="/deck/:deckId" element={<DeckPage />} />
-            <Route path="/deck/:deckId/add" element={<AddCardRoute />} />
-            <Route path="/deck/:deckId/test" element={<TestRoute />} />
-            <Route path="/review" element={<ReviewRoute />} />
-            <Route path="/deck/:deckId/review" element={<ReviewRoute />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/settings/how" element={<HowItWorks />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route element={<Shell />}>
+              <Route path="/" element={<Today />} />
+              <Route path="/decks" element={<Decks />} />
+              <Route path="/progress" element={<Progress />} />
+              <Route path="/new-deck" element={<NewDeck />} />
+              <Route path="/add" element={<AddCardRoute />} />
+              <Route path="/deck/:deckId" element={<DeckPage />} />
+              <Route path="/deck/:deckId/add" element={<AddCardRoute />} />
+              <Route path="/deck/:deckId/test" element={<TestRoute />} />
+              <Route path="/deck/:deckId/practice" element={<PracticeRoute />} />
+              <Route path="/review" element={<ReviewRoute />} />
+              <Route path="/deck/:deckId/review" element={<ReviewRoute />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/settings/how" element={<HowItWorks />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Route>
           </Routes>
         </HashRouter>
       </ErrorBoundary>

@@ -1,9 +1,10 @@
 // Settings (mockups/settings.html; spec §6; D39b, D43, D54, D60): Backup first, then Theme, then the
 // row that opens "How Nigiri picks your cards". No Reminders row: step 4 is out of this draft (D52).
+// Pass 2 C1: each part is a tile; the tab bar or sidebar is the way out.
 import { useEffect, useLayoutEffect, useRef, useState, type ChangeEvent, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import { useApp } from '../app/context';
-import { BackIcon, CheckTheme, Chevron } from '../components/Icons';
+import { CheckTheme, Chevron } from '../components/Icons';
 import { backupFileName, checkBackup, exportBackupText, replaceAll, restoreRejectLine, type BackupData } from '../lib/backup';
 import { cards, plural } from '../lib/copy';
 import { isQuotaError } from '../lib/errors';
@@ -178,75 +179,75 @@ export function Settings() {
 
   return (
     <>
-      <main className="screen settings is-column" inert={pending !== null}>
-        <header className="form-bar">
-          <Link className="btn-text back-link" to="/">
-            <BackIcon />
-            Home
-          </Link>
-          <span />
-          <span />
+      {/* Pass 2 C1: three tiles, the title like Progress's. The tab bar or the sidebar is always here, so
+          there's no Home link. */}
+      <main className="tiles-page settings settings-page" inert={pending !== null}>
+        <header className="page-head">
+          <h1 ref={heading} tabIndex={-1}>
+            Settings
+          </h1>
         </header>
-        <h1 className="t-section settings-title" ref={heading} tabIndex={-1}>
-          Settings
-        </h1>
 
-        <section className="sec is-first" aria-labelledby="backup-title">
-          <h2 className="t-title" id="backup-title">
-            Backup
-          </h2>
-          <p className="t-secondary">Your cards are only on this phone. Export a backup now and then.</p>
-          <button className="btn btn-primary" type="button" onClick={() => void exportNow()} disabled={busy !== null}>
-            Export backup
-          </button>
-          {/* Under the button it answers, so neither button moves when a line appears (UI-CRIT-2 req 1). */}
-          <p className={exportLine ? lineClass : 'status'} role="status">
-            {status.kind === 'exported' ? (
-              <>
-                {/* The file name never breaks across lines, so it can be read and found as one piece. */}
-                Exported. Look for <span className="file-name">{status.name}</span> in your downloads.
-              </>
-            ) : (
-              exportLine && status.kind === 'error' && status.text
-            )}
-          </p>
-          <div className="after-btn">
-            <button className="btn-text" type="button" ref={restoreRef} onClick={chooseFile} disabled={busy !== null}>
-              Restore a backup
+        <div className="settings-tiles">
+          <section className="tile sec" aria-labelledby="backup-title">
+            <h2 className="t-title" id="backup-title">
+              Backup
+            </h2>
+            <p className="t-secondary">Your cards are only on this phone. Export a backup now and then.</p>
+            <button className="btn btn-primary" type="button" onClick={() => void exportNow()} disabled={busy !== null}>
+              Export backup
             </button>
+            {/* Under the button it answers, so neither button moves when a line appears (UI-CRIT-2 req 1). */}
+            <p className={exportLine ? lineClass : 'status'} role="status">
+              {status.kind === 'exported' ? (
+                <>
+                  {/* The file name never breaks across lines, so it can be read and found as one piece. */}
+                  Exported. Look for <span className="file-name">{status.name}</span> in your downloads.
+                </>
+              ) : (
+                exportLine && status.kind === 'error' && status.text
+              )}
+            </p>
+            <div className="after-btn">
+              <button className="btn-text" type="button" ref={restoreRef} onClick={chooseFile} disabled={busy !== null}>
+                Restore a backup
+              </button>
+            </div>
+            <p className="helper">Replaces every deck and card on this phone.</p>
+            <p className={restoreLine ? lineClass : 'status'} role="status">
+              {restoreLine && (status.kind === 'ok' || status.kind === 'error') && keepDates(status.text)}
+            </p>
+            <input ref={fileRef} type="file" accept=".json,application/json" hidden tabIndex={-1} onChange={(e) => void onFile(e)} />
+          </section>
+
+          <section className="tile sec" aria-labelledby="theme-title">
+            <h2 className="t-title" id="theme-title">
+              Theme
+            </h2>
+            <ul className="themes" role="radiogroup" aria-labelledby="theme-title">
+              {THEMES.map((t) => (
+                <li key={t} role="none">
+                  <label className="theme">
+                    <input type="radio" name="theme" value={t} checked={theme === t} onChange={() => pickTheme(t)} />
+                    <span className="chip" data-theme={t} aria-hidden="true">
+                      Aa
+                    </span>
+                    <span className="name">{THEME_NAMES[t]}</span>
+                    <CheckTheme />
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          {/* D43: the one optional explainer, last. Never linked from the review screen. */}
+          <div className="tile how">
+            <Link className="row-link" to="/settings/how">
+              How Nigiri picks your cards
+              <Chevron />
+            </Link>
           </div>
-          <p className="helper">Replaces every deck and card on this phone.</p>
-          <p className={restoreLine ? lineClass : 'status'} role="status">
-            {restoreLine && (status.kind === 'ok' || status.kind === 'error') && keepDates(status.text)}
-          </p>
-          <input ref={fileRef} type="file" accept=".json,application/json" hidden tabIndex={-1} onChange={(e) => void onFile(e)} />
-        </section>
-
-        <section className="sec" aria-labelledby="theme-title">
-          <h2 className="t-title" id="theme-title">
-            Theme
-          </h2>
-          <ul className="themes" role="radiogroup" aria-labelledby="theme-title">
-            {THEMES.map((t) => (
-              <li key={t} role="none">
-                <label className="theme">
-                  <input type="radio" name="theme" value={t} checked={theme === t} onChange={() => pickTheme(t)} />
-                  <span className="chip" data-theme={t} aria-hidden="true">
-                    Aa
-                  </span>
-                  <span className="name">{THEME_NAMES[t]}</span>
-                  <CheckTheme />
-                </label>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {/* D43: the one optional explainer, last. Never linked from the review screen. */}
-        <Link className="row-link" to="/settings/how">
-          How Nigiri picks your cards
-          <Chevron />
-        </Link>
+        </div>
       </main>
 
       {pending && (

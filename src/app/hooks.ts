@@ -1,5 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
+import type { XpReview } from '../lib/xp';
 import { loadSnapshot, type Snapshot } from '../lib/snapshot';
 import { useApp } from './context';
 
@@ -47,3 +48,16 @@ export function useMediaQuery(query: string): boolean {
 }
 
 export const WIDE = '(min-width: 48em)';
+
+/**
+ * Every saved review's id, card, time and before-review due time, live, for the streak, the study
+ * calendar, the bars (D67) and XP (D73). Small data (a few friends), so the whole history is read;
+ * nothing new is stored.
+ */
+export function useReviewHistory(): XpReview[] | undefined {
+  const { db } = useApp();
+  return useLiveQuery(
+    async () => (await db.reviews.toArray()).map((r) => ({ id: r.id, cardId: r.cardId, reviewTime: r.reviewTime, dueAt: r.dueAt })),
+    [db],
+  );
+}

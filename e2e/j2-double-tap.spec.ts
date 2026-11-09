@@ -32,7 +32,7 @@ test('J2: double taps and a second open copy never log a second review', async (
   await addCards(page, 'Biology', [['Cristae', 'The folds of the inner membrane']], 1);
   expect(await countRecords(page, 'cards')).toBe(2);
   await page.getByRole('link', { name: 'Close' }).click();
-  await page.getByRole('link', { name: 'Home' }).click();
+  await page.getByRole('link', { name: 'Today', exact: true }).click();
   await page.getByRole('link', { name: 'Review 2 cards' }).click();
 
   // A double tap on Show answer: the second tap lands where Good now is, inside the guard. No review.

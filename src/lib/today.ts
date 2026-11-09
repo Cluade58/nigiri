@@ -2,6 +2,7 @@
 import { format } from 'date-fns';
 import type { Card, Deck, Review, Test } from './db';
 import { NBSP } from './copy';
+import { cardsPerDay } from './progress';
 import { SECONDS_PER_CARD, testApplies } from './testMode';
 import { calendarDaysBetween, startOfLocalDay, startOfLocalDayOffset } from './time';
 
@@ -40,11 +41,16 @@ export function showWelcomeBack({ now, dueCount, lastReviewAt, cardCreatedAts }:
   return calendarDaysBetween(new Date(latest), now) >= 3;
 }
 
-/** D50: cards added, and different cards reviewed, over the last 7 local calendar days including today. */
+/**
+ * D50, D71: cards added over the last 7 local calendar days including today, and cards reviewed: each
+ * day's different cards, added up over the 7 days, so it always equals the sum of the week's bars.
+ */
 export function lastSevenDays(cards: readonly Pick<Card, 'createdAt'>[], reviews: readonly Pick<Review, 'cardId' | 'reviewTime'>[], now: Date) {
   const start = startOfLocalDayOffset(now, -6).getTime();
   const added = cards.filter((c) => c.createdAt.getTime() >= start).length;
-  const reviewed = new Set(reviews.filter((r) => r.reviewTime.getTime() >= start).map((r) => r.cardId)).size;
+  const perDay = cardsPerDay(reviews.filter((r) => r.reviewTime.getTime() >= start));
+  let reviewed = 0;
+  for (const n of perDay.values()) reviewed += n;
   return { added, reviewed };
 }
 

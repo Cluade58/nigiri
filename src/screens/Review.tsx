@@ -3,21 +3,31 @@
 // Every rating saves as it's tapped (spec §3), so ✕ is the pause and Today's button is the resume (D42).
 // `early` (D63, from the deck page's "Study 3 cards early" only) also queues the new cards Test mode's
 // share holds back; the order, "N left", the countdown and Done work as in any session.
+// Round 1 (plan §3, §7, §8a): the card's marks render on both sides, a short answer reads larger, and
+// Done adds the streak strip, the XP ledger (each part's change since the session began, D73) and a
+// level-up line.
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { Link, Navigate } from 'react-router';
 import { Rating } from 'ts-fsrs';
 import { useApp } from '../app/context';
+import { RankIcon } from '../components/RankIcon';
+import { DayStrip, stripText } from '../components/Tiles';
 import { CheckSmall, CloseIcon } from '../components/Icons';
 import { deckStyle } from '../components/deckStyle';
-import { NBSP, OUT_OF_SPACE, cards as cardsText, notSaved } from '../lib/copy';
+import { NBSP, OUT_OF_SPACE, cards as cardsText, notSaved, plural } from '../lib/copy';
 import type { Card, Deck } from '../lib/db';
 import { isQuotaError } from '../lib/errors';
 import { computeDue, leftCount, pickNext, progressFraction } from '../lib/queue';
 import { saveRating, snapshotOf, type CardSnapshot, type RatingResult } from '../lib/saves';
-import { isNewCard, type Grade } from '../lib/scheduler';
-import { loadSnapshot, withSavedRating, type Snapshot } from '../lib/snapshot';
+import { formatReturn, isNewCard, previewDue, type Grade, type Scheduler } from '../lib/scheduler';
+import { heldBackDueTomorrow, nextDueLine, sessionDeckRows, type SessionDeckRow } from '../lib/doneSummary';
+import { cardsPerDay, streakOf } from '../lib/progress';
+import { loadSnapshot, loadXp, withSavedRating, type Snapshot } from '../lib/snapshot';
 import { testApplies } from '../lib/testMode';
+import { startOfLocalDay } from '../lib/time';
 import { orderDecks } from '../lib/today';
+import { levelOf, type XpParts, type XpReview } from '../lib/xp';
+import { CardPile } from './CardPile';
 import { StorageError } from './StorageError';
 import { useTitle } from './useTitle';
 
@@ -39,7 +49,7 @@ type Phase =
   | { kind: 'loading' }
   | { kind: 'failed' }
   | { kind: 'gone' }
-  | { kind: 'card'; card: Card; snap: CardSnapshot; revealed: boolean; at: number }
+  | { kind: 'card'; card: Card; snap: CardSnapshot; revealed: boolean; at: number; revealAt: Date | null }
   | { kind: 'wait'; dueAt: Date }
   | { kind: 'done' };
 
@@ -60,6 +70,10 @@ export function Review({ deckId, early = false }: { deckId?: string; early?: boo
   const [live, setLive] = useState('');
   /** D45: for each deck with a test ahead, how many of its cards weren't studied when the session began. */
   const [startUnstudied, setStartUnstudied] = useState<ReadonlyMap<string, number> | null>(null);
+  /** D73: XP when the session began, so Done shows each part's change (null if that read failed). */
+  const [startXp, setStartXp] = useState<XpParts | null>(null);
+  /** Plan §3: whether today already had a review before this session (then today's cell doesn't fill on Done). */
+  const [hadToday, setHadToday] = useState(true);
 
   // Callbacks read the latest values through refs; rendering reads state.
   const phaseRef = useRef<Phase>(phase);
@@ -75,7 +89,6 @@ export function Review({ deckId, early = false }: { deckId?: string; early?: boo
   /** True between a rating and the next card, so focus can move from the keys to Show answer. */
   const afterRating = useRef(false);
   const showRef = useRef<HTMLButtonElement>(null);
-  const answerRef = useRef<HTMLDivElement>(null);
 
   useTitle(phase.kind === 'done' ? 'Done' : 'Review');
 
@@ -141,7 +154,7 @@ export function Review({ deckId, early = false }: { deckId?: string; early?: boo
       }
       setError(null);
       const pick = pickNext(dueOf(snap, t), scope(snap), sessionRef.current, t);
-      if (pick.kind === 'card') setPhase({ kind: 'card', card: pick.card, snap: snapshotOf(pick.card), revealed: false, at: stamp() });
+      if (pick.kind === 'card') setPhase({ kind: 'card', card: pick.card, snap: snapshotOf(pick.card), revealed: false, at: stamp(), revealAt: null });
       else if (pick.kind === 'wait') setPhase({ kind: 'wait', dueAt: pick.dueAt });
       else setPhase({ kind: 'done' });
     },
@@ -162,9 +175,17 @@ export function Review({ deckId, early = false }: { deckId?: string; early?: boo
   // Start: read the cards, then pick the first one.
   useEffect(() => {
     let alive = true;
-    refresh()
-      .then(({ snap, t }) => {
+    // The XP read is separate: if it fails, Done just leaves the XP out.
+    const xpRead = loadXp(db).then(
+      (r) => r.xp,
+      () => null,
+    );
+    Promise.all([refresh(), xpRead])
+      .then(([{ snap, t }, xp]) => {
         if (!alive) return;
+        setStartXp(xp);
+        const todayStart = startOfLocalDay(t).getTime();
+        setHadToday(snap.recentReviews.some((r) => r.reviewTime.getTime() >= todayStart));
         const unstudied = new Map<string, number>();
         for (const c of scope(snap)) {
           if (isNewCard(c) && testApplies(snap.tests.get(c.deckId), t)) unstudied.set(c.deckId, (unstudied.get(c.deckId) ?? 0) + 1);
@@ -178,7 +199,7 @@ export function Review({ deckId, early = false }: { deckId?: string; early?: boo
     return () => {
       alive = false;
     };
-  }, [advance, refresh, scope, setPhase]);
+  }, [advance, db, refresh, scope, setPhase]);
 
   // The clock. Waiting ticks every second, but the time shown always comes from the card's dueAt;
   // at zero the screen picks again. Otherwise the count is redone once a minute, and whenever the
@@ -212,7 +233,7 @@ export function Review({ deckId, early = false }: { deckId?: string; early?: boo
     const p = phaseRef.current;
     if (p.kind !== 'card' || p.revealed) return;
     if (sinceMs(p.at) < GUARD_MS) return;
-    setPhase({ ...p, revealed: true, at: stamp() });
+    setPhase({ ...p, revealed: true, at: stamp(), revealAt: new Date() });
   }
 
   async function rate(grade: Grade, label: string) {
@@ -256,17 +277,14 @@ export function Review({ deckId, early = false }: { deckId?: string; early?: boo
     }
   }
 
-  // Focus: the answer when it appears (so it's read out); Show answer when a new card replaces the keys
-  // after a rating (the keys it was on are gone). The first card moves no focus.
+  // Focus: the answer when it appears (CardPile moves it there, so it's read out); Show answer when a
+  // new card replaces the keys after a rating (the keys it was on are gone). The first card moves no focus.
   const phaseKey = phase.kind === 'card' ? `${phase.card.id}:${phase.snap.reps}:${phase.revealed}` : phase.kind;
   useLayoutEffect(() => {
     const p = phaseRef.current;
-    if (p.kind !== 'card') return;
-    if (p.revealed) answerRef.current?.focus({ preventScroll: true });
-    else if (afterRating.current) {
-      afterRating.current = false;
-      if (!document.activeElement || document.activeElement === document.body) showRef.current?.focus({ preventScroll: true });
-    }
+    if (p.kind !== 'card' || p.revealed || !afterRating.current) return;
+    afterRating.current = false;
+    if (!document.activeElement || document.activeElement === document.body) showRef.current?.focus({ preventScroll: true });
   }, [phaseKey]);
 
   if (phase.kind === 'gone') return <Navigate to="/" replace />;
@@ -285,7 +303,18 @@ export function Review({ deckId, early = false }: { deckId?: string; early?: boo
     );
   }
   if (phase.kind === 'loading' || !data) return <div className="booting" aria-busy="true" />;
-  if (phase.kind === 'done') return <Done count={session.size} milestone={milestoneOf(data, startUnstudied, session, now)} />;
+  if (phase.kind === 'done') {
+    return (
+      <Done
+        count={session.size}
+        milestone={milestoneOf(data, startUnstudied, session, now)}
+        startXp={startXp}
+        hadToday={hadToday}
+        rows={sessionDeckRows(session, data.cards, data.decks)}
+        next={session.size > 0 ? nextDueLine(scope(data), now, heldBackDueTomorrow(scope(data), data.tests, data.firstReviewAt, now)) : null}
+      />
+    );
+  }
 
   const due = dueOf(data, now);
   const left = leftCount(due, scope(data), session, now);
@@ -293,10 +322,13 @@ export function Review({ deckId, early = false }: { deckId?: string; early?: boo
   const card = phase.kind === 'card' ? phase.card : null;
   const deck = card ? data.decks.find((d) => d.id === card.deckId) : undefined;
   const secondsLeft = phase.kind === 'wait' ? Math.max(0, Math.ceil((phase.dueAt.getTime() - now.getTime()) / 1000)) : 0;
+  // The pile under the card: cards left including this one, ≥3 → 2 layers, 2 → 1, 1 → none.
+  const layers = left >= 3 ? 2 : left === 2 ? 1 : 0;
+  const times = phase.kind === 'card' ? returnTimes(scheduler, phase, now) : null;
 
   return (
     <div className="session-wrap">
-      <div className="session" style={deckStyle(deck?.colour)}>
+      <div className="session is-review" style={deckStyle(deck?.colour)}>
         <header className="session-bar">
           <Link className="btn-icon" to="/" aria-label="End session. Your ratings are saved.">
             <CloseIcon />
@@ -332,21 +364,7 @@ export function Review({ deckId, early = false }: { deckId?: string; early?: boo
             <p className="t-secondary">Cards you're still learning come back after a short wait. Your ratings are saved.</p>
           </main>
         ) : (
-          <main className="card" key={`${phase.card.id}:${phase.snap.reps}`}>
-            <p className="context">
-              <span className="swatch is-small" aria-hidden="true" />
-              {deck?.name}
-            </p>
-            <h1 className={phase.card.front.trim().length > 140 ? 't-card is-long' : 't-card'}>{phase.card.front}</h1>
-            {phase.revealed && (
-              <>
-                <hr className="ink-rule" />
-                <div className="answer" tabIndex={-1} ref={answerRef}>
-                  <p>{phase.card.back}</p>
-                </div>
-              </>
-            )}
-          </main>
+          <CardPile card={phase.card} deck={deck} revealed={phase.revealed} layers={layers} cardKey={`${phase.card.id}:${phase.snap.reps}`} />
         )}
 
         <div className="action-zone">
@@ -368,12 +386,17 @@ export function Review({ deckId, early = false }: { deckId?: string; early?: boo
                     className={rated === grade ? 'key is-rated' : 'key'}
                     type="button"
                     disabled={rated !== null}
+                    // "Good, back in 5 days". A hidden ", back in " span would be read with a space before the
+                    // comma (an out-of-flow span counts as a block), so the name is set here from the same words.
+                    aria-label={times?.[grade] ? `${label}, back in ${times[grade]}` : undefined}
                     onClick={() => void rate(grade, label)}
                   >
                     <span className="k-label">
                       <CheckSmall />
                       {label}
                     </span>
+                    {/* D69: when it comes back, from the same calculation a tap saves; nothing if that fails. */}
+                    {times?.[grade] && <span className="k-time">{times[grade]}</span>}
                   </button>
                 ))}
               </div>
@@ -386,6 +409,23 @@ export function Review({ deckId, early = false }: { deckId?: string; early?: boo
       </div>
     </div>
   );
+}
+
+/**
+ * D69: the return time under each key, once the answer shows. Measured at the later of the reveal and
+ * the latest minute tick, from D23's review time. Nothing is saved; a failure shows no times.
+ */
+function returnTimes(scheduler: Scheduler, phase: Extract<Phase, { kind: 'card' }>, now: Date): Partial<Record<Grade, string>> | null {
+  if (!phase.revealed || !phase.revealAt) return null;
+  try {
+    const at = new Date(Math.max(phase.revealAt.getTime(), now.getTime()));
+    const { from, dueAt } = previewDue(scheduler, phase.card, at);
+    const out: Partial<Record<Grade, string>> = {};
+    for (const { grade } of KEYS) out[grade] = formatReturn(dueAt[grade].getTime() - from.getTime());
+    return out;
+  } catch {
+    return null;
+  }
 }
 
 interface Milestone {
@@ -408,12 +448,123 @@ function milestoneOf(data: Snapshot, startUnstudied: ReadonlyMap<string, number>
   return null;
 }
 
-/** Done (mockups/review-done.html): "Done", one real number (D45), and the way home. */
-function Done({ count, milestone }: { count: number; milestone: Milestone | null }) {
+const reduceMotion = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/**
+ * Plan §3: the total counts 0 → N over 480 ms (ease-out), starting 600 ms after it appears. Reduced
+ * motion: N at once. Leaving cancels the timer and the frame. Only the visible digits use it; the
+ * spoken total is the final number from the start.
+ */
+function useCountUp(target: number, delay = 600, duration = 480): number {
+  const reduce = reduceMotion();
+  const [shown, setShown] = useState(0);
+  useEffect(() => {
+    if (reduce) return;
+    let frame = 0;
+    const timer = window.setTimeout(() => {
+      const start = performance.now();
+      const step = (t: number) => {
+        const p = Math.min(1, Math.max(0, (t - start) / duration));
+        setShown(Math.round(target * (1 - Math.pow(1 - p, 3))));
+        if (p < 1) frame = requestAnimationFrame(step);
+      };
+      frame = requestAnimationFrame(step);
+    }, delay);
+    return () => {
+      window.clearTimeout(timer);
+      cancelAnimationFrame(frame);
+    };
+  }, [target, delay, duration, reduce]);
+  return reduce ? target : shown;
+}
+
+const signed = (n: number) => `${n < 0 ? '−' : '+'}${Math.abs(n).toLocaleString()}`;
+
+/**
+ * Plan §3(d, e): the ledger. Each row is that part's change since the session began, non-zero rows
+ * only; the total is their sum, so it is D73's change. Then the level-up line, if the level went up.
+ */
+function XpLedger({ start, end }: { start: XpParts; end: XpParts }) {
+  const rows = [
+    { label: 'Cards reviewed', n: end.review - start.review },
+    { label: 'Cards written', n: end.writing - start.writing },
+    { label: 'Bonus: every waiting card reviewed', n: end.bonus - start.bonus },
+  ].filter((r) => r.n !== 0);
+  const total = rows.reduce((sum, r) => sum + r.n, 0);
+  const final = `${signed(total)}${NBSP}XP`;
+  const shown = useCountUp(total);
+  const before = levelOf(start.total);
+  const after = levelOf(end.total);
+  const up = after.level > before.level;
+
+  if (rows.length === 0) return <p className="done-zero">No new XP: these cards already counted today.</p>;
+  return (
+    <div className="done-xp">
+      <p className="xp-total">
+        <span aria-hidden="true" style={{ minWidth: `${final.length}ch` }}>
+          {signed(shown)}
+          {NBSP}XP
+        </span>
+        <span className="sr-only">{final}</span>
+      </p>
+      <dl className="totals-list xp-rows">
+        {rows.map((r, i) => (
+          <div key={r.label} style={{ animationDelay: `${600 + i * 80}ms` }}>
+            <dt>{r.label}</dt>
+            <dd>{signed(r.n)}</dd>
+          </div>
+        ))}
+      </dl>
+      {up && (
+        <p className="level-up" style={{ animationDelay: `${600 + rows.length * 80}ms` }}>
+          <RankIcon rank={after.rank} size={64} />
+          <span>{after.rank !== before.rank ? `Up to level ${after.level}: ${after.rank}.` : `Up to level ${after.level}.`}</span>
+        </p>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Done (mockups/review-done.html; round 1 plan §3): "Done", one real number (D45), the streak with this
+ * week's strip, then the XP this session earned. The XP and the streak come from one read after the
+ * session, compared with the read when it began. "Back to home" works at any moment.
+ */
+function Done({
+  count,
+  milestone,
+  startXp,
+  hadToday,
+  rows,
+  next,
+}: {
+  count: number;
+  milestone: Milestone | null;
+  startXp: XpParts | null;
+  hadToday: boolean;
+  rows: readonly SessionDeckRow[];
+  next: string | null;
+}) {
+  const { db } = useApp();
   const heading = useRef<HTMLHeadingElement>(null);
+  const [after, setAfter] = useState<{ xp: XpParts; reviews: XpReview[]; now: Date } | null>(null);
   useEffect(() => {
     heading.current?.focus({ preventScroll: true });
   }, []);
+  useEffect(() => {
+    let alive = true;
+    loadXp(db).then(
+      (r) => {
+        if (alive) setAfter({ ...r, now: new Date() });
+      },
+      () => {}, // no streak or XP lines then; Done and Back to home still work
+    );
+    return () => {
+      alive = false;
+    };
+  }, [db]);
+  const perDay = after ? cardsPerDay(after.reviews) : null;
+  const streak = after && perDay ? streakOf(perDay, after.now).current : 0;
   return (
     <div className="session-wrap">
       <div className="session">
@@ -438,6 +589,32 @@ function Done({ count, milestone }: { count: number; milestone: Milestone | null
             </p>
           ) : (
             count > 0 && <p className="done-count">{cardsText(count)} reviewed.</p>
+          )}
+          {after && perDay && streak > 0 && (
+            <div className="done-streak">
+              <p className="done-streak-line">{plural(streak, 'day')} in a row.</p>
+              <DayStrip perDay={perDay} now={after.now} fillToday={!hadToday} />
+              <p className="sr-only">{stripText(perDay, after.now)}</p>
+            </div>
+          )}
+          {after && startXp && count > 0 && <XpLedger start={startXp} end={after.xp} />}
+          {/* Pass 2 R3: which decks this session covered, and when the next cards come back. No motion. */}
+          {rows.length > 0 && (
+            <section className="done-session" aria-labelledby="session-title">
+              <h2 id="session-title">This session</h2>
+              <dl className="totals-list session-rows">
+                {rows.map(({ deck, count: n }) => (
+                  <div key={deck.id} style={deckStyle(deck.colour)}>
+                    <dt>
+                      <span className="side-square" aria-hidden="true" />
+                      <span className="session-deck">{deck.name}</span>
+                    </dt>
+                    <dd>{cardsText(n)}</dd>
+                  </div>
+                ))}
+              </dl>
+              {next && <p className="done-next">{next}</p>}
+            </section>
           )}
           <div className="actions">
             <Link className="btn btn-primary" to="/">

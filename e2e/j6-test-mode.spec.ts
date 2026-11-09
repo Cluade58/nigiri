@@ -49,7 +49,7 @@ test('J6: a test 5 days away shows the facts and the fit, and no forecast', asyn
   await expectNoForecastWords(page);
 
   // Today: the Tests tile with the same facts, and one fit line.
-  await page.getByRole('link', { name: 'Home' }).click();
+  await page.getByRole('link', { name: 'Today', exact: true }).click();
   const tests = page.getByRole('region', { name: 'Tests' });
   await expect(tests).toContainText('AP Bio');
   await expect(tests).toContainText('Test Saturday, in 5 days');
@@ -100,7 +100,7 @@ test('J6: a test 5 days away shows the facts and the fit, and no forecast', asyn
   await expect(page.getByRole('link', { name: /Edit test/ })).toContainText('5 not studied yet: none left today, all by Friday');
   await expect(page.getByRole('link', { name: 'Study 5 cards early' })).toBeVisible();
   await expect(page.getByText(/due now come/)).toHaveCount(0);
-  await page.getByRole('link', { name: 'Home' }).click();
+  await page.getByRole('link', { name: 'Today', exact: true }).click();
 
   // The day after the test, the deck acts as if it has none (D30): the tile goes, "Add a test" is back.
   await page.clock.fastForward(6 * 24 * 60 * 60 * 1000);

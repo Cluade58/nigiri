@@ -1,20 +1,25 @@
-// Today: the bento (UI-BENTO-1, accepted as D51). Study, then Tests, Last 7 days and Decks.
-// Reading order = DOM order = focus order at every width. Copy from mockups/home*.html and the plan.
-// With no Tests tile, Last 7 days sits under Study in the first rail, so from 48em the rails are
-// [Study, Last 7 days] | [Decks] and end near each other (UI-CRIT-1 required 3). The DOM order stays
-// Study, Last 7 days, Decks, so phones and focus order don't change.
+// Today: the bento (UI-BENTO-1, D51; Card as hero, plan §4; D72-2; round 1 plan §2, §8c, §9). Three
+// blocks in DOM = phone = focus order: Study and Tests, then Getting started (first run), You and Last
+// 7 days, then Decks. From 48em a grid puts Study/Tests top left, Decks under it, and the rest in the
+// right column (no CSS `order`). With no deck yet: Study, then Getting started.
+// The tab bar (under 64em) or the sidebar (from 64em) is drawn by the Shell, not here.
 import { useMemo } from 'react';
 import { Link } from 'react-router';
-import { Chevron, GearIcon, PlusIcon } from '../components/Icons';
+import { DESKTOP } from '../app/Nav';
+import { useMediaQuery, useNow, useReviewHistory, useSnapshot } from '../app/hooks';
+import { Chevron, PlusIcon, StepCheck } from '../components/Icons';
+import { DeckRows, WeekTile, YouTile } from '../components/Tiles';
 import { deckStyle } from '../components/deckStyle';
-import { WIDE, useMediaQuery, useNow, useSnapshot } from '../app/hooks';
-import { cards, plural } from '../lib/copy';
+import { cards } from '../lib/copy';
+import { deckRowsOf } from '../lib/deckRows';
+import { cardsPerDay } from '../lib/progress';
 import { computeDue } from '../lib/queue';
 import { isNewCard } from '../lib/scheduler';
 import type { Snapshot } from '../lib/snapshot';
-import { fitLine, planLine, shortWhen, studiedLine, whenLine } from '../lib/testCopy';
+import { fitLine, planLine, studiedLine, whenLine } from '../lib/testCopy';
 import { fitCheck, testApplies } from '../lib/testMode';
 import { lastSevenDays, minutesLine, nextDueAt, nextDueLine, orderDecks, showWelcomeBack, todayTitle } from '../lib/today';
+import { xpOf } from '../lib/xp';
 import { useTitle } from './useTitle';
 
 type StudyState = 'first' | 'nocards' | 'due' | 'clear';
@@ -59,35 +64,50 @@ function todayView(snap: Snapshot, now: Date) {
     welcome: showWelcomeBack({ now, dueCount, lastReviewAt: snap.lastReviewAt, cardCreatedAts: snap.cards.map((c) => c.createdAt) }),
     week: lastSevenDays(snap.cards, snap.recentReviews, now),
     nextLine: next ? nextDueLine(next, now) : null,
-    decks: ordered.map((deck) => {
-      const t = snap.tests.get(deck.id);
-      return {
-        deck,
-        count: countByDeck.get(deck.id) ?? 0,
-        due: due.dueByDeck.get(deck.id) ?? 0,
-        // A deck with a test ahead shows its test day in place of its count (mockups/home.html).
-        testDay: testApplies(t, now) ? shortWhen(t.date, now) : null,
-      };
-    }),
+    decks: deckRowsOf(snap, now, due.dueByDeck),
+    // Plan §8c: until the first review ever.
+    gettingStarted: snap.lastReviewAt === null ? { decks: snap.decks.length, cards: snap.cards.length } : null,
   };
 }
 
-function AddCardButton({ filled, wide }: { filled: boolean; wide: boolean }) {
-  // One element that switches outlined/filled, so focus survives a recount (UI-BENTO-1).
-  const cls = filled ? 'btn btn-primary is-add' : 'btn btn-secondary';
+/**
+ * Plan §8c (D75 settlement 1): three steps until the first review ever. Not links. A done step is an
+ * ink disc with a check; step 3 ticks with the first review, when the tile goes, so it never shows ticked.
+ */
+function GettingStarted({ decks, cards: made }: { decks: number; cards: number }) {
+  const steps = [
+    { text: 'Make a deck', done: decks >= 1, sub: null },
+    { text: 'Write a few cards', done: made >= 3, sub: made >= 1 && made < 3 ? `${made} written so far` : null },
+    { text: 'Review your cards', done: false, sub: null },
+  ];
   return (
-    <Link className={wide ? cls : `${cls} btn-wide`} to="/add">
-      <PlusIcon />
-      Add card
-    </Link>
+    <section className="tile getting-started" aria-labelledby="gs-title">
+      <h2 className="tile-title" id="gs-title">
+        Getting started
+      </h2>
+      <ol className="gs-steps">
+        {steps.map((st, i) => (
+          <li key={st.text} className={st.done ? 'gs-step is-done' : 'gs-step'}>
+            <span className="gs-mark" aria-hidden="true">
+              {st.done ? <StepCheck /> : i + 1}
+            </span>
+            <span className="gs-text">
+              {st.text}
+              {st.done && <span className="sr-only">, done</span>}
+              {st.sub && <span className="gs-sub">{st.sub}</span>}
+            </span>
+          </li>
+        ))}
+      </ol>
+    </section>
   );
 }
 
-function NewDeckButton({ wide }: { wide: boolean }) {
+function AddCardButton({ filled }: { filled: boolean }) {
   return (
-    <Link className={wide ? 'btn btn-primary is-add' : 'btn btn-primary btn-wide'} to="/new-deck">
+    <Link className={filled ? 'btn btn-primary btn-wide is-add' : 'btn btn-secondary btn-wide'} to="/add">
       <PlusIcon />
-      New deck
+      Add card
     </Link>
   );
 }
@@ -96,159 +116,142 @@ export function Today() {
   useTitle('Nigiri');
   const now = useNow();
   const snap = useSnapshot(now);
-  const wide = useMediaQuery(WIDE);
+  const history = useReviewHistory();
+  const desktop = useMediaQuery(DESKTOP);
   const view = useMemo(() => (snap ? todayView(snap, now) : null), [snap, now]);
+  const perDay = useMemo(() => cardsPerDay(history ?? []), [history]);
+  const xp = useMemo(() => (snap && history ? xpOf(snap.cards, history).total : null), [snap, history]);
 
+  // m4: Study doesn't wait on the full review history; You and Last 7 days appear when it arrives.
   if (!view) return <div className="booting" aria-busy="true" />;
   const { state } = view;
-  const showWeek = view.week.added > 0 || view.week.reviewed > 0;
-  const showDecks = state !== 'first';
+  const first = state === 'first';
+  const showWeek = !first && (view.week.added > 0 || view.week.reviewed > 0);
   const hasTests = view.tests.length > 0 && view.fit !== null;
-  const week = showWeek && (
-    <section className="tile week" aria-labelledby="week-title">
-      <h2 className="tile-title" id="week-title">
-        Last 7 days
-      </h2>
-      {view.week.added > 0 && <p>{plural(view.week.added, 'card')} added</p>}
-      {view.week.reviewed > 0 && <p>{plural(view.week.reviewed, 'card')} reviewed</p>}
-    </section>
-  );
 
   return (
-    <>
-      <main className={wide ? 'today' : 'today has-bar'}>
-        <header className="app-head">
-          <span className="brand">Nigiri</span>
-          <Link className="btn-icon" to="/settings" aria-label="Settings">
-            <GearIcon />
-          </Link>
-        </header>
+    <main className="today">
+      <header className="app-head">
+        <span className="brand">Nigiri</span>
+      </header>
 
-        <div className="rails">
-          <div className="rail rail-now">
-            <section className="tile study" aria-labelledby="today-title">
-              {state === 'first' ? (
-                <>
-                  <h1 className="t-hero" id="today-title">
-                    Make your first deck
-                  </h1>
-                  <p className="t-secondary first-lines">
-                    One for each class or unit.
+      <div className="rails">
+        <div className="rail rail-now">
+          <section className="tile study" aria-labelledby="today-title">
+            {first ? (
+              <>
+                <h1 className="t-hero" id="today-title">
+                  Make your first deck
+                </h1>
+                <p className="t-secondary first-lines">
+                  One for each class or unit.
+                  <br />
+                  Then you write the cards, and Nigiri picks when each one comes back.
+                </p>
+                <div className="study-row">
+                  <Link className="btn btn-primary btn-wide is-add" to="/new-deck">
+                    <PlusIcon />
+                    New deck
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <>
+                <h1 id="today-title">{todayTitle(now)}</h1>
+                {view.welcome && (
+                  <p className="t-secondary welcome">
+                    Welcome back.
                     <br />
-                    Then you write the cards, and Nigiri picks when each one comes back.
+                    The cards waiting longest come first.
                   </p>
-                  {wide && (
-                    <div className="study-row">
-                      <NewDeckButton wide />
-                    </div>
-                  )}
-                </>
-              ) : (
-                <>
-                  <h1 id="today-title">{todayTitle(now)}</h1>
-                  {view.welcome && (
-                    <p className="t-secondary welcome">
-                      Welcome back.
-                      <br />
-                      The cards waiting longest come first.
+                )}
+                {state === 'nocards' && <p className="t-secondary empty-note">Add a card whenever something is worth remembering.</p>}
+                {state === 'clear' && <p className="nothing">Nothing due right now</p>}
+                {state === 'clear' && view.nextLine && <p className="t-secondary next-due">{view.nextLine}</p>}
+                {state === 'due' ? (
+                  <>
+                    <p className="due-focus">
+                      <span className="num">{view.dueCount}</span> {view.dueCount === 1 ? 'card due' : 'cards due'}
                     </p>
-                  )}
-                  {state === 'nocards' && <p className="t-secondary empty-note">Add a card whenever something is worth remembering.</p>}
-                  {state === 'clear' && <p className="nothing">Nothing due right now</p>}
-                  {state === 'clear' && view.nextLine && <p className="t-secondary next-due">{view.nextLine}</p>}
-                  {(state === 'due' || wide) && (
                     <div className="study-row">
-                      {state === 'due' ? (
-                        <Link className="btn btn-primary" to="/review" aria-describedby="lead-note">
-                          Review {cards(view.dueCount)}
-                        </Link>
-                      ) : null}
-                      {wide ? <AddCardButton filled={state !== 'due'} wide /> : null}
+                      <Link className="btn btn-primary btn-wide" to="/review" aria-describedby="lead-note">
+                        Review {cards(view.dueCount)}
+                      </Link>
                     </div>
-                  )}
-                  {state === 'due' && (
                     <p className="t-secondary lead-note" id="lead-note">
                       {view.minutes}
                       <br />
                       Every rating saves, so you can stop anytime.
                     </p>
-                  )}
-                </>
-              )}
-            </section>
-            {hasTests && view.fit && (
-              <section className="tile tests-tile" aria-labelledby="tests-title">
-                <div className="tile-head is-bare">
-                  <h2 className="tile-title" id="tests-title">
-                    Tests
-                  </h2>
-                </div>
-                <ul className="decks">
-                  {view.tests.map(({ deck, when, studied, plan }) => (
-                    <li key={deck.id}>
-                      <Link className="deck test-row" to={`/deck/${deck.id}`} style={deckStyle(deck.colour)}>
-                        <span className="swatch" aria-hidden="true" />
-                        <span className="test-facts">
-                          {/* Spaces between the facts, so the link's spoken name doesn't run them together. */}
-                          <span className="name">{deck.name}</span> <span className="when">{when}</span> <span className="sub">{studied}</span>{' '}
-                          {plan && <span className="sub plan">{plan}</span>}
-                        </span>
-                        <Chevron />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-                {/* The fit verdict is in words, never colour alone; no highlighter here (UI-BENTO-1). */}
-                <p className="fit-line">
-                  <strong>{view.fit.verdict}</strong>
-                  {view.fit.rest}
-                </p>
-              </section>
-            )}
-            {!hasTests && week}
-          </div>
-
-          {((hasTests && showWeek) || showDecks) && (
-            <div className="rail rail-yours">
-              {hasTests && week}
-              {showDecks && (
-                <section className="tile decks-tile" aria-labelledby="decks-title">
-                  <div className="tile-head">
-                    <h2 className="tile-title" id="decks-title">
-                      Decks
-                    </h2>
-                    <Link className="btn btn-secondary" to="/new-deck">
-                      <PlusIcon />
-                      New deck
-                    </Link>
+                    {/* From 64em the sidebar has Add card, so the tile drops it. */}
+                    {!desktop && (
+                      <div className="study-row is-add-row">
+                        <AddCardButton filled={false} />
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="study-row">
+                    <AddCardButton filled />
                   </div>
-                  <ul className="decks">
-                    {view.decks.map(({ deck, count, due, testDay }) => (
-                      <li key={deck.id}>
-                        <Link className="deck" to={`/deck/${deck.id}`} style={deckStyle(deck.colour)}>
-                          <span className="swatch" aria-hidden="true" />
-                          <span>
-                            <span className="name">{deck.name}</span>{' '}
-                            <span className="sub">{testDay ?? (count === 0 ? 'No cards yet' : cards(count))}</span>
-                          </span>
-                          <span className={due > 0 ? 'due' : 'due is-none'}>{due > 0 ? `${due}\u00A0due` : ''}</span>
-                          <Chevron />
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              )}
-            </div>
+                )}
+              </>
+            )}
+          </section>
+          {hasTests && view.fit && (
+            <section className="tile tests-tile" aria-labelledby="tests-title">
+              <div className="tile-head is-bare">
+                <h2 className="tile-title" id="tests-title">
+                  Tests
+                </h2>
+              </div>
+              <ul className="decks">
+                {view.tests.map(({ deck, when, studied, plan }) => (
+                  <li key={deck.id}>
+                    <Link className="deck test-row" to={`/deck/${deck.id}`} style={deckStyle(deck.colour)}>
+                      <span className="swatch" aria-hidden="true" />
+                      <span className="test-facts">
+                        {/* Spaces between the facts, so the link's spoken name doesn't run them together. */}
+                        <span className="name">{deck.name}</span> <span className="when">{when}</span> <span className="sub">{studied}</span>{' '}
+                        {plan && <span className="sub plan">{plan}</span>}
+                      </span>
+                      <Chevron />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              {/* The fit verdict is in words, never colour alone; no highlighter here (UI-BENTO-1). */}
+              <p className="fit-line">
+                <strong>{view.fit.verdict}</strong>
+                {view.fit.rest}
+              </p>
+            </section>
           )}
         </div>
-      </main>
 
-      {!wide && (
-        <nav className="bar is-today" aria-label="Make cards">
-          <div className="bar-inner">{state === 'first' ? <NewDeckButton wide={false} /> : <AddCardButton filled={state !== 'due'} wide={false} />}</div>
-        </nav>
-      )}
-    </>
+        {(view.gettingStarted || (!first && xp !== null)) && (
+          <div className="rail rail-yours">
+            {view.gettingStarted && <GettingStarted decks={view.gettingStarted.decks} cards={view.gettingStarted.cards} />}
+            {!first && xp !== null && <YouTile xp={xp} perDay={perDay} now={now} onToday />}
+            {!first && xp !== null && showWeek && <WeekTile perDay={perDay} now={now} added={view.week.added} />}
+          </div>
+        )}
+
+        {!first && (
+          <section className="tile decks-tile" aria-labelledby="decks-title">
+            <div className="tile-head">
+              <h2 className="tile-title" id="decks-title">
+                Decks
+              </h2>
+              <Link className="btn btn-secondary" to="/new-deck">
+                <PlusIcon />
+                New deck
+              </Link>
+            </div>
+            <DeckRows rows={view.decks} />
+          </section>
+        )}
+      </div>
+    </main>
   );
 }

@@ -1,0 +1,204 @@
+/* ======================================================================
+   Round 1 (mockups/round1-plan.md, D73 to D75): sushi ranks, the You tile, Done's streak and XP,
+   the deck bar, the Added list, formatting, and ADV-1's fixes. Loaded after hero.css.
+   Existing tokens only. --shade is written inside the rule that uses it, never on :root.
+   app.css's reduced-motion rule removes every animation here; the JS count-up checks it too.
+   ====================================================================== */
+
+/* ---------- 1. Rank icons: ink, one shade fill, the tile's own colour for rice ---------- */
+.rank-icon {
+  flex: none; display: block;
+  --shade: color-mix(in srgb, var(--ink) 35%, var(--tile-bg));
+  fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+.rank-icon > * { vector-effect: non-scaling-stroke; }
+.rank-icon .ri-rice { fill: var(--tile-bg); }
+.rank-icon .ri-rice.is-bare { stroke: none; }
+.rank-icon .ri-shade { fill: var(--shade); }
+.rank-icon .ri-nori, .rank-icon .ri-seed { fill: var(--ink); stroke: none; }
+.rank-icon .ri-line { fill: none; }
+.rank-icon .ri-stripe { fill: none; stroke: var(--tile-bg); }
+
+/* ---------- Meters: a capsule with a progress border, tile-coloured inside ---------- */
+.meter { position: relative; display: flex; overflow: hidden; background: var(--tile-bg); }
+/* The border sits above the segments, so a Learning segment keeps its edge too. */
+.meter::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: inset 0 0 0 1.5px var(--progress);
+}
+.meter.is-xp { margin-top: 12px; height: 10px; border-radius: 5px; }
+.meter.is-xp .m-fill { display: block; height: 100%; background: var(--progress); }
+
+/* ---------- 2. The You tile ---------- */
+.you-head { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.you-id { min-width: 0; }
+.you-rank { font-family: var(--font-head); font-size: 24px; font-weight: 700; line-height: 1.15; }
+.you-id .t-secondary { margin-top: 2px; font-variant-numeric: tabular-nums; }
+.you-next { margin-top: 8px; font-size: 15px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.you-next + .you-next { margin-top: 4px; }
+.you-streak { margin-top: 20px; }
+.you-streak .streak-num { font-family: var(--font-head); font-size: 20px; font-weight: 600; line-height: 1.2; }
+.you-streak .streak-zero { font-size: 17px; }
+.you-streak .streak-best { margin-top: 4px; }
+
+/* The calendar: this week and the 3 before, Monday first (also Done's one-week strip). */
+.week-cal {
+  margin-top: 16px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; max-width: 20rem;
+}
+.wc-head { font-size: 13px; line-height: 1.2; color: var(--ink-2); text-align: center; }
+.wc { aspect-ratio: 1; border-radius: 6px; }
+.wc.is-none { box-shadow: inset 0 0 0 1px var(--rule); }
+.wc.heat-1 { background: color-mix(in srgb, var(--progress) var(--heat-1-amt), var(--tile-bg)); }
+.wc.heat-2 { background: color-mix(in srgb, var(--progress) var(--heat-2-amt), var(--tile-bg)); }
+.wc.heat-3 { background: var(--progress); }
+.wc.heat-1, .wc.heat-2, .wc.heat-3 { box-shadow: inset 0 0 0 1.5px var(--progress); }
+.wc.is-later { border: 1px dashed var(--rule); }
+.wc.is-today { outline: 2px solid var(--ink); outline-offset: 2px; }
+/* Done: today's first review of the day fills its cell, 560 ms after it appears. */
+.wc.is-filling { animation: wc-fill 240ms 560ms var(--ease) backwards; }
+@keyframes wc-fill { from { background-color: var(--tile-bg); box-shadow: inset 0 0 0 1px var(--rule); } }
+
+/* ---------- 3. Done ---------- */
+.done-streak { margin-top: 32px; }
+.done-streak-line { font-size: 17px; font-weight: 600; }
+.done-streak .week-cal { margin-top: 12px; }
+.done-xp { margin-top: 32px; }
+.xp-total { font-family: var(--font-head); font-size: 28px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.xp-total > [aria-hidden] { display: inline-block; }
+.xp-rows { margin-top: var(--s1); }
+.xp-rows dt, .xp-rows dd { font-size: 15px; }
+.xp-rows dt { color: var(--ink); }
+.xp-rows div, .level-up { animation: xp-in 160ms var(--ease) both; }
+@keyframes xp-in { from { opacity: 0; } }
+.level-up { margin-top: 20px; display: flex; align-items: center; gap: 12px; font-size: 17px; font-weight: 600; }
+.done-zero { margin-top: 32px; font-size: 15px; color: var(--ink-2); max-width: 34ch; }
+
+/* ---------- 5. The deck bar: Solid, Learning, New ---------- */
+.meter.is-stages > span { flex: 1 1 0; min-width: 0; }
+.meter.is-stages > span + span { border-left: 1.5px solid var(--progress); }
+.meter.is-stages .m-solid { background: var(--progress); }
+.meter.is-stages .m-learning { background: color-mix(in srgb, var(--progress) var(--heat-1-amt), var(--tile-bg)); }
+.meter.is-stages .m-new { background: transparent; }
+.meter.is-row { margin-top: 6px; height: 8px; border-radius: 4px; width: min(100%, 10rem); }
+.meter.is-cover { height: 12px; border-radius: 6px; width: 100%; }
+.cover-stages { margin-top: 12px; }
+.cover-stages .stage-line { margin-top: 8px; font-variant-numeric: tabular-nums; }
+
+/* ---------- 6. Added this time ---------- */
+.added { margin-top: var(--s4); padding-bottom: calc(var(--s4) + env(safe-area-inset-bottom)); }
+.added-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s2); }
+.added-head h2 { font-size: 17px; font-weight: 600; line-height: 1.3; }
+.added-xp { font-size: 15px; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.added-list { margin-top: var(--s1); }
+.added-list li button { grid-template-columns: 12px minmax(0, 1fr) 16px; column-gap: 12px; }
+.added-list .side-square { align-self: start; margin-top: 5px; }
+.added-list li { animation: pop 200ms var(--ease) both; }
+.added-list .f .mark { font-weight: 600; }
+
+/* ---------- 7. Formatting on the card ---------- */
+.marks strong { font-weight: 700; color: var(--ink); }
+.answer.marks ul.m-ul { list-style: disc; padding-left: 1.25em; }
+.answer.marks li + li { margin-top: 4px; }
+.answer.marks > * + * { margin-top: 4px; }
+.answer.marks li { overflow-wrap: anywhere; }
+.t-card.marks .m-p, .t-card.marks .m-ul { display: block; }
+.t-card.marks .m-ul { padding-left: 1.25em; }
+.t-card.marks .m-li { display: list-item; list-style: disc; }
+.t-card.marks .m-li + .m-li, .t-card.marks > * + * { margin-top: 4px; }
+.format-hint { margin-top: 2px; }
+
+/* ---------- 8a. Short answers (the card's top space is in hero.css's .card-stack) ---------- */
+.answer.is-short { font-size: 22px; line-height: 1.35; font-weight: 500; }
+
+/* ---------- 8c. Getting started ---------- */
+.gs-steps { margin-top: var(--s1); display: grid; }
+.gs-step { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 6px 0; font-size: 17px; }
+.gs-mark {
+  flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+  font-size: 13px; font-weight: 600; line-height: 1; color: var(--ink-2); font-variant-numeric: tabular-nums;
+  box-shadow: inset 0 0 0 1.5px var(--ink-2);
+}
+.gs-step.is-done .gs-mark { background: var(--ink); box-shadow: none; }
+.gs-check { width: 14px; height: 14px; fill: none; stroke: var(--tile-bg); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.gs-text { min-width: 0; }
+.gs-sub { display: block; font-size: 15px; color: var(--ink-2); }
+
+/* ======================================================================
+   Pass 2 (round1-plan.md "Pass 2 changes", D76, D77). Existing tokens only.
+   ====================================================================== */
+
+/* R1: bold in the question reaches 800 (Bricolage is variable); the answer keeps 700. No highlighter. */
+.t-card strong, .t-card .marks strong, .t-card.marks strong { font-weight: 800; }
+
+/* O1: Midnight's Rules (1.36) can't be seen as an empty or later cell, so those cells use ink at 22%. */
+[data-theme="midnight"] .wc.is-none { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 22%, var(--tile-bg)); }
+[data-theme="midnight"] .wc.is-later { border-color: color-mix(in srgb, var(--ink) 22%, var(--tile-bg)); }
+
+/* R3: Done's "This session" rows and the "Next" line. Not tappable, no motion. */
+.done-session { margin-top: 32px; }
+.done-session h2 { font-size: 17px; font-weight: 600; line-height: 1.3; }
+.session-rows div { min-height: 44px; align-items: center; }
+.session-rows div:last-child { min-height: 44px; }
+.session-rows dt { display: flex; align-items: center; gap: 12px; min-width: 0; font-size: 15px; color: var(--ink); }
+.session-rows .session-deck { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.session-rows dd { flex: none; font-size: 15px; font-weight: 600; }
+.done-next { margin-top: 20px; font-size: 17px; color: var(--ink-2); max-width: 34ch; text-wrap: pretty; }
+/* The button stays in the flow under the content; this keeps a button's height plus 16px clear above the
+   safe area when the content runs long (360×640). */
+.done .actions { padding-bottom: 16px; }
+/* Practice done: Back to deck (filled) over Practice again (outlined), 12px apart (D78). */
+.done .actions { display: grid; gap: 12px; }
+
+/* C1: Settings in tiles, 16px apart; the page title like Progress's. */
+.settings-tiles { display: grid; gap: 16px; }
+.settings-tiles .tile > .t-title:first-child, .settings-tiles .tile > .tile-title:first-child { margin-top: 0; }
+.settings-tiles .sec { margin-top: 0; }
+/* In a tile the text fills the tile (it's at most 35rem wide, so lines stay readable), UI-CRIT-7 d. */
+.settings-tiles .sec > .t-secondary { max-width: none; }
+.settings-tiles .themes { margin-bottom: -8px; }
+.settings-tiles .row-link { margin: -8px 0; border: 0; min-height: 48px; }
+.settings-tiles .tile.how { padding-block: 16px; }
+
+/* C2: New deck's preview of the deck row. */
+.deck-preview { margin-top: 0; }
+.preview-label { font-size: 15px; font-weight: 600; }
+.preview-tile { margin-top: var(--s1); display: grid; grid-template-columns: 6px minmax(0, 1fr); column-gap: var(--s2); align-items: stretch; padding: var(--s2) 20px; }
+.preview-tile .swatch { height: auto; min-height: 22px; }
+.preview-tile .swatch.is-unset { background: none; opacity: 1; box-shadow: inset 0 0 0 1.5px var(--rule); }
+.preview-text { min-width: 0; }
+.preview-text .name { display: block; font-size: 17px; font-weight: 600; line-height: 1.3; color: var(--ink); overflow-wrap: anywhere; }
+.preview-text .name.is-placeholder { color: var(--ink-2); }
+.preview-text .sub { display: block; margin-top: 2px; font-size: 15px; line-height: 1.35; color: var(--ink-2); }
+/* Swatch hit areas reach at least 48×48: each radio covers half the 6px gap on every side. */
+.colour input { inset: -3px; width: auto; height: auto; }
+/* QA-7 m2: below 360px six in a row would be under 48px wide, so the colours go three by two. */
+@media (max-width: 22.49em) {
+  .colours { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+}
+
+/* C3: Progress from 64em: two rails, You + Days studied, then Since you started + Last 7 days. Below
+   that the rails don't draw a box, so the 48em grid areas still place the tiles. */
+.p-rail { display: contents; }
+@media (min-width: 64em) {
+  .progress-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: none; gap: 20px; }
+  .p-rail { display: grid; gap: 20px; align-content: start; min-width: 0; }
+  .p-rail > * { grid-area: auto; }
+}
+
+/* O3: Save test fills the column like the other forms' main buttons (phones; from 48em every form's
+   main button is the same 14rem-minimum button). */
+.test-zone .btn-primary { width: 100%; }
+@media (min-width: 48em) {
+  .is-form .test-zone .btn-primary { width: auto; }
+}
+
+/* D77: the deck page's practice row, under the test block's rule. */
+.row-link.practice-row { margin-top: 0; min-height: 48px; border-top: 0; }
+@media (min-width: 48em) {
+  /* Settings keeps its 35rem column inside the tiles frame. */
+  .tiles-page.settings-page { max-width: calc(35rem + 64px); }
+}
+@media (min-width: 48em) {
+  /* Export backup is the forms' desktop button: at least 14rem, not the tile's full width. */
+  .settings-tiles .sec > .btn-primary { width: auto; min-width: 14rem; }
+}

@@ -4,6 +4,7 @@
 import { getSettings, type Card, type Deck, type NigiriDb, type Review, type Settings, type Test } from './db';
 import { State } from './scheduler';
 import { startOfLocalDay, startOfLocalDayOffset } from './time';
+import { xpOf, type XpParts, type XpReview } from './xp';
 
 export interface Snapshot {
   decks: Deck[];
@@ -67,4 +68,11 @@ export function withSavedRating(old: Snapshot, saved: { card: Card; review: Revi
     firstReviewAt,
     lastReviewAt: last && last.getTime() > review.reviewTime.getTime() ? last : review.reviewTime,
   };
+}
+
+/** D73's XP right now, and every review it was counted from (for the streak on Done). One read. */
+export async function loadXp(db: NigiriDb): Promise<{ xp: XpParts; reviews: XpReview[] }> {
+  const [cards, reviews] = await db.transaction('r', db.cards, db.reviews, () => Promise.all([db.cards.toArray(), db.reviews.toArray()]));
+  const lite = reviews.map((r) => ({ id: r.id, cardId: r.cardId, reviewTime: r.reviewTime, dueAt: r.dueAt }));
+  return { xp: xpOf(cards, lite), reviews: lite };
 }

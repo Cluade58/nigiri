@@ -28,7 +28,6 @@ test('J4: export and restore round-trip; bad files change nothing; theme and dra
   await expect(page.getByRole('link', { name: /Edit test/ })).toBeVisible();
 
   // Export: one file, named by the local date, and a line that says where it went.
-  await page.getByRole('link', { name: 'Home' }).click();
   await page.getByRole('link', { name: 'Settings' }).click();
   // Each line sits under the button it answers, so a line never moves that button (UI-CRIT-2 req 1):
   // Export's line comes first on the page, Restore's (under its helper line) second.
@@ -52,7 +51,7 @@ test('J4: export and restore round-trip; bad files change nothing; theme and dra
 
   // A chosen theme and a half-typed card live outside the database.
   await page.getByRole('radio', { name: /Midnight/ }).check();
-  await page.getByRole('link', { name: 'Home' }).click();
+  await page.getByRole('link', { name: 'Today', exact: true }).click();
   await page.getByRole('link', { name: /Biology/ }).first().click();
   await page.getByRole('link', { name: 'Add card' }).click();
   await page.getByLabel('Front').fill('Half a card');

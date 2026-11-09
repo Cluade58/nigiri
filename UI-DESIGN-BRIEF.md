@@ -8,7 +8,8 @@
   - **Tests** appears only when a test is today or ahead.
   - **Last 7 days** shows cards added and cards reviewed; a zero line is hidden.
   - **Decks** is the list, plus New deck.
-- **Not on Today:** no assignment, agenda or calendar tile, and no filler tile.
+- **Not on Today:** no assignment or agenda tile, and no filler tile. _Changed 2026-11-08 (D66–D68):_ a Streak tile and a study-calendar preview (days you reviewed, linking to Progress) are in; Last 7 days becomes a strip of bars (D65).
+- **Tabs (D68):** phones get a bottom tab bar (Today, Decks, Progress, Settings) on the top-level screens; desktop (64em and up) gets a left sidebar with the same four rows, outlined Review and Add card, and the deck list. Review, Done and the forms stay focused, with no tabs. **Progress** holds the streak (current and best), a calendar of days studied, the last 7 days and totals (D67, D70).
 - **Look:** tiles are index cards: Surface, a 1px rule border, a 16px radius, no shadow. Only the tiles with lists get the 1.5px ink line under their heading. Content sets every height. DOM order is reading order at every width.
 - **Desktop column widths for the other screens:**
   - review and Done: 40rem
@@ -17,7 +18,7 @@
 
 **Direction: B, Highlighter.** Tokens and type are in [product-brief.md](product-brief.md); the reference screens start at `mockups/index.html`, and the plan behind them is `mockups/design-plan.md`. New screens extend that system.
 
-**A pure flashcards app.** Screens exist only for decks, cards, reviewing and a deck's test. There's no calendar or assignments, so the existing mockups' "Due soon" list and Calendar tab no longer apply.
+**A pure flashcards app.** Screens exist only for decks, cards, reviewing and a deck's test. There are no assignments and no assignments calendar (a calendar of days studied is in since D66), so the existing mockups' "Due soon" list and Calendar tab no longer apply.
 
 **The card screens come first.** They're designed from the card-creation flow in [product-spec.md §1](product-spec.md). Other screens follow outward from the card.
 - One way to make cards: write your own. No import.
@@ -120,7 +121,7 @@ The user's direction: a student opens Nigiri and thinks "I know what to study ne
 | **3. Stopping never loses anything.** | Every rating saves as it's tapped, so ✕ is the pause and home's button is the resume. | A "carry on where you left off" screen. The queue is just picked again. |
 | **4. Explain when asked, not on the way.** | The review screen keeps its one hint line. The full explanation is one optional page in Settings. | A friend who never opens Settings learns Good from Easy by using them. |
 | **5. Facts before forecasts.** | Test mode shows studied, not studied yet, and today's share: counts, not predictions. The fit check is the only estimate, and it states its 20-second assumption. | A readiness number in version one (it's on the 1.1 list). |
-| **6. Count effort, never punish absence.** | One-line moments for a finished session, a return after days away, and a test deck fully studied. No streak, lives, caps or blame. | The pull of loss aversion, on purpose. |
+| **6. Count effort, never punish absence.** | One-line moments for a finished session, a return after days away, and a test deck fully studied. No lives, caps or blame. _Changed 2026-11-08 (D66, the user):_ a streak is in, from real reviews only, and it never warns or blames (D67). | Loss-aversion pressure: no warnings, no "don't break", no freezes to buy. |
 | **7. Calm, with one loud thing per screen.** | Existing tokens, in every theme. The accent stays on the main action, and the highlighter on what just changed. | Nothing new gets a colour. |
 
 **The journey, from opening to useful study:**
@@ -134,12 +135,13 @@ The user's direction: a student opens Nigiri and thinks "I know what to study ne
 
 **Gamification, from the two guides the user sent** (Yu-kai Chou's Octalysis guide, and Adjust's app gamification guide):
 - **Kept:** Octalysis's "White Hat" drives. Accomplishment means real counts. Creativity is that you write every card, and the guide calls creativity the engine for the long run. Ownership is your decks and your colours. From Adjust: real-time feedback and visible progress (the review bar, "Saved. Biology has 12 cards.").
-- **Left out:** Octalysis's "Black Hat" drives, scarcity and loss: they bring urgency, then burnout and resentment. Adjust's coins, leaderboards, lives, levels, mascots and spin-the-wheel. It's a marketing guide for keeping paying users, and none of those help you remember a card.
-- **Celebrations:** one line that needs no tap, using the existing highlighter swipe. Under reduced motion, it appears without the swipe. No confetti, no sound, no exclamation marks. Never the words streak, lost, behind, "don't break" or "you missed".
+- **Softened 2026-11-08 (D66, the user: "Gamification is important"; D67, chief):** a streak (current and best), a calendar of days studied, and Today's focal due count are in. Still out: warnings, freezes, points, levels, badges, leaderboards, and anything needing accounts or other people.
+- **Left out (before D66):** Octalysis's "Black Hat" drives, scarcity and loss: they bring urgency, then burnout and resentment. Adjust's coins, leaderboards, lives, levels, mascots and spin-the-wheel. It's a marketing guide for keeping paying users, and none of those help you remember a card.
+- **Celebrations:** one line that needs no tap, using the existing highlighter swipe. Under reduced motion, it appears without the swipe. No confetti, no sound, no exclamation marks. Never the words lost, behind, "don't break" or "you missed". ("Streak" is allowed since D66.)
 
 **Experience checks (D48).** Spec §5 points here. Each step keeps these true once its screens exist; E2 runs at step 2, when friends get the link.
 - **E1. Clear next step.** With fixed data at 390×844 and 360×640, home shows exactly one filled button. With cards due, it's "Review N cards", with "About M minutes." (N × 20 s, rounded up) and the stop-anytime line under it, all above the fold. With nothing due, it's Add card. Empty home and an empty deck each name one next step.
 - **E2. Easy first use, watched.** One friend who hasn't seen Nigiri, on their own phone, makes a deck, writes three cards and finishes a review without help, within five minutes. Watch without prompting, and write down every stop and question. Any question about what to tap next fails the check.
 - **E3. Honest Test mode, fixed clock.** A deck of 35 cards, 30 studied, test in 3 days: the deck shows "30 of 35 studied" and "5 not studied yet: 2 today, all by Thursday". Moving the test 6 days out changes only that line and the fit check: every card's `dueAt` stays the same. No screen shows a percentage, grade, "ready" or prediction.
-- **E4. Effort counts, absence doesn't.** Done shows the real number of cards reviewed this session. With the last review or card made 3 days ago and cards due, home shows the welcome-back line. Searching every screen's copy and the reminder text finds no lives, cap, streak, points, or "lost", "behind", "don't break" or "you missed". Each celebration is one line, needs no tap, and appears without motion under reduced motion.
+- **E4. Effort counts, absence doesn't.** Done shows the real number of cards reviewed this session. With the last review or card made 3 days ago and cards due, home shows the welcome-back line. Searching every screen's copy and the reminder text finds no lives, cap, points, or "lost", "behind", "don't break" or "you missed". Each celebration is one line, needs no tap, and appears without motion under reduced motion.
 - **E5. Nothing lost on the way.** Close the app after five ratings and reopen it: home shows exactly five new reviews, and the unrated card is still due. Offline, a whole session saves. With storage failing, every save keeps what was typed or picked and says what to tap. A half-typed card comes back.

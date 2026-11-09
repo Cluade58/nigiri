@@ -3,17 +3,23 @@
 // From 48em, Add card sits beside Review (like Today) instead of in the phone bar (UI-BENTO-1 §5).
 // D63: with a test ahead, the daily share is a pace, not a limit, so the cards it holds back can be
 // studied early from here (never from Today), with one outlined pill under the test line.
+// D77: a row link opens the practice round (every card, shuffled, nothing saved).
+// Round 1: the cover carries the deck's New / Learning / Solid bar; rows show the card text plain (§7).
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, Navigate, useLocation, useParams } from 'react-router';
-import { WIDE, useMediaQuery, useNow, useSnapshot } from '../app/hooks';
+import { useBack } from '../app/Nav';
+import { useNow, useSnapshot } from '../app/hooks';
 import { BackIcon, Chevron, PlusIcon } from '../components/Icons';
+import { StageMeter } from '../components/Tiles';
 import { deckStyle } from '../components/deckStyle';
 import { cards } from '../lib/copy';
 import type { Card } from '../lib/db';
 import { computeDue } from '../lib/queue';
 import { isNewCard } from '../lib/scheduler';
 import { planLine, studiedLine, studyEarlyCount, whenLine } from '../lib/testCopy';
+import { plainMarks } from '../lib/marks';
 import { testApplies } from '../lib/testMode';
+import { stageCounts, stageLine } from '../lib/xp';
 import { EditSheet } from './EditSheet';
 import { useTitle } from './useTitle';
 
@@ -22,10 +28,10 @@ export function DeckPage() {
   const now = useNow();
   const snap = useSnapshot(now);
   const location = useLocation();
-  const wide = useMediaQuery(WIDE);
   const [editing, setEditing] = useState<Card | null>(null);
   const opener = useRef<HTMLButtonElement | null>(null);
   const heading = useRef<HTMLHeadingElement>(null);
+  const back = useBack('/decks', `/deck/${deckId}/`);
 
   const view = useMemo(() => {
     if (!snap) return null;
@@ -46,7 +52,7 @@ export function DeckPage() {
           early: studyEarlyCount(result.heldBack.size, saved.date, now),
         }
       : null;
-    return { deck, list: newestFirst, due: result.due.length, test } as const;
+    return { deck, list: newestFirst, due: result.due.length, test, stages: stageCounts(list) } as const;
   }, [snap, deckId, now]);
 
   useTitle(view?.deck?.name ?? 'Deck');
@@ -60,7 +66,7 @@ export function DeckPage() {
 
   if (!view) return <div className="booting" aria-busy="true" />;
   if (!view.deck) return <Navigate to="/" replace />;
-  const { deck, list, due, test } = view;
+  const { deck, list, due, test, stages } = view;
   const n = list.length;
   const counts = n === 0 ? 'No cards yet' : due > 0 ? `${cards(n)}, ${due}\u00A0due` : cards(n);
 
@@ -72,50 +78,54 @@ export function DeckPage() {
     });
   }
 
-  // One element that switches outlined/filled, so focus survives a recount (as on Today).
-  const addCard = (
-    <Link className={due > 0 ? 'btn btn-secondary' : 'btn btn-primary is-add'} to={`/deck/${deck.id}/add`}>
-      <PlusIcon />
-      Add card
-    </Link>
-  );
-
   return (
     <>
       <div inert={editing !== null}>
-        <main className={wide ? 'screen deck-screen' : 'screen deck-screen has-bar'} style={deckStyle(deck.colour)}>
-          <header className="form-bar">
-            <Link className="btn-text back-link" to="/">
-              <BackIcon />
-              Home
-            </Link>
-            <span />
-            <span />
-          </header>
-
-          <div className="deck-head">
-            <span className="swatch" aria-hidden="true" />
-            <div>
-              <h1 className="t-hero" ref={heading} tabIndex={-1}>
-                {deck.name}
-              </h1>
-              {/* While a test is set, "of 35" is in the test line and the due count is on the button. */}
-              {!test && <p className="t-secondary counts">{counts}</p>}
-            </div>
+        <main className="screen deck-screen" style={deckStyle(deck.colour)}>
+          {/* The cover: the deck's colour as a wash, holding Back, the name and the counts (plan §3). */}
+          <div className="deck-cover">
+            <header className="form-bar">
+              <Link className="btn-text back-link" to={back.to} onClick={back.onClick}>
+                <BackIcon />
+                Back
+              </Link>
+              <span />
+              <span />
+            </header>
+            <h1 className="t-hero" ref={heading} tabIndex={-1}>
+              {deck.name}
+            </h1>
+            {/* While a test is set, "of 35" is in the test line and the due count is on the button. */}
+            {!test && <p className="t-secondary counts">{counts}</p>}
+            {/* Round 1 plan §5: New / Learning / Solid, with the words beside it. */}
+            {n > 0 && (
+              <div className="cover-stages">
+                <StageMeter counts={stages} size="cover" />
+                <p className="t-secondary stage-line">{stageLine(stages)}</p>
+              </div>
+            )}
           </div>
 
           <div className="lead">
             {due > 0 ? (
-              <div className="study-row">
+              <div className="study-row deck-actions">
                 <Link className="btn btn-primary" to={`/deck/${deck.id}/review`}>
                   Review {cards(due)}
                 </Link>
-                {wide && addCard}
+                <Link className="btn btn-secondary" to={`/deck/${deck.id}/add`}>
+                  <PlusIcon />
+                  Add card
+                </Link>
               </div>
             ) : (
               <>
                 {n === 0 ? <p className="t-secondary">Add a card whenever something is worth remembering.</p> : <p className="nothing">Nothing due right now</p>}
-                {wide && <div className="study-row">{addCard}</div>}
+                <div className="study-row deck-actions">
+                  <Link className="btn btn-primary is-add" to={`/deck/${deck.id}/add`}>
+                    <PlusIcon />
+                    Add card
+                  </Link>
+                </div>
               </>
             )}
           </div>
@@ -150,6 +160,14 @@ export function DeckPage() {
             )}
           </div>
 
+          {/* D77: the whole deck once, shuffled, rating nothing. Under the test row, only with cards. */}
+          {n > 0 && (
+            <Link className="row-link practice-row" to={`/deck/${deck.id}/practice`}>
+              Practice all {cards(n)}
+              <Chevron />
+            </Link>
+          )}
+
           {n > 0 && (
             <section className="sec" aria-labelledby="cards-title" style={{ marginTop: 'var(--s4)' }}>
               <div className="sec-head">
@@ -168,8 +186,9 @@ export function DeckPage() {
                         setEditing(card);
                       }}
                     >
-                      <span className="f">{card.front}</span>
-                      <span className="b">{card.back}</span>
+                      <span className="fb">
+                        <span className="f">{plainMarks(card.front)}</span> <span className="b">{plainMarks(card.back)}</span>
+                      </span>
                       {/* D61(6): rows that open something carry a chevron (rule 3). */}
                       <Chevron />
                     </button>
@@ -180,16 +199,6 @@ export function DeckPage() {
           )}
         </main>
 
-        {!wide && (
-          <nav className="bar" aria-label="Make cards">
-            <div className="bar-inner">
-              <Link className={due > 0 ? 'btn btn-secondary btn-wide' : 'btn btn-primary btn-wide'} to={`/deck/${deck.id}/add`}>
-                <PlusIcon />
-                Add card
-              </Link>
-            </div>
-          </nav>
-        )}
       </div>
 
       {editing && <EditSheet key={editing.id} card={editing} onClose={closeSheet} />}

@@ -136,7 +136,7 @@ Step 1 must pass checks 1, 3, 4 and 5. Check 2 belongs to step 2.
 - **First open.** One button: **New deck**, because a card needs a deck to go in. *Who:* every friend, on day one.
 - **Home.** Tiles ([D49–D51](UI-DESIGN-BRIEF.md)): Study first, with **Review 18 cards** and about how long it takes (D41, D45), then Tests, Last 7 days, and decks with their due counts ("No cards yet" when empty). Nothing due: "Nothing due right now", when the next card is due, and **Add card** becomes the main button. *Who:* everyone, every day.
 - **New deck.** Type a name, pick one of the six highlighter colours, and tap **Create deck**. Add card then opens in the new deck. Nothing is picked for you: if you skip the colour, Create deck asks for one. *Who:* everyone, when a new class or unit starts.
-- **Review.** Four plain buttons: Again, Hard, Good, Easy, with one quiet line above them: "Forgot it? Tap Again. Right but slow? Hard." The top shows cards left, such as "12 left": cards due now plus cards from this session due again within 90 seconds, so a rating that sends the card back (Again, or Hard on a card you're still learning) leaves the count where it was. The bar under it is ratings saved this session out of that plus the cards left. **Waiting** shows "Next card in 0:48", with **Done for now** to go home. The time comes from that card's `dueAt`, never from a timer of its own; at zero the screen picks again. *Who:* everyone.
+- **Review.** A deck-coloured card; Again, Hard, Good, Easy show return times (D65), with one quiet line above them: "Forgot it? Tap Again. Right but slow? Hard." The top shows cards left, such as "12 left": cards due now plus cards from this session due again within 90 seconds, so a rating that sends the card back (Again, or Hard on a card you're still learning) leaves the count where it was. The bar under it is ratings saved this session out of that plus the cards left. **Waiting** shows "Next card in 0:48", with **Done for now** to go home. The time comes from that card's `dueAt`, never from a timer of its own; at zero the screen picks again. *Who:* everyone.
 - **Not saved.** A failed save puts one line above the button: "Not saved. Tap Save card again." (or whichever button), or, out of space, "Free up space on your phone". *Who:* anyone whose phone fills up.
 - **Storage can't open.** Instead of home: "Nigiri can't open your cards", three fixes, a warning not to remove the app, and **Try again**. *Who:* anyone in a private window or with a full phone.
 - **Done.** "Done", cards reviewed, and a button home (D45). From step 4, Done offers reminders until you answer. *Who:* everyone, after every session.
@@ -155,7 +155,7 @@ Each step is usable on its own. Stop anywhere and you still have an app.
 
 **Builder notes for ts-fsrs 6.0.0** (sources and test scenarios in [fsrs-notes.md](fsrs-notes.md)):
 - **Create the scheduler once at startup** with `await DefaultScheduler({ version: 'FSRS-7', desiredRetention: { 1: 0.9, 2: 0.9, 3: 0.9, 4: 0.95 }, learningSteps: ['1m'], relearningSteps: ['1m'], allowModelOverride: false })`. It's async: wait for it before the first review.
-- **After that, the calls are synchronous:** `newCard({ cardId, now })` for a new card, and `review({ card, grade, now })`, which returns `{ card, revlog }`. Save that `card` and `revlog` in one Dexie transaction. `preview()` isn't needed in version one. Pass the later of the tap and the card's `lastReviewAt` as `now`: FSRS-7 throws on a review dated before the last one.
+- **After that, the calls are synchronous:** `newCard({ cardId, now })` for a new card, and `review({ card, grade, now })`, which returns `{ card, revlog }`. Save that `card` and `revlog` in one Dexie transaction. Key return times: `previewDue` (D69). Pass the later of the tap and the card's `lastReviewAt` as `now`: FSRS-7 throws on a review dated before the last one.
 - **H1–H8 passed on the pinned library** ([fsrs-notes §7](fsrs-notes.md)). Re-check H4 through Dexie.
 - **Keyboard:** on Save card or Done, move focus to Front in the same tap, before waiting for the save, and clear the fields once it succeeds. Choosing a deck from home moves the cursor to Front.
 - **Don't use the v5 names** most tutorials show: `fsrs()`, `FSRS`, `createEmptyCard`, `next`, `repeat`.
@@ -172,8 +172,8 @@ Each step is usable on its own. Stop anywhere and you still have an app.
 
 Add these only after two weeks of use, and only the ones you actually miss.
 - **Write your own:** the duplicate-front check; opening in the deck you used last. (Keeping a half-typed card moved into step 1 on 2026-11-08.)
-- **Review:** undo last rating; rating buttons that show when the card comes back; editing a card mid-review.
+- **Review:** undo last rating; editing a card mid-review.
 - **Test mode:** the readiness number (average predicted recall on test day); a last look at every card before the test (RemNote's "Final Review"; the evidence is weak). **If readiness comes (D44):** counted out of every card in the deck, with cards not studied yet counted as not remembered. It isn't shown until every card has been studied at least once. It's worded as cards, never a grade or %: "about 28 of 35 likely to come back to you on test day, if you keep reviewing". It names its assumption (you keep reviewing what's due) and says it's an estimate.
 - **Reminders:** the number on the app icon.
-- **Around the card:** days studied this week, which never resets to zero (replaces the streak, D45); the session breakdown by rating (Done already shows the cards reviewed); the add-to-home-screen tip.
+- **Around the card:** the session breakdown by rating (Done already shows the cards reviewed); the add-to-home-screen tip.
 - **Decks:** renaming or deleting a deck.

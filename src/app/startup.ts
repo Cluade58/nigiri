@@ -91,7 +91,8 @@ async function start(): Promise<AppServices> {
   }
   if (import.meta.env.DEV) {
     // Dev-only fixtures for screenshots (?seed=...). This branch and its module are left out of the build.
-    const { seedFromUrl } = await import('../dev/seed');
+    const { seedFromUrl, themeFromUrl } = await import('../dev/seed');
+    themeFromUrl();
     await seedFromUrl(db, scheduler);
     if (fail === 'writes') failWrites(db);
     if (fail === 'slow-writes') slowWrites(db);

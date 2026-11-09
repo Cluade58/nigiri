@@ -15,7 +15,7 @@ test('J3: offline, the app loads and a review saves exactly once', async ({ page
   await createDeck(page, 'Biology', 'Green');
   await addCards(page, 'Biology', [['Osmosis', 'Water moving across a membrane']]);
   await page.getByRole('link', { name: 'Close' }).click();
-  await page.getByRole('link', { name: 'Home' }).click();
+  await page.getByRole('link', { name: 'Today', exact: true }).click();
   await expect(page.getByRole('link', { name: 'Review 1 card' })).toBeVisible();
 
   await context.setOffline(true);

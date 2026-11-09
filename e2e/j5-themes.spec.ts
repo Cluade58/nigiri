@@ -43,7 +43,7 @@ test('J5: one tap picks Midnight, and a reload has it before the app draws', asy
   await expect(page.getByRole('radio', { name: /Midnight/ })).toBeChecked();
 
   // Every screen follows it: Today too.
-  await page.getByRole('link', { name: 'Home' }).click();
+  await page.getByRole('link', { name: 'Today', exact: true }).click();
   await expect(page.locator('body')).toHaveCSS('background-color', MIDNIGHT_PAGE);
 });
 

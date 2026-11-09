@@ -9,12 +9,16 @@
 //   npm run shot -- mockups/home.html --dark --name home-v2
 //
 // Options:
-//   --viewport mobile|tablet|desktop|all   (default: mobile; comma lists work)
+//   --viewport mobile|small|narrow|tablet|laptop|desktop|all
+//                                          (default: mobile; small = 360x640, narrow = 320x568,
+//                                          laptop = 1024x768; comma lists work)
 //   --full                                 capture the full scrollable page
 //   --dark                                 emulate prefers-color-scheme: dark
 //   --name <name>                          output file prefix (default: from target)
 //   --out <dir>                            output folder (default: screenshots)
 //   --wait <ms>                            extra wait after load, for animations/fonts (default: 300)
+//   --click <text>                         click the button whose text is exactly <text> before the wait
+//                                          (for example "Show answer" for a revealed review card)
 //   --keep                                 add a timestamp so earlier shots aren't overwritten
 
 import puppeteer from 'puppeteer';
@@ -24,7 +28,10 @@ import { pathToFileURL } from 'node:url';
 
 const VIEWPORTS = {
   mobile: { width: 390, height: 844, deviceScaleFactor: 2, isMobile: true, hasTouch: true },
+  small: { width: 360, height: 640, deviceScaleFactor: 2, isMobile: true, hasTouch: true },
+  narrow: { width: 320, height: 568, deviceScaleFactor: 2, isMobile: true, hasTouch: true },
   tablet: { width: 820, height: 1180, deviceScaleFactor: 2, isMobile: true, hasTouch: true },
+  laptop: { width: 1024, height: 768, deviceScaleFactor: 1 },
   desktop: { width: 1440, height: 900, deviceScaleFactor: 1 },
 };
 
@@ -36,7 +43,7 @@ function parseArgs(argv) {
     if (a === '--full') opts.full = true;
     else if (a === '--dark') opts.dark = true;
     else if (a === '--keep') opts.keep = true;
-    else if (['--viewport', '--name', '--out', '--wait'].includes(a)) opts[a.slice(2)] = argv[++i];
+    else if (['--viewport', '--name', '--out', '--wait', '--click'].includes(a)) opts[a.slice(2)] = argv[++i];
     else rest.push(a);
   }
   opts.target = rest[0];
@@ -88,6 +95,14 @@ try {
     if (opts.dark) await page.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'dark' }]);
     await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
     await page.evaluate(() => document.fonts?.ready);
+    if (opts.click) {
+      const clicked = await page.evaluate((text) => {
+        const b = [...document.querySelectorAll('button')].find((el) => el.textContent.trim() === text);
+        b?.click();
+        return !!b;
+      }, opts.click);
+      if (!clicked) { problems++; console.log(`  [${vpName}] no button with the text "${opts.click}"`); }
+    }
     await new Promise((r) => setTimeout(r, Number(opts.wait)));
 
     // Flag horizontal overflow, a common mobile layout bug.

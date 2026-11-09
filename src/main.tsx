@@ -2,6 +2,8 @@
 import '@fontsource-variable/bricolage-grotesque/opsz.css';
 import '@fontsource-variable/atkinson-hyperlegible-next';
 import './styles/app.css';
+import './styles/hero.css';
+import './styles/round1.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';

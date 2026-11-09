@@ -1,5 +1,6 @@
 // New deck (mockups/new-deck.html). A name and one of the six colours; nothing is picked for you.
 // After Create deck, Add card opens in the new deck. A failed save keeps the name and colour (D17).
+// Pass 2 C2: under the colours, a preview of the deck's row in the deck list.
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useApp } from '../app/context';
@@ -140,6 +141,19 @@ export function NewDeck() {
             </p>
           )}
         </fieldset>
+
+        {/* Pass 2 C2: how the deck will look in the deck list, live as you type and pick. A picture only:
+            the name and colour fields already say it all. No animation. */}
+        <div className="deck-preview" aria-hidden="true">
+          <p className="preview-label">In your deck list</p>
+          <div className="tile preview-tile" style={colour ? deckStyle(colour) : undefined}>
+            <span className={colour ? 'swatch' : 'swatch is-unset'} />
+            <span className="preview-text">
+              <span className={name.trim() ? 'name' : 'name is-placeholder'}>{name.trim() || 'Your deck'}</span>
+              <span className="sub">0 cards</span>
+            </span>
+          </div>
+        </div>
       </form>
 
       <div className="action-zone">
