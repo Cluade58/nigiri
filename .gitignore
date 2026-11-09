@@ -23,3 +23,7 @@ screenshots/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Cloudflare: the built app copied for deploy, and Wrangler's local cache
+cf-site/nigiri/
+.wrangler/

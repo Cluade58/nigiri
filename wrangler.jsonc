@@ -1,0 +1,9 @@
+// Cloudflare hosting for Nigiri (the user's choice, 2026-11-09). An assets-only Worker: no server code.
+// `npm run deploy` builds the app into cf-site/nigiri/ (the app keeps its /nigiri/ address, so the
+// service worker, manifest and tests stay as they are) and cf-site/_redirects sends / to /nigiri/.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "nigiri",
+  "compatibility_date": "2026-11-01",
+  "assets": { "directory": "./cf-site" }
+}
