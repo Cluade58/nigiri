@@ -1,4 +1,4 @@
-// D73 (XP, levels, ranks) and D74 (Solid), round 1 build task B4: tests T1 to T7 and S2.
+// D73 (XP), D79 (levels and the ten ranks) and D74 (Solid): tests T1 to T7 and S2. T6 is LS-5's table (B5).
 // Fixed clock T0 = 2026-11-09T15:00:00Z, the pinned scheduler, and the real saveRating and reviewCard.
 // The time zone is UTC here unless a test says otherwise (tests/setup.ts sets New York for other files).
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
@@ -11,6 +11,7 @@ import { NBSP } from '../src/lib/copy';
 import { localDayKey } from '../src/lib/time';
 import {
   RANKS,
+  RANK_STARTS,
   SOLID_GAP_MS,
   bonusDays,
   levelOf,
@@ -264,28 +265,50 @@ describe('T5: XP follows the saved data', () => {
   });
 });
 
-describe('T6: levels and ranks', () => {
-  it('pins what each level needs', () => {
-    const needs = Array.from({ length: 18 }, (_, i) => needFor(i + 1));
-    expect(needs).toEqual([100, 140, 200, 270, 380, 540, 750, 1050, 1480, 2070, 2890, 4050, 5670, 7940, 11110, 15560, 21780, 30490]);
+describe('T6: levels and ranks (D79, LS-5)', () => {
+  const L = Array.from({ length: 40 }, (_, i) => i + 1);
+  it('pins what each level needs: 100 + 40(L − 1)', () => {
+    expect(L.map(needFor)).toEqual(L.map((l) => 100 + 40 * (l - 1)));
+    expect([needFor(1), needFor(2), needFor(37), needFor(38)]).toEqual([100, 140, 1540, 1580]);
   });
-  it('pins where levels start', () => {
-    expect([4, 7, 10, 13, 16, 19].map(xpToReach)).toEqual([440, 1630, 4910, 13920, 38640, 106470]);
-    expect(levelOf(439).level).toBe(3);
-    expect(levelOf(440).level).toBe(4);
-    expect(levelOf(0)).toMatchObject({ level: 1, rank: 'Rice', into: 0, need: 100, toNext: 100 });
+  it('pins where levels start: 100(L − 1) + 20(L − 1)(L − 2)', () => {
+    expect(L.map(xpToReach)).toEqual(L.map((l) => 100 * (l - 1) + 20 * (l - 1) * (l - 2)));
+    expect([xpToReach(2), xpToReach(5), xpToReach(37), xpToReach(39), xpToReach(40)]).toEqual([100, 640, 28800, 31920, 33540]);
+    // The sum of needFor agrees with the closed form.
+    for (const l of L) expect(xpToReach(l + 1) - xpToReach(l)).toBe(needFor(l));
   });
-  it('rank names change at 4, 7, 10, 13, 16 and 19', () => {
-    const ranks = Array.from({ length: 21 }, (_, i) => rankOf(i + 1));
+  it('pins the XP at each rank start', () => {
+    expect(RANK_STARTS.map(xpToReach)).toEqual([0, 240, 900, 1920, 3300, 5700, 8740, 13440, 20400, 30340]);
+    expect(RANK_STARTS.map(rankOf)).toEqual([...RANKS]);
+  });
+  it('rank names change exactly at 3, 6, 9, 12, 16, 20, 25, 31 and 38', () => {
+    const ranks = Array.from({ length: 60 }, (_, i) => rankOf(i + 1));
     const changes = ranks.flatMap((r, i) => (i > 0 && r !== ranks[i - 1] ? [i + 1] : []));
-    expect(changes).toEqual([4, 7, 10, 13, 16, 19]);
-    expect([rankOf(1), rankOf(4), rankOf(7), rankOf(10), rankOf(13), rankOf(16), rankOf(19), rankOf(40)]).toEqual([...RANKS, 'Master']);
+    expect(changes).toEqual([3, 6, 9, 12, 16, 20, 25, 31, 38]);
+    expect([rankOf(38), rankOf(45), rankOf(100)]).toEqual(['Omakase', 'Omakase', 'Omakase']);
+    expect(RANKS).toEqual(['Rice Grain', 'Cucumber Roll', 'Tamago', 'Sweet Shrimp', 'Salmon', 'Yellowtail', 'Ikura', 'Chutoro', 'Otoro', 'Omakase']);
+  });
+  it('levelOf at the edges', () => {
+    expect(levelOf(0)).toMatchObject({ level: 1, rank: 'Rice Grain', into: 0, need: 100, toNext: 100, nextRank: null });
+    expect(levelOf(99)).toMatchObject({ level: 1, toNext: 1 });
+    expect(levelOf(100)).toMatchObject({ level: 2, rank: 'Rice Grain', into: 0, need: 140, toNext: 140, nextRank: 'Cucumber Roll' });
+    expect(levelOf(239)).toMatchObject({ level: 2, into: 139, need: 140, toNext: 1 });
+    expect(levelOf(240)).toMatchObject({ level: 3, rank: 'Cucumber Roll', into: 0, need: 180 });
+    expect(levelOf(899)).toMatchObject({ level: 5, rank: 'Cucumber Roll', toNext: 1, nextRank: 'Tamago' });
+    expect(levelOf(900)).toMatchObject({ level: 6, rank: 'Tamago', into: 0 });
+    expect(levelOf(30339)).toMatchObject({ level: 37, rank: 'Otoro', into: 1539, need: 1540, toNext: 1, nextRank: 'Omakase' });
+    expect(levelOf(30340)).toMatchObject({ level: 38, rank: 'Omakase', into: 0, need: 1580, nextRank: null });
+  });
+  it('levelOf treats a non-finite total as 0 instead of looping (CR-9 m1)', () => {
+    for (const bad of [Infinity, -Infinity, NaN]) {
+      expect(levelOf(bad)).toMatchObject({ level: 1, rank: 'Rice Grain', into: 0, need: 100, toNext: 100 });
+    }
   });
   it('the next line names the rank when the next level starts one', () => {
     expect(nextLine(levelOf(0))).toBe(`100${NBSP}XP to level 2`);
-    expect(nextLine(levelOf(xpToReach(3)))).toBe(`200${NBSP}XP to Tamago`);
-    expect(nextLine(levelOf(xpToReach(18) + 10))).toBe(`30,480${NBSP}XP to Master`);
-    expect(nextLine(levelOf(xpToReach(19)))).toBe(`${needFor(19).toLocaleString()}${NBSP}XP to level 20`);
+    expect(nextLine(levelOf(100))).toBe(`140${NBSP}XP to Cucumber Roll`);
+    expect(nextLine(levelOf(30339))).toBe(`1${NBSP}XP to Omakase`);
+    expect(nextLine(levelOf(30340))).toBe(`1,580${NBSP}XP to level 39`);
   });
 });
 

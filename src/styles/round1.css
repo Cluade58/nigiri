@@ -5,19 +5,60 @@
    app.css's reduced-motion rule removes every animation here; the JS count-up checks it too.
    ====================================================================== */
 
-/* ---------- 1. Rank icons: ink, one shade fill, the tile's own colour for rice ---------- */
-.rank-icon {
-  flex: none; display: block;
-  --shade: color-mix(in srgb, var(--ink) 35%, var(--tile-bg));
-  fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+/* ---------- 1. Rank badges (D79, mockups/rank-badges-plan.md) ----------
+   Fixed sticker colours, the same in every theme: the --rk-* tokens are used only by the badges and
+   the rank-up's sparkles, never the accent and never a deck colour. The dark outline carries the edge
+   on the light themes, the white die-cut on Midnight. Locked ranks are a silhouette in ink and page. */
+:root {
+  --rk-line: #2B2530; --rk-rice: #FFFBF2; --rk-blush: #FF9BB0; --rk-gold: #F6D27A; --rk-gold-d: #C98F1B;
+  --rk-ceramic: #F1ECE2; --rk-ceramic-d: #B9AE9C; --rk-wood: #E6C796; --rk-wood-d: #C9A36B;
+  --rk-lacquer: #2B2530; --rk-lacquer-ring: #B8323A; --rk-nori: #34483A; --rk-nori-l: #5E7A5F;
+  --rk-cucumber: #7DBF5A; --rk-cucumber-d: #3F7D3A; --rk-egg: #FFD45C; --rk-egg-d: #E9A93A;
+  --rk-shrimp: #FF8A5C; --rk-shrimp-l: #FFE1D3; --rk-shrimp-tail: #E8573C;
+  --rk-salmon: #FF8C69; --rk-salmon-l: #FFE0D2; --rk-hamachi: #F7E3C8; --rk-hamachi-edge: #F2A7A0;
+  --rk-ikura: #FF6A2B; --rk-chutoro: #F07A86; --rk-chutoro-l: #FFD1D6; --rk-otoro: #F7A6B4; --rk-otoro-l: #FFE6EA;
+  --rk-gem: #E5484D;
 }
-.rank-icon > * { vector-effect: non-scaling-stroke; }
-.rank-icon .ri-rice { fill: var(--tile-bg); }
-.rank-icon .ri-rice.is-bare { stroke: none; }
-.rank-icon .ri-shade { fill: var(--shade); }
-.rank-icon .ri-nori, .rank-icon .ri-seed { fill: var(--ink); stroke: none; }
-.rank-icon .ri-line { fill: none; }
-.rank-icon .ri-stripe { fill: none; stroke: var(--tile-bg); }
+.rank-badge { display: block; flex: none; overflow: visible; }
+.rank-badge * { stroke-linecap: round; stroke-linejoin: round; }
+.rank-badge .rk-cut { fill: #fff; stroke: var(--rk-line); stroke-width: 2; }
+.rank-badge .rk-disc { stroke: var(--rk-line); stroke-width: 1.5; }
+.rank-badge .rk-food > * { stroke: var(--rk-line); stroke-width: 1.5; }
+.rank-badge .rk-eye { fill: var(--rk-line); }
+.rank-badge .rk-eye-w { fill: #fff; }
+.rank-badge .rk-shine { fill: #fff; }
+.rank-badge .rk-mouth { fill: none; stroke: var(--rk-line); stroke-width: 1.4; }
+.rank-badge .rk-blush { fill: var(--rk-blush); opacity: .8; }
+.rank-badge .rk-stroke { fill: none; }
+.rank-badge .rk-food > .rk-bare { stroke: none; }
+.rank-badge .rk-sparkles { fill: #fff; stroke: var(--rk-line); stroke-width: 1; }
+.rank-badge .rk-f-ceramic { fill: var(--rk-ceramic); } .rank-badge .rk-f-wood { fill: var(--rk-wood); }
+.rank-badge .rk-f-lacquer { fill: var(--rk-lacquer); } .rank-badge .rk-f-gold { fill: var(--rk-gold); }
+.rank-badge .rk-f-rice { fill: var(--rk-rice); } .rank-badge .rk-f-nori { fill: var(--rk-nori); }
+.rank-badge .rk-f-line { fill: var(--rk-line); } .rank-badge .rk-f-white { fill: #fff; }
+.rank-badge .rk-f-blush { fill: var(--rk-blush); } .rank-badge .rk-f-gem { fill: var(--rk-gem); }
+.rank-badge .rk-f-cucumber { fill: var(--rk-cucumber); } .rank-badge .rk-f-cucumber-d { fill: var(--rk-cucumber-d); }
+.rank-badge .rk-f-egg { fill: var(--rk-egg); } .rank-badge .rk-f-shrimp { fill: var(--rk-shrimp); }
+.rank-badge .rk-f-shrimp-tail { fill: var(--rk-shrimp-tail); } .rank-badge .rk-f-salmon { fill: var(--rk-salmon); }
+.rank-badge .rk-f-hamachi { fill: var(--rk-hamachi); } .rank-badge .rk-f-ikura { fill: var(--rk-ikura); }
+.rank-badge .rk-f-chutoro { fill: var(--rk-chutoro); } .rank-badge .rk-f-otoro { fill: var(--rk-otoro); }
+.rank-badge .rk-s-line { stroke: var(--rk-line); } .rank-badge .rk-s-white { stroke: #fff; }
+.rank-badge .rk-s-ceramic-d { stroke: var(--rk-ceramic-d); } .rank-badge .rk-s-wood-d { stroke: var(--rk-wood-d); }
+.rank-badge .rk-s-lacquer-ring { stroke: var(--rk-lacquer-ring); } .rank-badge .rk-s-gold-d { stroke: var(--rk-gold-d); }
+.rank-badge .rk-s-nori-l { stroke: var(--rk-nori-l); } .rank-badge .rk-s-cucumber-d { stroke: var(--rk-cucumber-d); }
+.rank-badge .rk-s-egg-d { stroke: var(--rk-egg-d); } .rank-badge .rk-s-shrimp-l { stroke: var(--rk-shrimp-l); }
+.rank-badge .rk-s-salmon-l { stroke: var(--rk-salmon-l); } .rank-badge .rk-s-hamachi-edge { stroke: var(--rk-hamachi-edge); }
+.rank-badge .rk-s-chutoro-l { stroke: var(--rk-chutoro-l); } .rank-badge .rk-s-otoro-l { stroke: var(--rk-otoro-l); }
+/* 32px: plate, food and eyes; no blush, sparkles or plate details. */
+.rank-badge[data-size="32"] .rk-detail { display: none; }
+/* Locked: the same shape as a silhouette. The outline is ink at 55% (the plan said 50%, which gives
+   Cream 2.96:1 on its page): 3.38 to 3.82:1 on the light pages and tiles, 5.6:1 on Midnight. */
+.rank-badge.is-locked :is(.rk-face, .rk-detail, .rk-stroke) { display: none; }
+.rank-badge.is-locked :is(.rk-plate, .rk-food) > * {
+  fill: color-mix(in srgb, var(--ink) 10%, var(--page)); stroke: color-mix(in srgb, var(--ink) 55%, var(--page));
+}
+/* Locked tier hint: keep the plate ring (lacquer / gold) at 56 and 120 so the tier still reads; hidden at 32. */
+.rank-badge.is-locked:not([data-size="32"]) .rk-s-lacquer-ring, .rank-badge.is-locked:not([data-size="32"]) .rk-s-gold-d { display: inline; stroke: color-mix(in srgb, var(--ink) 55%, var(--page)); }
 
 /* ---------- Meters: a capsule with a progress border, tile-coloured inside ---------- */
 .meter { position: relative; display: flex; overflow: hidden; background: var(--tile-bg); }
@@ -202,3 +243,84 @@
   /* Export backup is the forms' desktop button: at least 14rem, not the tile's full width. */
   .settings-tiles .sec > .btn-primary { width: auto; min-width: 14rem; }
 }
+
+/* ======================================================================
+   B5: the rank badges in place (D79 to D81, rank-badges-plan.md). Badge colours are the --rk-* tokens
+   above; the words around them use the theme's ink and ink-2. Motion is transform and opacity only,
+   nothing loops, and app.css's reduced-motion rule leaves the final state (sparkles at opacity 0).
+   ====================================================================== */
+
+/* Done: the rank-up, centred after the XP rows. */
+.rank-up { margin-top: 24px; display: flex; flex-direction: column; align-items: center; text-align: center; --rk-delay: 0ms; }
+.rank-up-art { position: relative; width: 120px; height: 120px; }
+.rank-up-art .rank-badge {
+  transform-origin: 50% 100%;
+  animation: rk-plop 320ms var(--rk-delay) cubic-bezier(.175, .885, .32, 1.275) backwards;
+}
+@keyframes rk-plop {
+  0% { opacity: 0; transform: translateY(-16px); }
+  70% { opacity: 1; transform: translateY(0) scale(1.06, .92); }
+  100% { opacity: 1; transform: none; }
+}
+.rank-up-sparks { position: absolute; left: -24px; top: -16px; width: 168px; height: 152px; overflow: visible; pointer-events: none; }
+.rk-spark {
+  fill: var(--rk-gold); stroke: var(--rk-line); stroke-width: 1.2; stroke-linejoin: round;
+  opacity: 0; transform-box: fill-box; transform-origin: center;
+}
+.rk-spark:nth-child(1) { animation: rk-spark 880ms calc(var(--rk-delay) + 320ms) ease-out; }
+.rk-spark:nth-child(2) { animation: rk-spark 820ms calc(var(--rk-delay) + 380ms) ease-out; }
+.rk-spark:nth-child(3) { animation: rk-spark 760ms calc(var(--rk-delay) + 440ms) ease-out; }
+@keyframes rk-spark {
+  0% { opacity: 0; transform: scale(.4); }
+  25% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+/* One blink at 1.4 s. */
+.rank-up-art .rk-eyes {
+  transform-box: fill-box; transform-origin: center;
+  animation: rk-blink 180ms calc(var(--rk-delay) + 1400ms) ease-in-out;
+}
+@keyframes rk-blink { 50% { transform: scaleY(.1); } }
+.rank-up-name, .rank-up-level, .rank-up-line { animation: xp-in 160ms calc(var(--rk-delay) + 160ms) var(--ease) backwards; }
+.rank-up-name { margin-top: 12px; font-family: var(--font-head); font-size: 28px; font-weight: 700; line-height: 1.1; }
+.rank-up-level { margin-top: 4px; font-variant-numeric: tabular-nums; }
+.rank-up-line { margin-top: 2px; max-width: 30ch; text-wrap: pretty; }
+/* The plan's fit check: at 390×844 the badge, its name and Back to home show without scrolling. A
+   rank-up (about ten a year) takes the space Done's top and section gaps would use. */
+.done:has(.rank-up) { padding-top: var(--s3); }
+.done:has(.rank-up) .t-hero { margin-top: 0; }
+.done:has(.rank-up) :is(.done-streak, .done-xp, .done-session) { margin-top: 24px; }
+.done:has(.rank-up) .rank-up { margin-top: 16px; }
+.done:has(.rank-up) .actions { padding-top: var(--s3); }
+
+/* Add card: "New rank: Cucumber Roll." under the Added header (D81). Plop only. */
+.added-rank { margin-top: 8px; display: flex; align-items: center; gap: 12px; font-size: 17px; font-weight: 600; line-height: 1.3; }
+.added-rank .rank-badge { transform-origin: 50% 100%; animation: rk-plop 320ms cubic-bezier(.175, .885, .32, 1.275) backwards; }
+
+/* Desktop sidebar: the rank under the wordmark, a 48px row that opens Progress. */
+.side-rank {
+  flex: none; display: flex; align-items: center; gap: 12px; min-height: 48px; margin: -4px -12px 12px; padding: 4px 12px;
+  border-radius: 12px; color: var(--ink); text-decoration: none;
+}
+.side-rank:active { background: var(--rule); }
+@media (hover: hover) { .side-rank:hover { background: color-mix(in srgb, var(--rule) 60%, transparent); } }
+.side-rank:focus-visible { outline-offset: -2px; }
+.side-rank-text { min-width: 0; display: grid; }
+.side-rank-name { font-size: 15px; font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
+.side-rank-level { font-size: 13px; line-height: 1.3; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+/* Progress: the Ranks tile. One column of 56px rows on phones; two columns from 48em. */
+.g-ranks { margin-top: 12px; }
+.rank-ladder { margin-top: var(--s2); display: grid; row-gap: 8px; }
+.rank-ladder li { display: flex; align-items: center; gap: 12px; min-height: 56px; min-width: 0; }
+.rl-text { min-width: 0; display: grid; }
+.rl-name { font-size: 17px; font-weight: 600; line-height: 1.25; color: var(--ink); }
+.rl-sub { display: flex; flex-wrap: wrap; column-gap: 12px; font-size: 15px; line-height: 1.35; }
+.rl-level { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.rl-here { color: var(--ink); font-weight: 600; }
+.rank-ladder .is-ahead .rl-name { color: var(--ink-2); font-weight: 500; }
+@media (min-width: 48em) {
+  .g-ranks { margin-top: 20px; }
+  .rank-ladder { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: repeat(5, auto); grid-auto-flow: column; column-gap: 24px; }
+}
+

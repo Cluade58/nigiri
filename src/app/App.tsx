@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { HashRouter, Navigate, Route, Routes, useParams, useSearchParams } from 'react-router';
 import { AddCard } from '../screens/AddCard';
 import { CrashScreen } from '../screens/CrashScreen';
@@ -17,6 +17,9 @@ import { AppContext, type AppServices } from './context';
 import { ErrorBoundary } from './ErrorBoundary';
 import { Shell } from './Nav';
 import { StartupError, startServices } from './startup';
+
+/** Dev only (B5): #/dev/badges, every rank badge for screenshots. Dropped from the build with its module. */
+const BadgeGallery = import.meta.env.DEV ? lazy(() => import('../dev/BadgeGallery')) : null;
 
 type Boot =
   | { status: 'opening' }
@@ -92,6 +95,16 @@ export function App() {
       <ErrorBoundary>
         <HashRouter>
           <Routes>
+            {BadgeGallery && (
+              <Route
+                path="/dev/badges"
+                element={
+                  <Suspense fallback={null}>
+                    <BadgeGallery />
+                  </Suspense>
+                }
+              />
+            )}
             <Route element={<Shell />}>
               <Route path="/" element={<Today />} />
               <Route path="/decks" element={<Decks />} />

@@ -1,14 +1,17 @@
 // Navigation (D68, plan §5). Under 64em a bottom tab bar (Today, Decks, Progress, Settings); from 64em a
-// left sidebar with the same four rows, outlined Review and Add card, and the deck list. Only one of the
+// left sidebar with the wordmark, your rank (D80, links to Progress), the same four rows, outlined Review
+// and Add card, and the deck list. Only one of the
 // two is in the page at a time. The current tab is marked by weight and an ink bar, never the accent.
 import { useEffect, useMemo, useSyncExternalStore, type ReactNode } from 'react';
 import { Link, Outlet, useLocation, useNavigate, useNavigationType } from 'react-router';
 import { BarsIcon, CardsIcon, GearIcon, PlusIcon, SunIcon } from '../components/Icons';
 import { deckStyle } from '../components/deckStyle';
+import { RankIcon } from '../components/RankIcon';
 import { cards } from '../lib/copy';
 import { computeDue } from '../lib/queue';
 import { orderDecks } from '../lib/today';
-import { useMediaQuery, useNow, useSnapshot } from './hooks';
+import { levelOf, xpOf } from '../lib/xp';
+import { useMediaQuery, useNow, useReviewHistory, useSnapshot } from './hooks';
 
 export const DESKTOP = '(min-width: 64em)';
 
@@ -118,6 +121,12 @@ function TabBar({ current, inert }: { current: Tab; inert: boolean }) {
 function Sidebar({ current, path, inert }: { current: Tab | null; path: string; inert: boolean }) {
   const now = useNow();
   const snap = useSnapshot(now);
+  const history = useReviewHistory();
+  // D80: the rank under the wordmark. xpOf walks every card and review. The snapshot reloads each
+  // minute (useNow), which gives a new cards array, so this recounts about once a minute and after
+  // any card or review change, not on every render.
+  const cardList = snap?.cards;
+  const rank = useMemo(() => (cardList && history ? levelOf(xpOf(cardList, history).total) : null), [cardList, history]);
   const view = useMemo(() => {
     if (!snap) return null;
     const due = computeDue({ cards: snap.cards, tests: snap.tests, firstReviewAt: snap.firstReviewAt, now }).due.length;
@@ -129,6 +138,15 @@ function Sidebar({ current, path, inert }: { current: Tab | null; path: string; 
   return (
     <nav className="sidebar" aria-label="Main" inert={inert}>
       <div className="side-brand">Nigiri</div>
+      {rank && (
+        <Link className="side-rank" to="/progress">
+          <RankIcon rank={rank.rank} size={32} />
+          <span className="side-rank-text">
+            <span className="side-rank-name">{rank.rank}</span>
+            <span className="side-rank-level">Level {rank.level}</span>
+          </span>
+        </Link>
+      )}
       <ul className="side-tabs">
         {TABS.map(({ tab, to, label, icon: Icon }) => (
           <li key={tab}>

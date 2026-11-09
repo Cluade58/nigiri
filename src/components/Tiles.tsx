@@ -6,7 +6,7 @@ import { Link } from 'react-router';
 import { cards, plural, NBSP } from '../lib/copy';
 import type { Deck } from '../lib/db';
 import { calendarWeeks, daysStudiedIn, heatStep, lastDays, streakOf, stripDays } from '../lib/progress';
-import { levelLine, levelOf, nextLine, stageLine, type StageCounts } from '../lib/xp';
+import { RANKS, levelLine, levelOf, nextLine, rankIndex, rankStart, stageLine, type StageCounts } from '../lib/xp';
 import { parseDayKey } from '../lib/time';
 import { Chevron } from './Icons';
 import { deckStyle } from './deckStyle';
@@ -98,7 +98,7 @@ function XpMeter({ fraction }: { fraction: number }) {
 }
 
 /**
- * The You tile (plan §2, §4, D75): the rank as the heading, "Level 5, 1,240 XP", the XP meter, what's
+ * The You tile (plan §2, §4, D75, D79): the 56px rank badge, the rank as the heading, "Level 5, 1,240 XP", the XP meter, what's
  * left to the next level, then the streak. On Today it adds the four-week calendar and See progress.
  */
 export function YouTile({ xp, perDay, now, onToday }: { xp: number; perDay: ReadonlyMap<string, number>; now: Date; onToday: boolean }) {
@@ -106,7 +106,7 @@ export function YouTile({ xp, perDay, now, onToday }: { xp: number; perDay: Read
   return (
     <section className="tile you" aria-labelledby="you-title">
       <div className="you-head">
-        <RankIcon rank={info.rank} />
+        <RankIcon rank={info.rank} size={56} />
         <div className="you-id">
           <h2 className="you-rank" id="you-title">
             {info.rank}
@@ -128,6 +128,41 @@ export function YouTile({ xp, perDay, now, onToday }: { xp: number; perDay: Read
           </Link>
         </>
       )}
+    </section>
+  );
+}
+
+/**
+ * Progress's Ranks tile (D80, rank-badges-plan.md "Chief's settlements"): all ten ranks in order, each a
+ * 56px badge, the name and the level it starts at. Reached ranks in full, the current one adds "You're
+ * here", ranks ahead are silhouettes with their name and level in ink-2. No accent. Each row's words
+ * are said once, by its sr-only line.
+ */
+export function RankLadder({ xp }: { xp: number }) {
+  const current = rankIndex(levelOf(xp).rank);
+  return (
+    <section className="tile ranks" aria-labelledby="ranks-title">
+      <h2 className="tile-title" id="ranks-title">
+        Ranks
+      </h2>
+      <ol className="rank-ladder">
+        {RANKS.map((rank, i) => {
+          const where = i < current ? 'reached' : i === current ? 'current rank' : 'not yet';
+          return (
+            <li key={rank} className={i === current ? 'is-current' : i > current ? 'is-ahead' : undefined}>
+              <RankIcon rank={rank} size={56} locked={i > current} />
+              <span className="rl-text" aria-hidden="true">
+                <span className="rl-name">{rank}</span>
+                <span className="rl-sub">
+                  <span className="rl-level">Level {rankStart(rank)}</span>
+                  {i === current && <span className="rl-here">You're here</span>}
+                </span>
+              </span>
+              <span className="sr-only">{`${rank}, level ${rankStart(rank)}, ${where}`}</span>
+            </li>
+          );
+        })}
+      </ol>
     </section>
   );
 }

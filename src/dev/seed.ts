@@ -21,6 +21,11 @@
 //   ?seed=session3#/review      6 due across 3 decks, 4 due tomorrow: Done's "This session" and "Next: 4 cards tomorrow."
 //   ?seed=sunday-streak#/review reviews yesterday, 3 due now: Done says "2 days in a row." with both days in the strip
 //   ?seed=practice#/deck/bio    a 12-card deck, nothing due: "Practice all 12 cards" on the deck page
+// Rank badges (B5, D79 to D81):
+//   ?seed=rankup#/review        5 cards due, XP 1 to 60 under Tamago (900): Done shows the rank-up
+//   ?seed=rankup-add#/deck/bio/add  225 XP (15 new cards): saving one card reaches Cucumber Roll on Add card
+//   ?seed=ladder#/progress      XP partway through Salmon: the Ranks tile with 5 reached, 5 ahead
+//   #/dev/badges                (no seed) every badge at 32, 56 and 120px, and locked
 import { Rating } from 'ts-fsrs';
 import type { Card, Deck, DeckColour, NigiriDb, Review, Test } from '../lib/db';
 import { DEFAULT_SETTINGS } from '../lib/db';
@@ -28,7 +33,7 @@ import { DRAFT_KEY } from '../lib/draft';
 import { newId } from '../lib/ids';
 import { newCardFields, reviewCard, type Grade, type Scheduler } from '../lib/scheduler';
 import { isTheme, saveTheme } from '../lib/theme';
-import { levelOf, xpOf, xpToReach } from '../lib/xp';
+import { RANK_STARTS, levelOf, xpOf, xpToReach } from '../lib/xp';
 import { addDaysToKey, localDayKey, startOfLocalDayOffset } from '../lib/time';
 
 const H = 3_600_000;
@@ -445,6 +450,38 @@ export async function seedFromUrl(db: NigiriDb, s: Scheduler): Promise<void> {
         if (left >= 1 && left <= 60) break;
         w.card(spanish, [`Verb ${i + 1}`, `Meaning ${i + 1}`], 9 * D - i * 1000, good(1 * D + i * 1000));
       }
+      break;
+    }
+    case 'rankup': {
+      // As ?seed=levelup, but the fillers stop 1 to 60 XP under the next rank's start (Tamago at 900 from
+      // here), so this session's 5 × 10 + 20 crosses it and Done shows the rank-up.
+      const bio = w.deck('bio', 'AP Bio unit 4', 'green', 40 * D);
+      BIO.forEach((c, i) => {
+        if (i < 4) w.cardSolid(bio, c, 30 * D);
+        else if (i < 9) w.card(bio, c, 19 * D, good(5 * D));
+        else w.card(bio, c, 19 * D, good(1 * D));
+      });
+      const spanish = w.deck('spanish', 'Spanish verbs', 'blue', 10 * D);
+      for (let i = 0; i < 400; i++) {
+        const xp = w.xp();
+        const nextStart = RANK_STARTS.map(xpToReach).find((t) => t > xp) ?? Infinity;
+        if (nextStart - xp >= 1 && nextStart - xp <= 60) break;
+        w.card(spanish, [`Verb ${i + 1}`, `Meaning ${i + 1}`], 9 * D - i * 1000, good(1 * D + i * 1000));
+      }
+      break;
+    }
+    case 'rankup-add': {
+      // 15 new cards, 225 XP (15 each): one more card on Add card makes 240, Cucumber Roll's start.
+      const bio = w.deck('bio', 'AP Bio unit 4', 'green', 2 * D);
+      for (let i = 0; i < 15; i++) w.card(bio, i < BIO.length ? BIO[i] : [`Term ${i + 1}`, `Meaning ${i + 1}`], 1 * D - i * 1000);
+      break;
+    }
+    case 'ladder': {
+      // The ?seed=due decks plus Spanish fillers (25 XP each) until XP is partway through Salmon (3,300
+      // to 5,699): about 3,700.
+      threeDecks(w, 'due');
+      const spanish = w.deck('spanish', 'Spanish verbs', 'blue', 30 * D);
+      for (let i = 0; i < 400 && w.xp() < 3700; i++) w.card(spanish, [`Verb ${i + 1}`, `Meaning ${i + 1}`], 29 * D - i * 1000, good(2 * D + i * 1000));
       break;
     }
     case 'zero-xp': {

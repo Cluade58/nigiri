@@ -1,4 +1,4 @@
-// XP, levels and sushi ranks (D73), and the deck bar's Solid (D74). Everything is counted from saved
+// XP (D73), levels and the ten sushi ranks (D79), and the deck bar's Solid (D74). Everything is counted from saved
 // reviews and cards, like the streak: nothing new is stored, so Export and Restore carry it all, and
 // the number can go down when a card (and its reviews) is deleted. XP never depends on the rating.
 // Days are the phone's local calendar days (D58). Pure: no function reads the clock.
@@ -126,24 +126,50 @@ export function xpOfDay(cards: readonly XpCard[], reviews: readonly XpReview[], 
 
 // ---------- Levels and ranks ----------
 
-export const RANKS = ['Rice', 'Tamago', 'Cucumber', 'Salmon', 'Tuna', 'Otoro', 'Master'] as const;
+/** D79: ten sushi ranks, Rice Grain to Omakase (mockups/rank-badges-plan.md). */
+export const RANKS = ['Rice Grain', 'Cucumber Roll', 'Tamago', 'Sweet Shrimp', 'Salmon', 'Yellowtail', 'Ikura', 'Chutoro', 'Otoro', 'Omakase'] as const;
 export type Rank = (typeof RANKS)[number];
 
-/** XP level L needs to reach level L + 1: round(100 × 1.4^(L−1) / 10) × 10. */
+/** The level each rank starts at, in RANKS order (D79). Omakase is 38 and up. */
+export const RANK_STARTS: readonly number[] = [1, 3, 6, 9, 12, 16, 20, 25, 31, 38];
+
+/** The rank-up line under each rank's name (the plan's table). */
+export const RANK_FLAVOUR: Record<Rank, string> = {
+  'Rice Grain': 'Every chef starts with one grain.',
+  'Cucumber Roll': 'Small, crisp, and rolled tight.',
+  Tamago: "You've earned your first nori belt.",
+  'Sweet Shrimp': "Tail up. You're getting the hang of it.",
+  Salmon: 'The one everybody orders.',
+  Yellowtail: 'Smooth, cool, a little fancy.',
+  Ikura: 'Every card a little jewel.',
+  Chutoro: 'Marbled. Halfway to legend.',
+  Otoro: 'Melts in your mouth. Rare air.',
+  Omakase: 'The chef trusts you with anything.',
+};
+
+/** XP level L needs to reach level L + 1 (D79): 100 + 40 × (L − 1). */
 export function needFor(level: number): number {
-  return Math.round((100 * Math.pow(1.4, level - 1)) / 10) * 10;
+  return 100 + 40 * (Math.max(1, level) - 1);
 }
 
-/** Total XP at which level L starts (level 1 starts at 0). */
+/** Total XP at which level L starts (level 1 starts at 0): 100(L−1) + 20(L−1)(L−2). */
 export function xpToReach(level: number): number {
-  let sum = 0;
-  for (let l = 1; l < level; l++) sum += needFor(l);
-  return sum;
+  const n = Math.max(1, Math.floor(level)) - 1;
+  return 100 * n + 20 * n * (n - 1);
 }
 
-/** Every 3 levels: Rice 1–3, Tamago 4–6, … Otoro 16–18, Master 19 and up. */
+/** Where `rank` sits in RANKS (0 for Rice Grain), for comparing two ranks. */
+export const rankIndex = (rank: Rank): number => RANKS.indexOf(rank);
+
+/** The level a rank starts at: Salmon is 12. */
+export const rankStart = (rank: Rank): number => RANK_STARTS[rankIndex(rank)];
+
+/** The last rank whose start level is at or below `level` (D79): Rice Grain 1–2, … Omakase 38 and up. */
 export function rankOf(level: number): Rank {
-  return RANKS[Math.min(RANKS.length - 1, Math.floor((Math.max(1, level) - 1) / 3))];
+  const l = Math.max(1, level);
+  let i = 0;
+  while (i + 1 < RANK_STARTS.length && RANK_STARTS[i + 1] <= l) i += 1;
+  return RANKS[i];
 }
 
 export interface LevelInfo {
@@ -161,7 +187,7 @@ export interface LevelInfo {
 }
 
 export function levelOf(xp: number): LevelInfo {
-  const total = Math.max(0, Math.floor(xp));
+  const total = Number.isFinite(xp) ? Math.max(0, Math.floor(xp)) : 0;
   let level = 1;
   let start = 0;
   while (start + needFor(level) <= total) {
@@ -174,7 +200,7 @@ export function levelOf(xp: number): LevelInfo {
   return { level, rank, xp: total, into: total - start, need, toNext: start + need - total, nextRank: next !== rank ? next : null };
 }
 
-/** "120 XP to level 6", or "120 XP to Salmon" when the next level starts a rank. */
+/** "140 XP to level 4", or "140 XP to Cucumber Roll" when the next level starts a rank. */
 export function nextLine(info: LevelInfo): string {
   const n = info.toNext.toLocaleString();
   return info.nextRank ? `${n}${NBSP}XP to ${info.nextRank}` : `${n}${NBSP}XP to level ${info.level + 1}`;

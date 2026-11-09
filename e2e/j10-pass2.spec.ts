@@ -37,7 +37,7 @@ test('J10: a practice round shows every card and writes nothing (D77)', async ({
     await rate(page, 'Good');
   }
   await page.getByRole('link', { name: 'Back to home' }).click();
-  const you = page.getByRole('region', { name: /Rice|Level/ }).first();
+  const you = page.getByRole('region', { name: /Rice Grain|Level/ }).first();
   await expect(you).toContainText('1 day in a row');
   const youBefore = await you.innerText();
 

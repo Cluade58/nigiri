@@ -40,7 +40,7 @@ test('J9: Added list, You tile, formatting and XP on Done', async ({ page }) => 
 
   // Today: Getting started has two steps done, and the You tile is at level 1 with 60 XP.
   await expect(page.getByRole('heading', { name: 'Getting started' })).toBeVisible();
-  const you = page.getByRole('region', { name: 'Rice' });
+  const you = page.getByRole('region', { name: 'Rice Grain' });
   await expect(you).toContainText('Level 1, 60\u00A0XP');
   await expect(you).toContainText('40\u00A0XP to level 2');
   await expect(you).toContainText('Review a card to start a streak.');
@@ -74,6 +74,6 @@ test('J9: Added list, You tile, formatting and XP on Done', async ({ page }) => 
 
   // Back on Today: Getting started is gone after the first review, and the You tile says level 2.
   await expect(page.getByRole('heading', { name: 'Getting started' })).toHaveCount(0);
-  await expect(page.getByRole('region', { name: 'Rice' })).toContainText('Level 2, 120\u00A0XP');
-  await expect(page.getByRole('region', { name: 'Rice' })).toContainText('1\u00A0day in a row');
+  await expect(page.getByRole('region', { name: 'Rice Grain' })).toContainText('Level 2, 120\u00A0XP');
+  await expect(page.getByRole('region', { name: 'Rice Grain' })).toContainText('1\u00A0day in a row');
 });

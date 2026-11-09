@@ -5,7 +5,7 @@
 // share holds back; the order, "N left", the countdown and Done work as in any session.
 // Round 1 (plan §3, §7, §8a): the card's marks render on both sides, a short answer reads larger, and
 // Done adds the streak strip, the XP ledger (each part's change since the session began, D73) and a
-// level-up line.
+// level-up line, or the rank-up when the rank changed (D79, D80).
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { Link, Navigate } from 'react-router';
 import { Rating } from 'ts-fsrs';
@@ -26,7 +26,7 @@ import { loadSnapshot, loadXp, withSavedRating, type Snapshot } from '../lib/sna
 import { testApplies } from '../lib/testMode';
 import { startOfLocalDay } from '../lib/time';
 import { orderDecks } from '../lib/today';
-import { levelOf, type XpParts, type XpReview } from '../lib/xp';
+import { RANK_FLAVOUR, levelOf, rankIndex, type LevelInfo, type XpParts, type XpReview } from '../lib/xp';
 import { CardPile } from './CardPile';
 import { StorageError } from './StorageError';
 import { useTitle } from './useTitle';
@@ -478,11 +478,53 @@ function useCountUp(target: number, delay = 600, duration = 480): number {
   return reduce ? target : shown;
 }
 
+/** When the total's count-up ends (600 ms wait + 480 ms): the rank-up starts then. */
+const COUNT_UP_END = 1080;
+
+/**
+ * The rank-up (rank-badges-plan.md, D80): a centred block with the 120px badge, the rank's name at the
+ * XP total's size, "Level N" and the rank's line. Motion (round1.css): the badge plops in over 320 ms,
+ * three sparkles follow 60 ms apart and fade by 1.2 s, one blink at 1.4 s; nothing loops, and reduced
+ * motion shows the final state at once. Screen readers hear one polite line; its words are set just after
+ * the block appears, so the live region announces them.
+ */
+function RankUp({ info, delay }: { info: LevelInfo; delay: number }) {
+  const said = `New rank: ${info.rank}. Level ${info.level}.`;
+  const [live, setLive] = useState('');
+  useEffect(() => {
+    const t = window.setTimeout(() => setLive(said), 100);
+    return () => window.clearTimeout(t);
+  }, [said]);
+  return (
+    <div className="rank-up" style={{ '--rk-delay': `${delay}ms` } as CSSProperties}>
+      <div className="rank-up-art" aria-hidden="true">
+        <RankIcon rank={info.rank} size={120} />
+        <svg className="rank-up-sparks" viewBox="0 0 168 152" focusable="false">
+          <path className="rk-spark" d="M22 34Q22 44 32 44Q22 44 22 54Q22 44 12 44Q22 44 22 34Z" />
+          <path className="rk-spark" d="M148 22Q148 30 156 30Q148 30 148 38Q148 30 140 30Q148 30 148 22Z" />
+          <path className="rk-spark" d="M150 100Q150 107 157 107Q150 107 150 114Q150 107 143 107Q150 107 150 100Z" />
+        </svg>
+      </div>
+      <p className="rank-up-name" aria-hidden="true">
+        {info.rank}
+      </p>
+      <p className="t-secondary rank-up-level" aria-hidden="true">
+        Level {info.level}
+      </p>
+      <p className="sr-only" aria-live="polite">
+        {live}
+      </p>
+      <p className="t-secondary rank-up-line">{RANK_FLAVOUR[info.rank]}</p>
+    </div>
+  );
+}
+
 const signed = (n: number) => `${n < 0 ? '−' : '+'}${Math.abs(n).toLocaleString()}`;
 
 /**
  * Plan §3(d, e): the ledger. Each row is that part's change since the session began, non-zero rows
- * only; the total is their sum, so it is D73's change. Then the level-up line, if the level went up.
+ * only; the total is their sum, so it is D73's change. Then, if the rank changed, the rank-up (D79,
+ * D80: the final rank only, no tap); otherwise the one level-up line, if the level went up.
  */
 function XpLedger({ start, end }: { start: XpParts; end: XpParts }) {
   const rows = [
@@ -496,6 +538,7 @@ function XpLedger({ start, end }: { start: XpParts; end: XpParts }) {
   const before = levelOf(start.total);
   const after = levelOf(end.total);
   const up = after.level > before.level;
+  const rankUp = rankIndex(after.rank) > rankIndex(before.rank);
 
   if (rows.length === 0) return <p className="done-zero">No new XP: these cards already counted today.</p>;
   return (
@@ -515,11 +558,15 @@ function XpLedger({ start, end }: { start: XpParts; end: XpParts }) {
           </div>
         ))}
       </dl>
-      {up && (
-        <p className="level-up" style={{ animationDelay: `${600 + rows.length * 80}ms` }}>
-          <RankIcon rank={after.rank} size={64} />
-          <span>{after.rank !== before.rank ? `Up to level ${after.level}: ${after.rank}.` : `Up to level ${after.level}.`}</span>
-        </p>
+      {rankUp ? (
+        <RankUp info={after} delay={COUNT_UP_END} />
+      ) : (
+        up && (
+          <p className="level-up" style={{ animationDelay: `${600 + rows.length * 80}ms` }}>
+            <RankIcon rank={after.rank} size={56} />
+            <span>Up to level {after.level}.</span>
+          </p>
+        )
       )}
     </div>
   );

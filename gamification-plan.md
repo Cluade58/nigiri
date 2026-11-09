@@ -37,7 +37,7 @@ _Draft plan, 2026-11-09. The user asked for "streaks, xp, leagues, and that stuf
 |---|---|---|
 | **Daily quest** | Three small tasks each day, picked from what you can actually do: "Review 10 cards", "Write 3 cards", "Finish everything due". Each one is worth bonus XP. If nothing is due, no quest asks you to review. No penalty for skipping. | Medium |
 | **Achievements** | A collection on Progress, each with a drawn badge: first deck, 10/50/100/500 cards written, 7/30/100-day streak, 1,000 reviews, a test deck fully studied. Locked ones show as outlines, so you see what's next. | Medium |
-| **Level-up moment** | A full-card moment on Done when you rank up: the new sushi icon drops in, with your new title. One tap to continue. It's the one place a bigger animation is allowed. | Small |
+| **Level-up moment** | A full-card moment on Done when you rank up: the new sushi icon drops in, with your new title. No tap needed: Back to home stays the one button (decided 2026-11-09, D80). It's the one place a bigger animation is allowed. | Small |
 | **Weekly recap** | On Progress: "This week: 240 XP, 31 cards written, best day Wednesday." | Small |
 
 ## Iteration 3: leagues with everybody (needs a server)

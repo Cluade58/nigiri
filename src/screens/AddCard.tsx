@@ -4,6 +4,8 @@
 // Round 1 plan §6: cards saved since this screen opened are listed under the form ("Added this time"),
 // newest first; tap one to edit or delete it in the edit sheet. Nothing about the list is stored.
 // Plan §7: a hint under Back says how to make bold text and lists.
+// D81: when the cards written on this visit take you to a new rank, the Added header says so, with the
+// 56px badge. Worked out from XP when the screen opened and XP now; nothing is stored.
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { Link, Navigate } from 'react-router';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -18,7 +20,9 @@ import { isQuotaError } from '../lib/errors';
 import { EmptySideError, MissingDeckError, addCard, cleanSide } from '../lib/saves';
 import { FORMAT_HINT, plainMarks } from '../lib/marks';
 import { orderDecks } from '../lib/today';
-import { XP_PER_CARD } from '../lib/xp';
+import { loadXp } from '../lib/snapshot';
+import { XP_PER_CARD, levelOf, rankIndex } from '../lib/xp';
+import { RankIcon } from '../components/RankIcon';
 import { EditSheet } from './EditSheet';
 import { useTitle } from './useTitle';
 
@@ -64,6 +68,24 @@ export function AddCard({ deckId: fixedDeckId }: { deckId?: string }) {
   const pendingFocus = useRef<'opener' | 'front' | null>(null);
   /** Bumped when pendingFocus is set, so the effect below runs after that render. */
   const [focusTick, setFocusTick] = useState(0);
+
+  // D81: XP when this screen opened (read once), and XP now (live, so an edit-sheet delete counts too).
+  const [startXp, setStartXp] = useState<number | null>(null);
+  useEffect(() => {
+    let alive = true;
+    loadXp(db).then(
+      (r) => {
+        if (alive) setStartXp(r.xp.total);
+      },
+      () => {}, // no rank-up line then; saving still works
+    );
+    return () => {
+      alive = false;
+    };
+  }, [db]);
+  const xpNow = useLiveQuery(() => loadXp(db).then((r) => r.xp.total), [db]);
+  const newRank =
+    startXp !== null && xpNow !== undefined && rankIndex(levelOf(xpNow).rank) > rankIndex(levelOf(startXp).rank) ? levelOf(xpNow).rank : null;
 
   const decks = useMemo(() => (lists ? orderDecks(lists.decks, new Map(lists.tests.map((t) => [t.deckId, t])), now) : []), [lists, now]);
   const deck = decks.find((d) => d.id === deckId);
@@ -353,6 +375,9 @@ export function AddCard({ deckId: fixedDeckId }: { deckId?: string }) {
             )}
             {status.kind === 'error' && status.text}
           </p>
+          <p className="sr-only" aria-live="polite">
+            {newRank && added.length > 0 ? `New rank: ${newRank}.` : ''}
+          </p>
           <button className="btn btn-primary" type="submit" form="add-card-form" disabled={saving}>
             Save card
           </button>
@@ -364,6 +389,12 @@ export function AddCard({ deckId: fixedDeckId }: { deckId?: string }) {
               <h2 id="added-title">Added this time</h2>
               <span className="added-xp">+{(XP_PER_CARD * added.length).toLocaleString()}{NBSP}XP</span>
             </div>
+            {newRank && (
+              <p className="added-rank" key={newRank}>
+                <RankIcon rank={newRank} size={56} />
+                <span>New rank: {newRank}.</span>
+              </p>
+            )}
             <ul className="card-list added-list">
               {added.map(({ card, deck: d, edits }) => (
                 <li key={card.id}>

@@ -1,0 +1,11 @@
+/* Dev only: the #/dev/badges gallery (B5). Imported only by BadgeGallery.tsx, so it isn't in the build. */
+.dev-gallery { padding: 16px; }
+.dev-gallery h1 { font-family: var(--font-head); font-size: 24px; margin-bottom: 12px; }
+.dev-gallery table { border-collapse: separate; border-spacing: 8px; }
+.dev-gallery th { font-size: 13px; font-weight: 600; text-align: center; vertical-align: bottom; }
+.dev-gallery th span { display: block; font-weight: 400; color: var(--ink-2); }
+.dev-gallery tbody th { text-align: left; vertical-align: middle; color: var(--ink-2); }
+.dev-gallery td { text-align: center; vertical-align: middle; }
+.dev-gallery td svg { margin: 0 auto; }
+.dev-gallery-page { margin: 16px 0 8px; font-size: 15px; color: var(--ink-2); }
+.dev-gallery-strip { display: flex; flex-wrap: wrap; gap: 8px; }

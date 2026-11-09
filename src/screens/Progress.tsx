@@ -1,10 +1,10 @@
 // Progress (D66, D67, plan §6; round 1 plan §4): the You tile (rank, level, XP and the streak), an
-// 8-week calendar of days studied, the totals since you started, and the last 7 days. All counted from saved reviews and cards; nothing new is stored.
+// 8-week calendar of days studied, the totals since you started, the last 7 days, and the ten ranks (D80). All counted from saved reviews and cards; nothing new is stored.
 // No filled button here: nothing on this screen is an action.
 import { format } from 'date-fns';
 import { useMemo, useRef } from 'react';
 import { useNow, useReviewHistory, useSnapshot } from '../app/hooks';
-import { WeekTile, YouTile, dateOfKey } from '../components/Tiles';
+import { RankLadder, WeekTile, YouTile, dateOfKey } from '../components/Tiles';
 import { cards, NBSP } from '../lib/copy';
 import { calendarWeeks, cardsPerDay, heatStep, totalsOf, type CalendarCell } from '../lib/progress';
 import { lastSevenDays } from '../lib/today';
@@ -128,6 +128,10 @@ export function Progress() {
             </div>
           )}
         </div>
+      </div>
+      {/* D80: the ten ranks under the grid, full width; two columns inside the tile from 48em. */}
+      <div className="g-ranks">
+        <RankLadder xp={xp} />
       </div>
     </main>
   );
