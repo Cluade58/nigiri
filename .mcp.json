@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "shadcn": {
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
+    },
+    "watermelon": {
+      "type": "http",
+      "url": "https://mcp.watermelon.sh/mcp"
+    }
+  }
+}
