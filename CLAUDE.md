@@ -44,6 +44,8 @@
 - Its font pairings and styles don't apply: the fonts and layout stay as decided. Where its numbers differ from the briefs, the briefs win.
 - Its SKILL.md runs the search script through `${CLAUDE_PLUGIN_ROOT}`, which isn't set in this project. From the project root, the script is at `.claude/skills/ui-ux-pro-max/scripts/search.py`. Agents without a shell read the `references/` and `data/` files directly.
 
+**`apple-hig`** (`~/.claude/skills/apple-hig/`, user-wide, from dickwu/apple-design-skill, added by the user on 2026-11-26) is attached to **ui-designer** only, as a review checklist built on Apple's Human Interface Guidelines. Use its general principles (feedback, forms, navigation, dark mode, accessibility, typography, motion) and mark iOS-only features not applicable. The briefs and the four themes win over it. It's a different skill from the older `apple-design` motion skill, which no agent uses.
+
 ## Agent workflow
 
 Nine agents live in `.claude/agents/`, and each agent's file holds its full instructions. [chief-officer](.claude/agents/chief-officer.md) runs the work: start it with `/iterate-project` ([SKILL.md](.claude/skills/iterate-project/SKILL.md)) or `claude --agent chief-officer`. Its file holds the task contracts, design-skill loading, research standards, phase gates and acceptance rules. This section only adds this project's limits.
